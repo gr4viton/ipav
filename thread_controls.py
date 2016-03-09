@@ -75,7 +75,7 @@ class Chain():
 
 
         if self.name in ['standard']:
-            self.step_names = ['original', 'resize', 'gray', 'thresholded']
+            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
 
         if self.name in self.load_data_chain_names:
             self.load_data()
@@ -83,7 +83,7 @@ class Chain():
 
     def load_data(self):
         # self.data = LockedValue( [1,2,3,42,69] )
-        self.data = [1,2,3,42,69]
+        self.data = [1, 2, 3, 42, 69]
         pass
 
 

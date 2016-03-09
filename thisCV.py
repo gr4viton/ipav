@@ -2,6 +2,9 @@ import numpy as np
 import cv2
 
 import findHomeography as fh
+
+from subprocess import Popen, PIPE
+
 # from cv2 import xfeatures2d
 # import common
 import time
@@ -290,9 +293,47 @@ class StepControl():
             self.recreate_buffer(im)
         return self.buffer
 
-
     def add_available_step(self, name, function):
         self.available_steps[name] = Step(name, function)
+
+    def select_steps(self, current_chain):
+        self.chain = current_chain
+
+        if current_chain.tag_search == True:
+            def make_find_tags(im):
+                markuped_scene, seen_tags = findTagsInScene(im.copy(), self.chain)
+                self.seen_tags = seen_tags
+                return markuped_scene
+
+            # add find tag with currentyl selected current_chain
+            findtag_name = 'findTags'
+            self.available_steps.pop(findtag_name, None)
+            self.add_available_step(findtag_name, make_find_tags)
+
+        # create steps list for this current_chain algorithm
+        self.steps = []
+        [self.steps.append(self.available_steps[step_name]) for step_name in self.chain.step_names]
+
+
+    def __init__(self, resolution_multiplier, current_chain):
+
+        self.resolution_multiplier = resolution_multiplier
+        self.define_available_steps()
+        self.select_steps(current_chain)
+
+
+    # def add_operation(self):
+    #     pass
+
+    def run_all(self, im):
+        for step in self.steps:
+            im = step.run(im)
+        self.ret = im
+
+    def step_all(self, im, resolution_multiplier):
+        self.resolution_multiplier = resolution_multiplier
+        self.run_all(im)
+
 
     def define_available_steps(self):
 
@@ -566,6 +607,33 @@ class StepControl():
             # return im_gray
             return im_out
 
+        # "blender myscene.blend --background --python myscript.py"
+        blender_path = "C:\\PROG\\grafic\\Blender\\blender.exe -b"
+        script_path = "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"
+        blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+
+        cmd = str('--python "'+script_path+'"')
+        print(cmd)
+
+        out = blender.stdout.readline()
+        print(out)
+        out = blender.stdout.readline()
+        print(out)
+        out = blender.stdout.readline()
+        print(out)
+
+        # out,err = blender.communicate('--python "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"')
+        # out,err = blender.communicate(cmd)
+        # print(err)
+        def make_blender_cube(im):
+            # sp.check_output(["echo", "Hello World!"])
+
+            # out, err = p.communicate("2\n6\n")
+            # print(out)
+
+            im_out = im
+            return im_out
+
         self.add_available_step('original', make_nothing)
         self.add_available_step('gray', make_gray)
         self.add_available_step('clahed', make_clahe)
@@ -596,6 +664,8 @@ class StepControl():
         self.add_available_step('freak', make_freak)
         self.add_available_step('fast', make_fast)
 
+        self.add_available_step('blender cube', make_blender_cube)
+
         # self.available_steps.append(Step('original', make_nothing))
         # self.available_steps.append(Step('gray', make_gray))
         # self.steps.append(Step('clahed', make_clahe))
@@ -611,47 +681,9 @@ class StepControl():
         # self.available_steps.append(Step('flooded w/black', lambda im: make_flood(im, 0)))
 
 
-    def select_steps(self, current_chain):
-        self.chain = current_chain
 
-        if current_chain.tag_search == True:
-            def make_find_tags(im):
-                markuped_scene, seen_tags = findTagsInScene(im.copy(), self.chain)
-                self.seen_tags = seen_tags
-                return markuped_scene
-
-            # add find tag with currentyl selected current_chain
-            findtag_name = 'findTags'
-            self.available_steps.pop(findtag_name, None)
-            self.add_available_step(findtag_name, make_find_tags)
-
-        # create steps list for this current_chain algorithm
-        self.steps = []
-        [self.steps.append(self.available_steps[step_name]) for step_name in self.chain.step_names]
-
-
-    def __init__(self, resolution_multiplier, current_chain):
-
-        self.resolution_multiplier = resolution_multiplier
-        self.define_available_steps()
-        self.select_steps(current_chain)
-
-
-    def add_operation(self):
-        pass
-
-    def run_all(self, im):
-        for step in self.steps:
-            im = step.run(im)
-        self.ret = im
-
-    def step_all(self, im, resolution_multiplier):
-        self.resolution_multiplier = resolution_multiplier
-        self.run_all(im)
-
-
-def add_operation(operation_name, im_steps, im):
-    return im_steps.insert(0, [operation_name, [im]] )
+# def add_operation(operation_name, im_steps, im):
+#     return im_steps.insert(0, [operation_name, [im]] )
 
 # def loopCV(cap):
 #     print("loopCV started")
