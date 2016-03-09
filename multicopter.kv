@@ -1,0 +1,319 @@
+#:kivy 1.9
+
+
+<Multicopter>:
+    cols: 2
+    gl_left: gl_left
+#    gl_middle: gl_middle
+#    gl_right: gl_right
+    img_webcam: img_webcam
+    img_tags: img_tags
+    txt_numFound: txt_numFound
+#    sla_tags: sla_tags
+    layout_steps: layout_steps
+#    img_steps: img_steps # temporal
+#    label_mean_exec_time: label_mean_exec_time
+    grid_img_tags: grid_img_tags
+    # lb_webcam_resolution: lb_webcam_resolution
+
+#    ScrollView:
+#        Label:
+#            text: str('looooooong text '*1000)
+#            font_size: 12
+#            text_size: self.width, None
+#            size_hint_y: None
+#            height: self.texture_size[1]
+    GridLayout:
+#        size_hint_x: 1
+        cols:1
+        id: gl_left
+#        padding: 10
+#        canvas.before:
+#            Color:
+#                rgba: 0, 1, 0, 1
+#            Rectangle:
+#                # self here refers to the widget i.e FloatLayout
+#                pos: self.pos
+#                size: self.size
+
+        Button:
+            text: "Hide all steps"
+            size_hint_y: 0.1
+            on_press: root.step_widgets_control.show('none')
+        Button:
+            text: "Show all steps"
+            size_hint_y: 0.1
+            on_press: root.step_widgets_control.show('all')
+        Button:
+#            text: 'Switch cameras'
+            text: 'Toggle computing'
+            size_hint_y: .1
+            on_press: root.findtag_control.toggle_findtagging()
+            # pos_hint: {'center_x':.5, 'center_y': .5}
+        Button:
+            text: 'Toggle capturing'
+            size_hint_y: .1
+            on_press: root.capture_control.toggle_capturing();
+        Button:
+            text: 'Switch cameras'
+            size_hint_y: .1
+            on_press: root.capture_control.toggle_source_id();
+            # pos_hint: {'center_x':.5, 'center_y': .5}
+
+        Image:
+            id: img_webcam
+            size_hint_y: 1
+
+        GridLayout:
+            cols: 1
+            size_hint_y: 0.3
+            padding: (2,2,2,2)
+            spacing: (2,2)
+            margin: 5
+            color: .08, .16 , .24
+            canvas.before:
+                Color:
+                    rgb: self.color
+                Rectangle:
+                    pos: self.x + self.margin, self.y + self.margin + 1
+                    size: self.width - 2 * self.margin , self.height - 2 * self.margin
+    #            size_hint_x: 1
+            Label:
+                text: "Camera resolution"
+            Label:
+                #id: lb_webcam_resolution
+#                size_hint_y: .1
+                text: root.lb_webcam_resolution
+
+        GridLayout:
+            cols: 1
+            size_hint_y: 0.3
+            padding: (2,2,2,2)
+            spacing: (2,2)
+            margin: 5
+            color: .08, .16 , .24
+            canvas.before:
+                Color:
+                    rgb: self.color
+                Rectangle:
+                    pos: self.x + self.margin, self.y + self.margin + 1
+                    size: self.width - 2 * self.margin , self.height - 2 * self.margin
+
+            Label:
+                text: 'Resolution multiplier'
+            Label:
+                text: str(slider_resolution_div.value)
+            Slider:
+                id: slider_resolution_div
+                sla_steps: 42
+                value: 0.5
+                min: 0.05
+                max: 2
+                on_value: root.findtag_control.set_resolution_div(self.value);
+
+
+
+        GridLayout:
+            cols: 2
+            size_hint_y: None
+            padding: (2,2,2,2)
+            spacing: (2,2)
+            margin: 5
+            color: .08, .16 , .24
+            canvas.before:
+                Color:
+                    rgb: self.color
+                Rectangle:
+                    pos: self.x + self.margin, self.y + self.margin + 1
+                    size: self.width - 2 * self.margin , self.height - 2 * self.margin
+
+#            row_force_default: 'true'
+#            row_default_height: 15
+
+            Label:
+                size_hint_x: 2
+                text: "Found tags"
+                halign: "right"
+                valign: "middle"
+                text_size: self.size
+#                pos_hint_x: 10
+            Label:
+#                size_hint_x: None
+                id: txt_numFound
+
+            Label:
+                text: "Chain last [ms]"
+                halign: 'right'
+                valign: "middle"
+                text_size: self.size
+            Label:
+                text: root.label_mean_exec_time_last
+            Label:
+                text: "Chain mean [ms]"
+                halign: 'right'
+                valign: "middle"
+                text_size: self.size
+            Label:
+                text: root.label_mean_exec_time
+#                size_hint_y: 0.2
+    #            text: root.findtag_control.mean_exec_time
+#        Label:
+#            text:
+#                'splitter.width: {}\nparent.width: {}\nmax_size: {}'\
+#                .format(spl.width, root.width, spl.max_size)
+
+    Splitter:
+        id: spl
+
+#        width: 1100
+        max_size: self.parent.width - 50
+#        spl.width : 1100
+#        self.width
+        size: 1100, 400
+        size_hint: None,1
+
+        GridLayout:
+            cols: 2
+#            width: 1100
+#            size_hint_x: 1
+#            orientation: 'vertical'
+#            id: gl_middle
+#            id: sla_steps
+            padding: 5
+#            ScrollView:
+#                size: root.size
+    #            do_scroll: 1
+#            ScrollView:
+#                viewport_size: root.size
+#                do_scroll_x: False
+
+            GridLayout:
+                cols:2
+                id: grid_steps
+                ScrollView:
+                    id: scroll_steps
+    #                    do_scroll_y: 'True'
+    #                    size_hint: 1, None
+    #                    size: grid_steps.size
+    #                    minimum_height
+                    StackLayout:
+                        height: self.minimum_height -0
+                        size_hint_y: None
+#                        size_hint_x: 1
+    #                        allow_stretch: True
+    #                        height: scroll_steps.height
+    #                        size_hint_y: 1
+                        id: layout_steps
+    #                        minimum_height = self.height
+                        orientation: 'lr-tb'
+        #                orientation: 'tb-lr'
+    #                        size_hint_x: 1
+
+            GridLayout:
+                id: grid_img_tags
+                cols: 1
+                size_hint_x: 0.2
+                margin: 1
+                color: 0.08, 0.16 , 0.24
+                padding: (2,2,2,2)
+                canvas.before:
+                    Color:
+                        rgb: self.color
+                    Rectangle:
+                        pos: self.x + self.margin, self.y + self.margin + 1
+                        size: self.width - 2 * self.margin , self.height - 2 * self.margin
+                Label:
+                    halign: 'left'
+                    font_size: 10
+                    do_rotation: 90
+                    text: root.tag_error_count_text
+                Image:
+                    id: img_tags
+
+#                    id: lb_tag_error_count
+    #        Button:
+    #            text: 'Save the matrix??'
+
+#        Splitter:
+#            vertical: 0
+#            GridLayout:
+#                size_hint_x: 0.5
+#                cols:1
+#                id: gl_right
+#                padding: 10
+#                Button:
+#                    text: 'Save the matrix??'
+        #
+        #        Button:
+        #            text: 'Exit'
+        #            on_press: Exit()
+
+
+#[ColoredGrid@GridLayout]:
+#    cols: 1
+#    size_hint_y: None
+##    height: self.minimum_height * 4
+##            height: 300
+##    size_hint_y: layout_steps_height / 400
+##            size_hint_x: 1/3
+#    cols: 1
+#    padding: (2,2,2,2)
+#    spacing: (2,2)
+#    margin: 5
+#    color: .08, .16 , .24
+#    canvas.before:
+#        Color:
+#            rgb: self.color
+#        Rectangle:
+#            pos: self.x + self.margin, self.y + self.margin + 1
+#            size: self.width - 2 * self.margin , self.height - 2 * self.margin
+#
+#    GridLayout:
+#        ctx.GridLayout
+
+<StepWidget>:
+    toggle_object: toggle
+    kivy_image: kivy_image
+    stat_label: stat_label
+#    layout_steps_height: 1500
+#    size_hint_y: 0.4
+    size_hint_y: None
+#    height: self.minimum_height * 4
+    height: 300
+#    size_hint_y: layout_steps_height / 400
+    size_hint_x: 1/3
+    cols: 1
+    padding: (2,2,2,2)
+    spacing: (2,2)
+    margin: 1
+    color: .08,.16 , .24
+    canvas.before:
+        Color:
+            rgb: self.color
+        Rectangle:
+            pos: self.x + self.margin, self.y + self.margin + 1
+            size: self.width - 2 * self.margin , self.height - 2 * self.margin
+#            self.thickness
+    ToggleButton:
+        id: toggle
+        text: root.name
+        size_hint_y: 0.15
+        state: 'down'
+        on_state: root.set_drawing(self.state == 'down')
+
+    Image:
+        id: kivy_image
+        size_hint_y: 0.8
+#        size_hint_x: 1
+        background_normal: 'True'
+    Label:
+        id: stat_label
+        valign: 'top'
+        size_hint_y: 0.08
+    #    on_touch_down: root.drawing = (toggle.state == 'down')
+    #    on_press: print('jasd')
+        #self.toggle_drawing()
+    #    root.drawing = (toggle_object.state == 'down')
+
+#    GridLayout
+#        cols: 1
