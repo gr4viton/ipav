@@ -203,12 +203,14 @@ class Multicopter(GridLayout):
 class multicopterApp(App):
     # frame = []
     # running_findtag = False
+    title = ''
     def build(self):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
         w = 1300
         Config.set('kivy', 'show_fps', 1)
         Config.set('kivy', 'desktop', 1)
+        # Config.set('kivy', 'name', 'a')
 
         # Config.set('graphics', 'window_state', 'maximized')
         Config.set('graphics', 'position', 'custom')

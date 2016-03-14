@@ -165,12 +165,10 @@
     Splitter:
         id: spl
 
-#        width: 1100
         max_size: self.parent.width - 50
-#        spl.width : 1100
-#        self.width
         size: 1100, 400
         size_hint: None,1
+
 
         GridLayout:
             cols: 2
@@ -212,10 +210,11 @@
             GridLayout:
                 id: grid_img_tags
                 cols: 1
-                size_hint_x: 0.2
+####                size_hint_x: 0.2
+                size_hint_x: 0
                 margin: 1
                 color: 0.08, 0.16 , 0.24
-                padding: (2,2,2,2)
+#####                padding: (2,2,2,2)
                 canvas.before:
                     Color:
                         rgb: self.color
@@ -224,11 +223,13 @@
                         size: self.width - 2 * self.margin , self.height - 2 * self.margin
                 Label:
                     halign: 'left'
-                    font_size: 10
+#                    font_size: 10
+                    font_size: 0
                     do_rotation: 90
                     text: root.tag_error_count_text
                 Image:
                     id: img_tags
+                    color: 0,0,0
 
 #                    id: lb_tag_error_count
     #        Button:

@@ -75,7 +75,10 @@ class Chain():
 
 
         if self.name in ['standard']:
-            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
+            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
+            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
+            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
+            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
 
         if self.name in self.load_data_chain_names:
             self.load_data()

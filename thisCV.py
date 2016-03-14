@@ -607,6 +607,19 @@ class StepControl():
             # return im_gray
             return im_out
 
+        def make_sobel(im, vertical=0, ksize=5):
+            # out = im.copy()
+            if vertical == 0:
+                sob = cv2.Sobel(im, cv2.CV_64F, 0, 1, ksize=ksize)
+            else:
+                sob = cv2.Sobel(im, cv2.CV_64F, 1, 0, ksize=ksize)
+
+            abs_sob = np.absolute(sob)
+            return np.uint8(abs_sob)
+
+        def make_laplacian(im):
+            return cv2.Laplacian(im,cv2.CV_64F)
+
         # "blender myscene.blend --background --python myscript.py"
         blender_path = "C:\\PROG\\grafic\\Blender\\blender.exe -b"
         script_path = "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"
@@ -663,6 +676,10 @@ class StepControl():
 
         self.add_available_step('freak', make_freak)
         self.add_available_step('fast', make_fast)
+        self.add_available_step('sobel horizontal', lambda im: make_sobel(im, vertical=0, ksize=5))
+        self.add_available_step('sobel vertical', lambda im: make_sobel(im, vertical=1, ksize=5))
+        self.add_available_step('laplacian', make_laplacian)
+
 
         self.add_available_step('blender cube', make_blender_cube)
 
