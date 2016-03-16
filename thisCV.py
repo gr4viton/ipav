@@ -649,6 +649,13 @@ class StepControl():
             im_out = im
             return im_out
 
+        def make_bounding_box_center():
+            """
+            from multiple camera segmented images - only bounding boxes of contours
+            center of bounding box -> line intersection = center of object
+
+            """
+
         self.add_available_step('original', make_nothing)
         self.add_available_step('gray', make_gray)
         self.add_available_step('clahed', make_clahe)

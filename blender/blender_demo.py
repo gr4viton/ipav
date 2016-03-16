@@ -5,24 +5,44 @@ import findHomeography as fh
 import sys
 import time
 import os
-from subprocess import Popen, PIPE
+from subprocess import Popen, PIPE, STDOUT
 
+import select
 
 class blender_module():
+    outs = ['-','-','-']
 
     def print_stdout(self):
         printing = True
+
         while printing:
             out = self.blender.stdout.readline()
-            print(out[:-1].decode('utf-8'))
-            if not self.blender.stdout.isatty():
-                printing = False
+            str_out = out[:-1].decode('utf-8')
+            self.outs.append(str_out)
+
+            # if not self.blender.stdout.isatty():
+            #     return
+
+            # print(self.outs[-1])
+            a = ''.join([self.outs[-1], self.outs[-2], self.outs[-3]])
+            # print("x"*5, a, "y"*5)
+            if a == '':
+                return
+
+            print(str_out)
 
     def write_stdin(self, params):
         # self.blender.stdin.write(bytes(params, 'UTF-8'))
         # params += '\n\r'
-        self.blender.stdin.write(params.encode('utf-8'))
-        self.blender.stdin.flush()
+        # self.blender.stdin.write(params.encode('utf-8'))
+
+        param_bytes = params.encode('utf-8')
+        self.blender.stdin.write(param_bytes)
+
+        # self.blender.communicate(input=param_bytes)
+
+        # self.blender.stdin.flush()
+        print('>>> writed >>> ',params)
 
 
 
@@ -43,9 +63,7 @@ class blender_module():
         blender_path += params
         print(params)
         print(blender_path)
-        self.blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=PIPE) #, shell=False)
-
-        print('a')
+        self.blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT) #, shell=False)
 
         # blender.stdin.write(bytes(params, 'UTF-8'))
 
@@ -57,19 +75,21 @@ class blender_module():
         while(looping):
 
             params = 'exit'
-
-            self.write_stdin(params)
-            # print('sent data :', params)
-
             # params = 'render'
-            # write_stdin(params)
 
-            self.print_stdout()
+            # self.write_stdin(params)
+            # self.print_stdout()
+
+            param_bytes = params.encode('utf-8')
+            # grep_stdout = self.blender.communicate(input=param_bytes)[0]
+            self.blender.stdin.write(param_bytes)
+            grep_stdout = self.blender.communicate()[0]
+            print(grep_stdout)
 
             sys.stdout.flush()
-            time.sleep(0.05)
+            time.sleep(0.5)
 
-
+        self.blender.stdin.close()
 
 
 

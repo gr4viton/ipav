@@ -1,17 +1,23 @@
 import subprocess
 import threading
 # import StringIO
+import sys
+import select
 
 class terminal(threading.Thread):
     def run(self):
         self.prompt()
 
-    def prompt(self):
+    def prompt(self, command):
         x = True
         while x:
-            # command = raw_input(':')
-            command = ':'
-            x = self.interpret(command)
+            select.select((sys.stdin,),(),())
+            a = sys.stdin.read(1)
+            if not a == '\n':
+                sys.stdout.write(a)
+                sys.stdout.flush()
+            else:
+                x = self.interpret(command)
 
     def interpret(self,command):
         if command == 'exit':
@@ -29,6 +35,7 @@ class test(threading.Thread):
         line = p.stderr.readline()
         if not line: break
         print(line.strip())
+
 
 term = terminal()
 testcl = test()
