@@ -620,6 +620,8 @@ class StepControl():
         def make_laplacian(im):
             return cv2.Laplacian(im,cv2.CV_64F)
 
+
+        print("%"*42,"blendering")
         # "blender myscene.blend --background --python myscript.py"
         blender_path = "C:\\PROG\\grafic\\Blender\\blender.exe -b"
         script_path = "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"
@@ -636,7 +638,7 @@ class StepControl():
         print(out)
 
         # out,err = blender.communicate('--python "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"')
-        # out,err = blender.communicate(cmd)
+        # out,err = blender.communicate(params)
         # print(err)
         def make_blender_cube(im):
             # sp.check_output(["echo", "Hello World!"])
