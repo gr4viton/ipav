@@ -1,6 +1,6 @@
 import subprocess
 import threading
-import StringIO
+# import StringIO
 
 class terminal(threading.Thread):
     def run(self):
@@ -9,24 +9,26 @@ class terminal(threading.Thread):
     def prompt(self):
         x = True
         while x:
-            command = raw_input(':')
+            # command = raw_input(':')
+            command = ':'
             x = self.interpret(command)
 
     def interpret(self,command):
         if command == 'exit':
             return False
         else:
-            print 'Invalid Command'
+            print('Invalid Command')
         return True
 
 class test(threading.Thread):
     command = 'java -jar ../bukkit/craftbukkit.jar'
-    test = StringIO.StringIO()
-    p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    # test = StringIO.StringIO()
+    p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
+                         stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     while (p.poll() == None):
         line = p.stderr.readline()
         if not line: break
-        print line.strip()
+        print(line.strip())
 
 term = terminal()
 testcl = test()

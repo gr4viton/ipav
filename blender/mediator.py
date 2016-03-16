@@ -8,7 +8,8 @@ import sys
 import fileinput
 import time
 
-script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/')
+# script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/')
+script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
 script_file = 'render.py'
 # script_file = 'mediator.py'
 script_path = os.path.join(script_dir, script_file)
