@@ -26,11 +26,12 @@ class blender_module():
     script_path = os.path.join(script_dir, script_file)
 
     blender_server_path = os.path.join(script_dir, 'blender_server.py')
-    other_params = ' '.join(['-noglsl','-noaudio','-nojoystick',''])
-    blender_server = ' '.join([blender_path, '-b', other_params,'--python', blender_server_path])
+    other_params = ' '.join(['-noglsl','-noaudio','-nojoystick'])
+    # blender_server = ' '.join([blender_path, '-b', other_params,'--python', blender_server_path])
+    blender_server = ' '.join([blender_path, '-b', '--python', blender_server_path])
     print(blender_server)
 
-    PORT = 8082
+    PORT = 8083
     HOST = "localhost"
 
     def send_command(self, param):

@@ -3,7 +3,7 @@
 # Script to run from blender:
 #   blender --python blender_server.py
 
-PORT = 8082
+PORT = 8083
 HOST = "localhost"
 # HOST = "127.0.0.1"
 # HOST = "192.168.1.100"

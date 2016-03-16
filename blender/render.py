@@ -2,6 +2,8 @@ import bpy, mathutils, math
 from mathutils import Vector
 from math import pi
 import os
+import time
+from datetime import datetime
 
 def addTrackToConstraint(ob, name, target):
     cns = ob.constraints.new('TRACK_TO')
@@ -131,7 +133,9 @@ def add_isosphere():
 
 def render():
     # path = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/image.jpg')
-    path = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender/image.jpg')
+    # i = time.strftime("%Y-%m-%d %H_%M_%S", time.gmtime)
+    i = datetime.now().strftime("%Y-%m-%d %H_%M_%S")
+    path = os.path.abspath(''.join(['D:/DEV/PYTHON/pyCV/kivyCV_start/blender/pic/',str(i),'image.jpg']))
     bpy.data.scenes['Scene'].render.filepath = path
     bpy.ops.render.render( write_still=True ) 
 
