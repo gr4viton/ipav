@@ -2,6 +2,9 @@
 # Script to send paths to run in blender:
 #   blender_client.py script1.py script2.py
 
+# http://blender.stackexchange.com/questions/41533/how-to-remotely-run-a-python-script-in-an-existing-blender-instance
+
+
 PORT = 8081
 HOST = "localhost"
 

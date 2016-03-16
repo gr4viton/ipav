@@ -1,6 +1,7 @@
 import bpy, mathutils, math
 from mathutils import Vector
 from math import pi
+import os
 
 def addTrackToConstraint(ob, name, target):
     cns = ob.constraints.new('TRACK_TO')
@@ -129,7 +130,9 @@ def add_isosphere():
     cubeobject(location=(1, 1, 1))
 
 def render():
-    bpy.data.scenes['Scene'].render.filepath = 'D:\\DEV\\PYTHON\\pyCV\\blender_out\\image.jpg'
+    # path = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/image.jpg')
+    path = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender/image.jpg')
+    bpy.data.scenes['Scene'].render.filepath = path
     bpy.ops.render.render( write_still=True ) 
 
 if __name__ == "__main__":
