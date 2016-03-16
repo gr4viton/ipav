@@ -46,7 +46,7 @@ class blender_module():
 
 
 
-    def run(self):
+    def run2(self):
         print('%'*42, 'blendering')
         # 'blender myscene.blend --background --python myscript.py'
         blender_dif = os.path.abspath('C:/PROG/grafic/Blender/')
@@ -91,6 +91,56 @@ class blender_module():
 
         self.blender.stdin.close()
 
+    def run(self):
+        print('%'*42, 'blendering')
+        # 'blender myscene.blend --background --python myscript.py'
+        blender_dif = os.path.abspath('C:/PROG/grafic/Blender/')
+        blender_file = 'blender.exe'
+        blender_path = os.path.join(blender_dif, blender_file)
+
+        # script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/')
+        script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
+        script_file = 'render.py'
+        script_file = 'mediator.py'
+        script_path = os.path.join(script_dir, script_file)
+
+        b_param = ' -b'
+        main_param = ' '.join([b_param, '--python-console'])
+        params = str(' '.join([b_param, '--python', '"' + script_path + '"']))
+        params = str(' '.join([' --python', '"' + script_path + '"']))
+
+        # blender_path += b_param
+        blender_path += main_param
+        print(params)
+        print(blender_path)
+        self.blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT) #, shell=False)
+
+        # blender.stdin.write(bytes(params, 'UTF-8'))
+
+        self.print_stdout()
+
+        time.sleep(2)
+
+        looping = True
+        while(looping):
+
+            # params = 'exit'
+            # params = 'render'
+            params = 'print("hello world!"'
+            # self.write_stdin(params)
+            self.print_stdout()
+
+            param_bytes = params.encode('utf-8')
+            # grep_stdout = self.blender.communicate(input=param_bytes)[0]
+            self.blender.stdin.write(param_bytes)
+            grep_stdout = self.blender.communicate()[0]
+            print(param_bytes)
+            print(grep_stdout)
+
+            sys.stdout.flush()
+            time.sleep(0.5)
+
+        self.blender.stdin.close()
 
 
     # import_scene
