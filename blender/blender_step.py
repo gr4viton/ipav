@@ -26,19 +26,20 @@ class blender_module():
     script_path = os.path.join(script_dir, script_file)
 
     blender_server_path = os.path.join(script_dir, 'blender_server.py')
-    blender_server = blender_path + ' -b --python ' + blender_server_path
+    other_params = ' '.join(['-noglsl','-noaudio','-nojoystick',''])
+    blender_server = ' '.join([blender_path, '-b', other_params,'--python', blender_server_path])
+    print(blender_server)
 
-
-    PORT = 8081
+    PORT = 8082
     HOST = "localhost"
 
-    def send_command(self, argv):
+    def send_command(self, param):
         clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientsocket.connect((self.HOST, self.PORT))
 
         # for arg in sys.argv[1:]:
-        for arg in argv:
-            clientsocket.sendall(arg.encode("utf-8") + b'\x00')
+        # for arg in argv:
+        clientsocket.sendall(param.encode("utf-8") + b'\x00')
 
 
     def run(self):
@@ -47,19 +48,27 @@ class blender_module():
 
 
         # self.blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT) #, shell=False)
-        self.bs = Popen(self.blender_server, stdout=PIPE, stdin=PIPE, stderr=STDOUT) #, shell=False)
+        self.bs = Popen(self.blender_server, stdin=PIPE, stderr=STDOUT) #, shell=False)
 
         print('blender_server running and waiting for command!')
         # blender.stdin.write(bytes(params, 'UTF-8'))
 
         # self.print_stdout()
 
-        time.sleep(4)
+        time.sleep(1)
 
         looping = True
         while(looping):
             print('sending command >> ', self.script_path)
-            self.send_command(self.script_path)
+
+            param = self.script_path
+            # param_bytes = param.encode('utf-8')
+
+            self.send_command(param)
+
+
+            # self.bs.communicate()
+            # print(txt)
             #
             # param_bytes = params.encode('utf-8')
             # # grep_stdout = self.blender.communicate(input=param_bytes)[0]
@@ -69,7 +78,7 @@ class blender_module():
             # print(grep_stdout)
             #
             # sys.stdout.flush()
-            time.sleep(3.5)
+            time.sleep(0.05)
 
         # self.blender.stdin.close()
 

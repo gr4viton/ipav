@@ -3,12 +3,13 @@
 # Script to run from blender:
 #   blender --python blender_server.py
 
-PORT = 8081
+PORT = 8082
 HOST = "localhost"
 # HOST = "127.0.0.1"
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
 
+import sys
 
 def execfile(filepath):
     import os
@@ -35,6 +36,7 @@ def main():
         for filepath in buf.split(b'\x00'):
             if filepath:
                 print("Executing:", filepath)
+                # sys.stderr.write(str(''.join(["Executing:", filepath])))
                 try:
                     execfile(filepath)
                 except:
