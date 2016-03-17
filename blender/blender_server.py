@@ -3,8 +3,7 @@
 # Script to run from blender:
 #   blender --python blender_server.py
 
-PORT = 8083
-HOST = "localhost"
+
 # HOST = "127.0.0.1"
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
@@ -21,7 +20,7 @@ def execfile(filepath):
         exec(compile(file.read(), filepath, 'exec'), global_namespace)
 
 
-def main():
+def main(PORT, HOST):
     import socket
 
     serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,4 +44,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    PORT = 8083
+    HOST = "localhost"
+    for arg in argv:
+        print(arg)
+    main(PORT, HOST)
