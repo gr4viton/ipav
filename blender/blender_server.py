@@ -4,8 +4,12 @@
 #   blender --python blender_server.py
 
 import sys
+import pickle
 
-global param_dict
+sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
+import render
+
+
 # HOST = "127.0.0.1"
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
@@ -47,6 +51,9 @@ class FlushFile(object):
     def fileno(self):
         return self.fd.fileno()
 
+def printl():
+    print('_'*42)
+
 
 def main(PORT, HOST):
     import socket
@@ -56,26 +63,65 @@ def main(PORT, HOST):
     serversocket.listen(1)
 
     print("Listening on %s:%s" % (HOST, PORT))
+    printl()
 
     looping = True
+    ending = pickle.STOP + b'\x00'
     while looping:
         connection, address = serversocket.accept()
         buf = connection.recv(PATH_MAX)
 
-        for filepath in buf.split(b'\x00'):
-            if filepath:
-                if filepath == b'exit()':
-                    print('blender_server got exit() command thus shutting down blender program.')
-                    looping = False
-                    break
-                else:
-                    print("Executing:", filepath)
-                    # sys.stderr.write(str(''.join(["Executing:", filepath])))
-                    try:
-                        execfile(filepath)
-                    except:
-                        import traceback
-                        traceback.print_exc()
+        # for loaded_pickle in buf.split(b'\x00'):
+
+        for loaded_pickle in buf.split(ending):
+
+            if loaded_pickle:
+                loaded_pickle += pickle.STOP
+                print('loaded_pickle =', loaded_pickle)
+                data_dict = pickle.loads(loaded_pickle)
+                print('data_dict =', data_dict )
+
+                if data_dict:
+                    script = data_dict.get('exec', None)
+                    if script:
+                        print("Executing:", script)
+                        execfile(script)
+
+                    # exitit = data_dict.get('exit', None)
+                    # if exitit == True:
+                    #     looping = False
+                    #     break
+
+                    if data_dict.get('exit', None) == True:
+                        looping = False
+                        break
+
+                    # if 'exit' in data_dict:
+                    #     if data_dict['exit'] == True:
+                    #         looping = False
+                    #         break
+
+                    # elif 'exec' in data_dict:
+                    #     script = data_dict.get('exec')
+                    #     print("Executing:", script)
+                    #     execfile(script)
+                    else:
+                        printl()
+
+        # for filepath in buf.split(b'\x00'):
+        #     if filepath:
+        #         if filepath == b'exit()':
+        #             print('blender_server got exit() command thus shutting down blender program.')
+        #             looping = False
+        #             break
+        #         else:
+        #             print("Executing:", filepath)
+        #             # sys.stderr.write(str(''.join(["Executing:", filepath])))
+        #             try:
+        #                 execfile(filepath)
+        #             except:
+        #                 import traceback
+        #                 traceback.print_exc()
 
     serversocket.close()
 

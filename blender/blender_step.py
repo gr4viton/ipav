@@ -12,15 +12,17 @@ from subprocess import Popen, PIPE, STDOUT
 # import blender_client
 import sys
 import socket
-import select
+# import select
 
 import pickle
 
 #TODO
 # socket communication with script running in blender (scipt running in blender would be the blender_server)
 # multiple blender servers - at the same time (synchro would be difficult)
-# pickle - with custom protocol version (blender python version 3.4 ?) encapsuling data
+# pickle encapsuling data - with custom protocol version (python 3.4.2 in blender 2.7.6)
 # do not send the whole pickle every time - the other side should buffer it, so only changes should be sent
+# keyword marshalling
+
 class blender_module():
 
     PORT = 8084
@@ -33,6 +35,7 @@ class blender_module():
         self.init_params()
 
         self.data_pickle = pickle.dumps(self.param_dict)
+        print('data_pickle =', self.data_pickle)
 
 
     def init_path(self):
@@ -61,17 +64,19 @@ class blender_module():
         # param dict
         self.param_dict.update({'PORT': self.PORT})
         self.param_dict.update({'HOST': self.HOST})
+
+        str_hostport = ' '.join([' '.join([str(key), str(value)])
+                                   for key, value in self.param_dict.items()])
+
         self.param_dict.update({'pic_dir': self.pic_dir})
 
-        str_param_dict = ' '.join([' '.join([str(key), str(value)])
-                                   for key, value in self.param_dict.items()])
-        print('str_param_dict =', str_param_dict)
+        print('str_param_dict =', str_hostport)
 
 
-        self.blender_server_params = ' '.join([self.blender_server, '--', str_param_dict])
+        self.blender_server_params = ' '.join([self.blender_server, '--', str_hostport])
         print('blender_server_params =', self.blender_server_params)
 
-    def send_command(self, param):
+    def send_string_command(self, param):
         clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientsocket.connect((self.HOST, self.PORT))
 
@@ -79,6 +84,15 @@ class blender_module():
         # for arg in argv:
         clientsocket.sendall(param.encode("utf-8") + b'\x00')
 
+    def send_pickle(self, pickle):
+        clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        clientsocket.connect((self.HOST, self.PORT))
+        print('sending pickle=', pickle)
+        clientsocket.sendall(pickle + b'\x00' )
+
+    def send_data_dict(self, data_dict):
+        print('pickling data_dict=', data_dict)
+        self.send_pickle(pickle.dumps(data_dict))
 
     def run(self):
         print('%'*42, 'blendering')
@@ -101,33 +115,19 @@ class blender_module():
         a = 5
         while(looping):
 
-            # param = self.script_params
-            param = self.script_path
-            print('sending command >> ', param)
-            # param_bytes = param.encode('utf-8')
+            # self.send_pickle(self.data_pickle)
 
-            self.send_command(param)
-
-
-            # self.bs.communicate()
-            # print(txt)
-            #
-            # param_bytes = params.encode('utf-8')
-            # # grep_stdout = self.blender.communicate(input=param_bytes)[0]
-            # self.blender.stdin.write(param_bytes)
-            # grep_stdout = self.blender.communicate()[0]
-            # print(param_bytes)
-            # print(grep_stdout)
-            #
-            # sys.stdout.flush()
+            self.send_data_dict({'exec': str(self.script_path)})
 
             time.sleep(0.05)
+            time.sleep(1)
             # time.sleep(4)
 
             if a > 0:
                 a -= 1
             else:
-                self.send_command(self.param_exit)
+                # self.send_string_command(self.param_exit)
+                self.send_data_dict({'exit':True})
                 looping = False
 
 
