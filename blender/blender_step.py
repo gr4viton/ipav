@@ -20,7 +20,7 @@ import pickle
 # socket communication with script running in blender (scipt running in blender would be the blender_server)
 # multiple blender servers - at the same time (synchro would be difficult)
 # pickle - with custom protocol version (blender python version 3.4 ?) encapsuling data
-
+# do not send the whole pickle every time - the other side should buffer it, so only changes should be sent
 class blender_module():
 
     PORT = 8084
