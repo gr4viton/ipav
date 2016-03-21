@@ -102,6 +102,8 @@ def createCamera(origin, target):
 
 
 def run(origin):
+
+
     # Delete all old cameras and lamps
     scn = bpy.context.scene
     for ob in scn.objects:
@@ -145,7 +147,13 @@ if __name__ == "__main__":
     """
     This script is executed by blender python interpreter through exec command in blender_server.py
     """
-    for arg in sys.argv:
-        print('HELLO WORLD\n'*10, arg)
+    global param_dict
+
+    # for arg in sys.argv:
+    #     print('HELLO WORLD\n'*10, arg)
+    # if 'pic_dir' in param_dict.keys():
+    #     pic_dir = param_dict['pic_dir']
+    #     print('HELLO WORLD\n'*10, pic_dir)
     run(Vector((0,0,0)))
+
 

@@ -14,34 +14,59 @@ import sys
 import socket
 import select
 
+#TODO
+# socket communication with script running in blender (scipt running in blender would be the blender_server)
+# multiple blender servers - at the same time (synchro would be difficult)
+# pickle - with custom protocol version (blender python version 3.4 ?) encapsuling data
+
 class blender_module():
-
-    blender_dif = os.path.abspath('C:/PROG/grafic/Blender/')
-    blender_file = 'blender.exe'
-    blender_path = os.path.join(blender_dif, blender_file)
-
-    param_exit = 'exit()'
-
-    # script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/')
-    script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
-    pic_dir = os.path.join(script_dir, 'pic')
-    script_file = 'render.py'
-    # script_file = 'mediator.py'
-    script_path = os.path.join(script_dir, script_file)
-
-    script_params = ' '.join([script_path, pic_dir])
-
-    blender_server_path = os.path.join(script_dir, 'blender_server.py')
-    other_params = ' '.join(['-noglsl','-noaudio','-nojoystick'])
-    # blender_server = ' '.join([blender_path, '-b', other_params,'--python', blender_server_path])
-    blender_server = ' '.join([blender_path, '-b', '--python', blender_server_path])
-    print('blender_server = ',blender_server)
 
     PORT = 8084
     HOST = "localhost"
+    param_dict = {}
+    param_exit = 'exit()'
 
-    blender_server_params = ' '.join([blender_server, '--', str(PORT), HOST])
-    print('blender_server_params =', blender_server_params)
+    def __init__(self):
+        self.init_path()
+        self.init_params()
+
+
+
+    def init_path(self):
+        blender_dir = os.path.abspath('C:/PROG/grafic/Blender/')
+        blender_file = 'blender.exe'
+        blender_path = os.path.join(blender_dir, blender_file)
+
+        script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
+        self.pic_dir = os.path.join(script_dir, 'pic')
+        script_file = 'render.py'
+        # script_file = 'mediator.py'
+        self.script_path = os.path.join(script_dir, script_file)
+
+        # script_params = ' '.join([script_path, pic_dir])
+
+        blender_server_path = os.path.join(script_dir, 'blender_server.py')
+
+        other_params = ' '.join(['-noglsl', '-noaudio', '-nojoystick'])
+        # self.blender_server = ' '.join([blender_path, '-b', other_params,'--python', blender_server_path])
+
+        self.blender_server = ' '.join([blender_path, '-b', '--python', blender_server_path])
+        print('blender_server = ', self.blender_server)
+
+    def init_params(self):
+
+        # param dict
+        self.param_dict.update({'PORT': self.PORT})
+        self.param_dict.update({'HOST': self.HOST})
+        self.param_dict.update({'pic_dir': self.pic_dir})
+
+        str_param_dict = ' '.join([' '.join([str(key), str(value)])
+                                   for key, value in self.param_dict.items()])
+        print('str_param_dict =', str_param_dict)
+
+
+        self.blender_server_params = ' '.join([self.blender_server, '--', str_param_dict])
+        print('blender_server_params =', self.blender_server_params)
 
     def send_command(self, param):
         clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -72,7 +97,7 @@ class blender_module():
         a = 5
         while(looping):
 
-            param = self.script_params
+            # param = self.script_params
             param = self.script_path
             print('sending command >> ', param)
             # param_bytes = param.encode('utf-8')
@@ -105,14 +130,9 @@ class blender_module():
         # self.blender.stdin.close()
         time.sleep(1)
         self.delete_images()
-#TODO
-# socket communication with script running in blender (scipt running in blender would be the blender_server)
-# multiple blender servers - at the same time (synchro would be difficult)
-
 
     def delete_images(self):
-        path = os.path.abspath(''.join([self.script_dir,'\pic']))
-        print(path)
+        path = self.pic_dir
         for the_file in os.listdir(path):
             file_path = os.path.join(path, the_file)
             try:

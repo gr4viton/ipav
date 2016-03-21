@@ -3,12 +3,12 @@
 # Script to run from blender:
 #   blender --python blender_server.py
 
+import sys
 
+global param_dict
 # HOST = "127.0.0.1"
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
-
-import sys
 
 def execfile(filepath):
     import os
@@ -97,18 +97,30 @@ if __name__ == "__main__":
     PORT = 8083
     HOST = 'localhost'
 
+    delimiter = '--'
     read_params = False
+    last_param = ''
+    param_dict = {}
+
     print('sys.argv =', sys.argv)
     for arg in sys.argv:
-        if read_params == True:
-            if HOST == '':
-                HOST = arg
-            else:
-                PORT = int(arg)
-                HOST = ''
         if arg == '--':
             read_params = True
+        else:
+            if read_params == True:
+                if last_param == '':
+                    last_param = arg
+                else:
+                    param_dict.update({last_param: arg})
+                    last_param = ''
 
-    print('executing main')
-    sys.stdout.flush()
+    print('param_dict =', param_dict)
+    if 'PORT' in param_dict.keys():
+        PORT =  int(param_dict['PORT'])
+    if 'HOST' in param_dict.keys():
+        HOST =  param_dict['HOST']
+
+
+    print('Executing main with PORT=', PORT, '| HOST=', HOST)
+    # sys.stdout.flush()
     main(PORT, HOST)
