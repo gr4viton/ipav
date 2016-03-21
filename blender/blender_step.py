@@ -59,6 +59,7 @@ class blender_module():
         # self.blender_server = ' '.join([blender_path, '-b', other_params,'--python', blender_server_path])
 
         self.blender_server = ' '.join([blender_path, '-b', '--python', blender_server_path])
+        # self.blender_server = ' '.join([blender_path, '--python', blender_server_path])
         print('blender_server = ', self.blender_server)
 
     def init_params(self):
@@ -89,11 +90,11 @@ class blender_module():
     def send_pickle(self, pickle):
         clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         clientsocket.connect((self.HOST, self.PORT))
-        print('sending pickle=', pickle)
+        print('>>> sending pickle=', pickle)
         clientsocket.sendall(pickle + b'\x00' )
 
     def send_data_dict(self, data_dict):
-        print('pickling data_dict=', data_dict)
+        print('>>> pickling data_dict=', data_dict)
         self.send_pickle(pickle.dumps(data_dict))
 
     def run(self):
@@ -114,6 +115,11 @@ class blender_module():
         # should wait from started tag from server
 
         self.send_data_dict({'load_blend': self.blend_path})
+        # time.sleep(10)
+        self.send_data_dict({'create_cam_lines':True})
+
+        # time.sleep(20)
+
 
         looping = True
         a = 5
@@ -121,6 +127,7 @@ class blender_module():
 
             # self.send_pickle(self.data_pickle)
             # self.send_data_dict({'exec': self.script_path})
+
 
             self.send_data_dict({'render':True})
 
@@ -138,7 +145,7 @@ class blender_module():
 
 
         # self.blender.stdin.close()
-        time.sleep(1)
+        time.sleep(2)
         self.delete_images()
 
     def delete_images(self):

@@ -10,6 +10,8 @@ import bpy
 import os
 import datetime as dt
 
+
+
 sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 import render
 
@@ -18,165 +20,247 @@ import render
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
 
-def execfile(filepath):
-    import os
-    global_namespace = {
-        "__file__": filepath,
-        "__name__": "__main__",
-        }
-    with open(filepath, 'rb') as file:
-        exec(compile(file.read(), filepath, 'exec'), global_namespace)
+def printl():
+    print('_'*42)
 
-def csgSubtract(target, opObj):
-   '''subtract opObj from the target'''
+import bpy, mathutils, math
+from mathutils import Vector
+from math import pi
 
-   # Deselect All
-   bpy.ops.object.select_all(action='DESELECT')
-
-   # Select the new object.
-   target.select = True
-   bpy.context.scene.objects.active = target
-
-   # Add a modifier
-   bpy.ops.object.modifier_add(type='BOOLEAN')
-
-   mod = target.modifiers
-   mod[0].name = "SubEmUp"
-   mod[0].object = opObj
-   mod[0].operation = 'DIFFERENCE'
-
-   # Apply modifier
-   bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod[0].name)
+import time
 
 
-def bisect():
-    """
-    if it is quicker than subtract - bisect individual planes
-    """
+class RealCamera():
+    pos = Vector((0,0,0))
+    rot = Vector((0,0,0))
+    # height, width, distance of the plane == aspect ratios, distance
+    size = Vector((0,0,0))
+
+    def __init__(self, pos, rot, size):
+        self.pos = Vector(pos)
+        self.rot = Vector(rot)
+        self.size = Vector(size)
+
+    def init_rot(self, real_point, pixel):
+        """
+        initializes rotation from real space point projection to camera plane
+        """
+    def create_iso(self):
+        cubeobject = bpy.ops.mesh.primitive_ico_sphere_add
+        #    cursor = context.scene.cursor_location
+        #   x = cursor.x
+        #  y = cursor.y
+        # z = cursor.z
+        cubeobject(location=(1, 1, 1))
+
+    def create_line(self):
+        new_cone = bpy.ops.mesh.primitive_cone_add(
+            vertices=32, radius1=2, depth=10.0,
+            location=self.pos, rotation=self.rot)
 
 
-    pass
+        print("created new_cone =", new_cone)
+        # scn = bpy.context.scene.GetCurrent()
+        # scn.objects.new(new_cone, 'cone')
 
-def load_file(blend):
-    print("Loading file", blend)
 
-    # multiple files opened simultaneously http://stackoverflow.com/questions/28075599/opening-blend-files-using-blenders-python-api
-    path = "D:/DEV/PYTHON/pyCV/kivyCV_start/blender/main.blend"
-    bpy.ops.wm.open_mainfile(filepath=path)
-    sys.stdout.flush()
 
-def render_to_file():
-    i = dt.datetime.now().strftime("%Y-%m-%d %H_%M_%S")
-    path = os.path.abspath(''.join(['D:/DEV/PYTHON/pyCV/kivyCV_start/blender/pic/', str(i), ' image.jpg']))
-    print('path =', path)
-    bpy.data.scenes['Scene'].render.filepath = path
-    bpy.ops.render.render( write_still=True )
 
-width = 100
-height = 100
+class BlenderServer():
 
-def init_render():
-    width = 100
-    height = 100
-    bpy.data.scenes['Scene'].render.filepath='file1' # directory and name
-    bpy.data.scenes['Scene'].render.resolution_x = width
-    bpy.data.scenes['Scene'].render.resolution_y = height
-    bpy.data.scenes['Scene'].render.pixel_aspect_x = 1.0
-    bpy.data.scenes['Scene'].render.pixel_aspect_y = 1.0
+    # real_cam_set
+    real_cam_set = []
 
-def render():
-    image = bpy.data.images['image02'] # image02 as seen in uv editor
-    imageR = bpy.data.images['Render Result'] # useless, so bad
-    width = image.size[0]
-    height = image.size[1]
+    def __init__(self):
+        path = 'D:/DEV/PYTHON/pyCV/kivyCV_start/blender/real_cam_set.ini'
+        self.init_real_cam_set(path)
 
-    PIXELS = [0.0 for i in range(len(image.pixels))]
-    # len(image.pixels) == width * height * 3 ( or 4 with the alpha channel )
 
-    # here, work with PIXELS
-    image.pixels=PIXELS
+    def init_real_cam_set(self, path):
+        print ('Initializing real cameras location data.')
+        vector_delimiter = '|'
+        number_delimiter = ';'
+        with open(path, 'r') as f:
+            for cam_line in f.readlines():
+                # print('cam_line =', cam_line)
+                pos_rot_size = []
+                for vector in cam_line.split(vector_delimiter):
+                    # print('vector =', vector)
+                    pos_rot_size.append( [float(value) for value in vector.split(number_delimiter)])
+                    # print('pos_rot_size =', pos_rot_size[-1])
 
-    # nodes work around - only with blender gui on - no other work arounds when gui is off
-    # https://ammous88.wordpress.com/2015/01/16/blender-access-render-results-pixels-directly-from-python-2/
+                self.real_cam_set.append(RealCamera(*pos_rot_size))
 
-def main(PORT, HOST):
-    import socket
+        print(len(self.real_cam_set),'real camera location data initialized.')
 
-    serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    serversocket.bind((HOST, PORT))
-    serversocket.listen(1)
+    def create_cam_lines(self):
+        for cam in self.real_cam_set:
+            print('creating line')
+            cam.create_line()
 
-    print("Listening on %s:%s" % (HOST, PORT))
-    printl()
+    def execfile(self, filepath):
+        import os
+        global_namespace = {
+            "__file__": filepath,
+            "__name__": "__main__",
+            }
+        with open(filepath, 'rb') as file:
+            exec(compile(file.read(), filepath, 'exec'), global_namespace)
 
-    looping = True
-    ending = pickle.STOP + b'\x00'
-    while looping:
-        connection, address = serversocket.accept()
-        buf = connection.recv(PATH_MAX)
+    def csgSubtract(self, target, opObj):
+       '''subtract opObj from the target'''
 
-        # for loaded_pickle in buf.split(b'\x00'):
+       # Deselect All
+       bpy.ops.object.select_all(action='DESELECT')
 
-        for loaded_pickle in buf.split(ending):
+       # Select the new object.
+       target.select = True
+       bpy.context.scene.objects.active = target
 
-            if loaded_pickle:
-                loaded_pickle += pickle.STOP
-                print('loaded_pickle =', loaded_pickle)
-                data_dict = pickle.loads(loaded_pickle)
-                print('data_dict =', data_dict )
+       # Add a modifier
+       bpy.ops.object.modifier_add(type='BOOLEAN')
 
-                if data_dict:
-                    script = data_dict.get('exec', None)
-                    if script:
-                        print("Executing:", script)
-                        execfile(script)
+       mod = target.modifiers
+       mod[0].name = "SubEmUp"
+       mod[0].object = opObj
+       mod[0].operation = 'DIFFERENCE'
 
-                    blend = data_dict.get('load_blend', None)
-                    if blend:
-                        load_file(blend)
+       # Apply modifier
+       bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod[0].name)
 
-                    # exitit = data_dict.get('exit', None)
-                    # if exitit == True:
-                    #     looping = False
-                    #     break
 
-                    if data_dict.get('render', None) == True:
-                        render_to_file()
+    def bisect(self):
+        """
+        if it is quicker than subtract - bisect individual planes
+        """
 
-                    if data_dict.get('exit', None) == True:
-                        looping = False
-                        break
 
-                    # if 'exit' in data_dict:
-                    #     if data_dict['exit'] == True:
-                    #         looping = False
-                    #         break
+        pass
 
-                    # elif 'exec' in data_dict:
-                    #     script = data_dict.get('exec')
-                    #     print("Executing:", script)
-                    #     execfile(script)
-                    else:
-                        printl()
 
-            # sys.stdout.flush()
 
-        # for filepath in buf.split(b'\x00'):
-        #     if filepath:
-        #         if filepath == b'exit()':
-        #             print('blender_server got exit() command thus shutting down blender program.')
-        #             looping = False
-        #             break
-        #         else:
-        #             print("Executing:", filepath)
-        #             # sys.stderr.write(str(''.join(["Executing:", filepath])))
-        #             try:
-        #                 execfile(filepath)
-        #             except:
-        #                 import traceback
-        #                 traceback.print_exc()
+    def load_file(self, blend):
+        print("Loading file", blend)
 
-    serversocket.close()
+        # multiple files opened simultaneously http://stackoverflow.com/questions/28075599/opening-blend-files-using-blenders-python-api
+        path = "D:/DEV/PYTHON/pyCV/kivyCV_start/blender/main.blend"
+        bpy.ops.wm.open_mainfile(filepath=path)
+        sys.stdout.flush()
+
+    def render_to_file(self):
+        format_str = "%Y-%m-%d %H_%M_%S"
+        # format_str = "-%H%M%S %Y-%m-%d"
+        i = dt.datetime.now().strftime(format_str)
+        path = os.path.abspath(''.join(['D:/DEV/PYTHON/pyCV/kivyCV_start/blender/pic/', str(i), ' image.jpg']))
+        print('path =', path)
+        bpy.data.scenes['Scene'].render.filepath = path
+        bpy.ops.render.render( write_still=True )
+
+    def init_render(self):
+        self.width = 100
+        self.height = 100
+        bpy.data.scenes['Scene'].render.filepath='file1' # directory and name
+        bpy.data.scenes['Scene'].render.resolution_x = self.width
+        bpy.data.scenes['Scene'].render.resolution_y = self.height
+        bpy.data.scenes['Scene'].render.pixel_aspect_x = 1.0
+        bpy.data.scenes['Scene'].render.pixel_aspect_y = 1.0
+
+    def render(self):
+        image = bpy.data.images['image02'] # image02 as seen in uv editor
+        imageR = bpy.data.images['Render Result'] # useless, so bad
+        width = image.size[0]
+        height = image.size[1]
+
+        PIXELS = [0.0 for i in range(len(image.pixels))]
+        # len(image.pixels) == width * height * 3 ( or 4 with the alpha channel )
+
+        # here, work with PIXELS
+        image.pixels=PIXELS
+
+        # nodes work around - only with blender gui on - no other work arounds when gui is off
+        # https://ammous88.wordpress.com/2015/01/16/blender-access-render-results-pixels-directly-from-python-2/
+
+    def main(self, PORT, HOST):
+        import socket
+
+        serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        serversocket.bind((HOST, PORT))
+        serversocket.listen(1)
+
+        print("Listening on %s:%s" % (HOST, PORT))
+        printl()
+
+        looping = True
+        ending = pickle.STOP + b'\x00'
+        while looping:
+            connection, address = serversocket.accept()
+            buf = connection.recv(PATH_MAX)
+
+            # for loaded_pickle in buf.split(b'\x00'):
+            for loaded_pickle in buf.split(ending):
+
+                if loaded_pickle:
+                    loaded_pickle += pickle.STOP
+                    print('loaded_pickle =', loaded_pickle)
+                    data_dict = pickle.loads(loaded_pickle)
+                    print('data_dict =', data_dict )
+
+                    if data_dict:
+                        script = data_dict.get('exec', None)
+                        if script:
+                            print("Executing:", script)
+                            self.execfile(script)
+
+                        blend = data_dict.get('load_blend', None)
+                        if blend:
+                            self.load_file(blend)
+
+
+                        # exitit = data_dict.get('exit', None)
+                        # if exitit == True:
+                        #     looping = False
+                        #     break
+
+                        if data_dict.get('create_cam_lines', None) == True:
+                            self.create_cam_lines()
+
+                        if data_dict.get('render', None) == True:
+                            self.render_to_file()
+
+                        if data_dict.get('exit', None) == True:
+                            looping = False
+                            break
+
+                        # if 'exit' in data_dict:
+                        #     if data_dict['exit'] == True:
+                        #         looping = False
+                        #         break
+
+                        # elif 'exec' in data_dict:
+                        #     script = data_dict.get('exec')
+                        #     print("Executing:", script)
+                        #     execfile(script)
+                        else:
+                            printl()
+
+                # sys.stdout.flush()
+
+            # for filepath in buf.split(b'\x00'):
+            #     if filepath:
+            #         if filepath == b'exit()':
+            #             print('blender_server got exit() command thus shutting down blender program.')
+            #             looping = False
+            #             break
+            #         else:
+            #             print("Executing:", filepath)
+            #             # sys.stderr.write(str(''.join(["Executing:", filepath])))
+            #             try:
+            #                 execfile(filepath)
+            #             except:
+            #                 import traceback
+            #                 traceback.print_exc()
+
+        serversocket.close()
 
 class FlushFile(object):
     '''
@@ -206,8 +290,6 @@ class FlushFile(object):
     def fileno(self):
         return self.fd.fileno()
 
-def printl():
-    print('_'*42)
 
 
 if __name__ == "__main__":
@@ -254,5 +336,6 @@ if __name__ == "__main__":
 
     print('Executing main with PORT=', PORT, '| HOST=', HOST)
     # sys.stdout.flush()
-    main(PORT, HOST)
+    bs = BlenderServer()
+    bs.main(PORT, HOST)
 
