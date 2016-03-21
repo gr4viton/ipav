@@ -14,6 +14,8 @@ import sys
 import socket
 import select
 
+import pickle
+
 #TODO
 # socket communication with script running in blender (scipt running in blender would be the blender_server)
 # multiple blender servers - at the same time (synchro would be difficult)
@@ -30,6 +32,7 @@ class blender_module():
         self.init_path()
         self.init_params()
 
+        self.data_pickle = pickle.dumps(self.param_dict)
 
 
     def init_path(self):
@@ -84,6 +87,7 @@ class blender_module():
 
         # self.blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=STDOUT) #, shell=False)
         self.bs = Popen(self.blender_server_params, stdin=PIPE, stderr=STDOUT) #, shell=False)
+        # must be opened as binary - to ensure correct pickle transfer
 
         print('blender_server process started!')
         # blender.stdin.write(bytes(params, 'UTF-8'))
