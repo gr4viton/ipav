@@ -2,7 +2,9 @@ import bpy, mathutils, math
 from mathutils import Vector
 from math import pi
 import os
+import sys
 import time
+
 from datetime import datetime
 
 def addTrackToConstraint(ob, name, target):
@@ -140,5 +142,10 @@ def render():
     bpy.ops.render.render( write_still=True ) 
 
 if __name__ == "__main__":
+    """
+    This script is executed by blender python interpreter through exec command in blender_server.py
+    """
+    for arg in sys.argv:
+        print('HELLO WORLD\n'*10, arg)
     run(Vector((0,0,0)))
 

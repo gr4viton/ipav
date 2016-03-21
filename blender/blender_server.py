@@ -19,6 +19,34 @@ def execfile(filepath):
     with open(filepath, 'rb') as file:
         exec(compile(file.read(), filepath, 'exec'), global_namespace)
 
+class FlushFile(object):
+    '''
+    http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
+    to flush after print
+    '''
+
+    def __init__(self, fd):
+        self.fd = fd
+
+    def write(self, x):
+        ret = self.fd.write(x)
+        self.fd.flush()
+        return ret
+
+    def writelines(self, lines):
+        ret = self.writelines(lines)
+        self.fd.flush()
+        return ret
+
+    def flush(self):
+        return self.fd.flush
+
+    def close(self):
+        return self.fd.close()
+
+    def fileno(self):
+        return self.fd.fileno()
+
 
 def main(PORT, HOST):
     import socket
@@ -28,24 +56,59 @@ def main(PORT, HOST):
     serversocket.listen(1)
 
     print("Listening on %s:%s" % (HOST, PORT))
-    while True:
+
+    looping = True
+    while looping:
         connection, address = serversocket.accept()
         buf = connection.recv(PATH_MAX)
 
         for filepath in buf.split(b'\x00'):
             if filepath:
-                print("Executing:", filepath)
-                # sys.stderr.write(str(''.join(["Executing:", filepath])))
-                try:
-                    execfile(filepath)
-                except:
-                    import traceback
-                    traceback.print_exc()
+                if filepath == b'exit()':
+                    print('blender_server got exit() command thus shutting down blender program.')
+                    looping = False
+                    break
+                else:
+                    print("Executing:", filepath)
+                    # sys.stderr.write(str(''.join(["Executing:", filepath])))
+                    try:
+                        execfile(filepath)
+                    except:
+                        import traceback
+                        traceback.print_exc()
 
+    serversocket.close()
 
 if __name__ == "__main__":
+    """
+    This script is intended to be run in blender python interpreter.
+     Thus it enables to remotely (by socket) execute another python scripts in blender.
+     Advantage is the blender is always running in background so it has not to be started every time.
+     The main functions loops forever waiting for socket input until the input is 'exit()'.
+
+    """
+
+    sys.stdout = FlushFile(sys.stdout)
+
+    # '''To write to screen in real-time'''
+    # message = lambda x: print(x, flush=True, end="")
+    # message('I am flushing out now...')
+
     PORT = 8083
-    HOST = "localhost"
-    for arg in argv:
-        print(arg)
+    HOST = 'localhost'
+
+    read_params = False
+    print('sys.argv =', sys.argv)
+    for arg in sys.argv:
+        if read_params == True:
+            if HOST == '':
+                HOST = arg
+            else:
+                PORT = int(arg)
+                HOST = ''
+        if arg == '--':
+            read_params = True
+
+    print('executing main')
+    sys.stdout.flush()
     main(PORT, HOST)
