@@ -45,9 +45,11 @@ class blender_module():
 
         script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
         self.pic_dir = os.path.join(script_dir, 'pic')
-        script_file = 'render.py'
-        # script_file = 'mediator.py'
-        self.script_path = os.path.join(script_dir, script_file)
+
+
+        self.script_path = os.path.join(script_dir, 'render.py')
+        self.blend_path = os.path.join(script_dir, 'main.blend')
+
 
         # script_params = ' '.join([script_path, pic_dir])
 
@@ -111,13 +113,17 @@ class blender_module():
         time.sleep(2)
         # should wait from started tag from server
 
+        self.send_data_dict({'load_blend': self.blend_path})
+
         looping = True
         a = 5
         while(looping):
 
             # self.send_pickle(self.data_pickle)
+            # self.send_data_dict({'exec': self.script_path})
 
-            self.send_data_dict({'exec': str(self.script_path)})
+            self.send_data_dict({'render':True})
+
 
             time.sleep(0.05)
             time.sleep(1)

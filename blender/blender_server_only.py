@@ -6,10 +6,6 @@
 import sys
 import pickle
 
-import bpy
-import os
-import datetime as dt
-
 sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 import render
 
@@ -27,77 +23,42 @@ def execfile(filepath):
     with open(filepath, 'rb') as file:
         exec(compile(file.read(), filepath, 'exec'), global_namespace)
 
-def csgSubtract(target, opObj):
-   '''subtract opObj from the target'''
+class FlushFile(object):
+    '''
+    http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
+    to flush after print
+    '''
 
-   # Deselect All
-   bpy.ops.object.select_all(action='DESELECT')
+    def __init__(self, fd):
+        self.fd = fd
 
-   # Select the new object.
-   target.select = True
-   bpy.context.scene.objects.active = target
+    def write(self, x):
+        ret = self.fd.write(x)
+        self.fd.flush()
+        return ret
 
-   # Add a modifier
-   bpy.ops.object.modifier_add(type='BOOLEAN')
+    def writelines(self, lines):
+        ret = self.writelines(lines)
+        self.fd.flush()
+        return ret
 
-   mod = target.modifiers
-   mod[0].name = "SubEmUp"
-   mod[0].object = opObj
-   mod[0].operation = 'DIFFERENCE'
+    def flush(self):
+        return self.fd.flush
 
-   # Apply modifier
-   bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod[0].name)
+    def close(self):
+        return self.fd.close()
 
+    def fileno(self):
+        return self.fd.fileno()
 
-def bisect():
-    """
-    if it is quicker than subtract - bisect individual planes
-    """
+def printl():
+    print('_'*42)
 
 
-    pass
 
 def load_file(blend):
     print("Loading file", blend)
-
-    # multiple files opened simultaneously http://stackoverflow.com/questions/28075599/opening-blend-files-using-blenders-python-api
-    path = "D:/DEV/PYTHON/pyCV/kivyCV_start/blender/main.blend"
-    bpy.ops.wm.open_mainfile(filepath=path)
-    sys.stdout.flush()
-
-def render_to_file():
-    i = dt.datetime.now().strftime("%Y-%m-%d %H_%M_%S")
-    path = os.path.abspath(''.join(['D:/DEV/PYTHON/pyCV/kivyCV_start/blender/pic/', str(i), ' image.jpg']))
-    print('path =', path)
-    bpy.data.scenes['Scene'].render.filepath = path
-    bpy.ops.render.render( write_still=True )
-
-width = 100
-height = 100
-
-def init_render():
-    width = 100
-    height = 100
-    bpy.data.scenes['Scene'].render.filepath='file1' # directory and name
-    bpy.data.scenes['Scene'].render.resolution_x = width
-    bpy.data.scenes['Scene'].render.resolution_y = height
-    bpy.data.scenes['Scene'].render.pixel_aspect_x = 1.0
-    bpy.data.scenes['Scene'].render.pixel_aspect_y = 1.0
-
-def render():
-    image = bpy.data.images['image02'] # image02 as seen in uv editor
-    imageR = bpy.data.images['Render Result'] # useless, so bad
-    width = image.size[0]
-    height = image.size[1]
-
-    PIXELS = [0.0 for i in range(len(image.pixels))]
-    # len(image.pixels) == width * height * 3 ( or 4 with the alpha channel )
-
-    # here, work with PIXELS
-    image.pixels=PIXELS
-
-    # nodes work around - only with blender gui on - no other work arounds when gui is off
-    # https://ammous88.wordpress.com/2015/01/16/blender-access-render-results-pixels-directly-from-python-2/
+    
 
 def main(PORT, HOST):
     import socket
@@ -140,9 +101,6 @@ def main(PORT, HOST):
                     #     looping = False
                     #     break
 
-                    if data_dict.get('render', None) == True:
-                        render_to_file()
-
                     if data_dict.get('exit', None) == True:
                         looping = False
                         break
@@ -158,8 +116,6 @@ def main(PORT, HOST):
                     #     execfile(script)
                     else:
                         printl()
-
-            # sys.stdout.flush()
 
         # for filepath in buf.split(b'\x00'):
         #     if filepath:
@@ -177,38 +133,6 @@ def main(PORT, HOST):
         #                 traceback.print_exc()
 
     serversocket.close()
-
-class FlushFile(object):
-    '''
-    http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
-    to flush after print
-    '''
-
-    def __init__(self, fd):
-        self.fd = fd
-
-    def write(self, x):
-        ret = self.fd.write(x)
-        self.fd.flush()
-        return ret
-
-    def writelines(self, lines):
-        ret = self.writelines(lines)
-        self.fd.flush()
-        return ret
-
-    def flush(self):
-        return self.fd.flush
-
-    def close(self):
-        return self.fd.close()
-
-    def fileno(self):
-        return self.fd.fileno()
-
-def printl():
-    print('_'*42)
-
 
 if __name__ == "__main__":
     """
