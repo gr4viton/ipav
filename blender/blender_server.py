@@ -16,6 +16,7 @@ sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 import render
 
 
+global param_dict
 # HOST = "127.0.0.1"
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
@@ -410,6 +411,8 @@ class BlenderServer():
 
         serversocket.close()
 
+
+
 class FlushFile(object):
     '''
     http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
@@ -481,9 +484,7 @@ if __name__ == "__main__":
     if 'HOST' in param_dict.keys():
         HOST =  param_dict['HOST']
 
-
     print('Executing main with PORT=', PORT, '| HOST=', HOST)
     # sys.stdout.flush()
     bs = BlenderServer()
     bs.main(PORT, HOST)
-

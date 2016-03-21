@@ -45,9 +45,11 @@ class blender_module():
 
         script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
         self.pic_dir = os.path.join(script_dir, 'pic')
+<<<<<<< HEAD
 
 
         self.script_path = os.path.join(script_dir, 'render.py')
+        # script_file = 'mediator.py'
         self.blend_path = os.path.join(script_dir, 'main.blend')
 
 
@@ -137,6 +139,11 @@ class blender_module():
         print('pickling data took enormous time [s]:', end-start)
 
         im = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
+
+            # param = self.script_params
+            # param = self.script_path
+            # print('sending command >> ', param)
+            # param_bytes = param.encode('utf-8')
         return im
 
 
@@ -176,6 +183,20 @@ class blender_module():
         # should wait from started tag from server
         self.run_commands()
 
+        # self.blender.stdin.close()
+        # time.sleep(1)
+        # self.delete_images()
+
+    def delete_images(self):
+        path = self.pic_dir
+        for the_file in os.listdir(path):
+            file_path = os.path.join(path, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+            except Exception as e:
+                print(e)
 
     # import_scene
 
