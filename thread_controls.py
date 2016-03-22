@@ -144,7 +144,7 @@ class ChainControl():
 
     def do_chain(self):
         start = time.time()
-        self._step_control.step_all(self.capture_control.image_stream_control.frame, self.resolution_multiplier )
+        self._step_control.step_all(self.capture_control.image_stream_control.frame.val, self.resolution_multiplier )
         end = time.time()
         self.add_exec_times(end-start)
 
@@ -169,10 +169,17 @@ class ImageStreamControl():
     """
     Shared class to control source capture execution
     """
-    frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 255 )
-    capturing = LockedValue(False)
+
+    # frame = np.ones( (32,24,3,), np.uint8 ) * 128
+    # frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
 
     def __init__(self):
+        print('initiialized')
+        self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
+        # self.frame = np.ones( (32,24,3,), np.uint8 ) * 128
+
+        self.capturing = LockedValue(False)
+
         self.capture_lock = threading.Lock()
         self.capture = None
 
@@ -229,11 +236,36 @@ class ImageStreamControl():
         self.capture.release()
         self.capture_lock.release()
 
-    def start_capturing(self):
-        self.open_capture()
-        self.capturing = True
-        self.thread = threading.Thread(target=self.capture_loop)
-        self.thread.start()
+    def start_capturing(self, blocking = True):
+        if blocking == False:
+            self.open_capture()
+            self.capturing = True
+            self.thread = threading.Thread(target=self.capture_loop)
+            self.thread.start()
+        else:
+            self.start_capturing_blocking()
+
+    def start_capturing_blocking(self, min_height = 50, iterations = 1000000):
+        self.start_capturing(blocking=False)
+
+        print('Captured frame with dimensions', self.frame.val.shape,
+              '. Waiting until the heighth is greater than', min_height, 'px')
+        looping = iterations + 1
+
+        while looping > 1:
+            if self.frame.val.shape[0] < min_height:
+                pass
+            else:
+                print('Captured frame with dimensions', self.frame.val.shape,
+                      '. Continuing with program execution.')
+                return True
+            looping -= 1
+        print('Did not captured frame with greater heighth than',
+              min_height, 'px in ', iterations, 'iterations.')
+        return False
+
+    def stop_capturing(self):
+        self.capturing = False
 
     def toggle_capturing(self):
         if self.capturing == False:
@@ -242,7 +274,7 @@ class ImageStreamControl():
             self.capturing = False
 
     def on_stop(self):
-        # stops capturing and releases capture object
+        """ stops capturing and releases capture object """
         self.capturing = False
         self.close_capture()
 
@@ -259,5 +291,5 @@ class ImageStreamControl():
         else:
             ret, frame = self.capture.read()
         self.capture_lock.release()
-        self.frame = frame
+        self.frame.val = frame
         # print(self.frame.shape)

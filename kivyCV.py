@@ -201,26 +201,23 @@ class Multicopter(GridLayout):
 
 
 class CaptureControl():
-
-
+    streams = []
     def __init__(self):
-        self.image_stream_control = ImageStreamControl()
+        self.streams.append(ImageStreamControl())
+        self.streams.append(ImageStreamControl())
+        self.streams[-1].toggle_source_id()
+
+        # print(self.streams)
+        self.image_stream_control = self.streams[0]
+
+        # time.sleep(10)
 
 
     def start_all_capturing(self):
+        for image_stream_control in self.streams:
+            if image_stream_control.start_capturing_blocking() == False:
+                image_stream_control.stop_capturing()
 
-        self.image_stream_control.start_capturing()
-
-        minHeight = 50
-        print('Captured frame with dimensions',self.image_stream_control.frame.shape,
-              '. Waiting until the heighth is greater than', minHeight, 'px')
-        while self.image_stream_control.frame.shape[0] < minHeight:
-            pass
-        print('Captured frame with dimensions',self.image_stream_control.frame.shape,
-              '. Continuing with program execution.')
-        # time.sleep(0.5)
-
-        pass
 
 
 class multicopterApp(App):
@@ -291,17 +288,20 @@ class multicopterApp(App):
     # timeit individual steps and display on widgets
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     def redraw_capture(self, dt):
-        # for frame in self.capture_control.frames:
-        #     # frame = self.capture_control.frame
-        #     self.root.lb_webcam_resolution = str(frame.shape)
-        #
-        #     if frame is not None:
-        #         self.root.img_webcam.texture = convert_to_texture(frame)
-        frame = self.capture_control.image_stream_control.frame
-        self.root.lb_webcam_resolution = str(frame.shape)
+        for image_stream_control in self.capture_control.streams:
+            # frame = self.capture_control.frame
+            frame = image_stream_control.frame.val
+            self.root.lb_webcam_resolution = str(frame.shape)
 
-        if frame is not None:
-            self.root.img_webcam.texture = convert_to_texture(frame)
+            if frame is not None:
+                self.root.img_webcam.texture = convert_to_texture(frame)
+
+            return
+        # frame = self.capture_control.image_stream_control.frame
+        # self.root.lb_webcam_resolution = str(frame.shape)
+        #
+        # if frame is not None:
+        #     self.root.img_webcam.texture = convert_to_texture(frame)
 
 
     def set_tags_found(self, found = False):
