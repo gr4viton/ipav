@@ -202,22 +202,51 @@ class Multicopter(GridLayout):
 
 class CaptureControl():
     streams = []
+    stream_id = 0
     def __init__(self):
-        self.streams.append(ImageStreamControl())
-        self.streams.append(ImageStreamControl())
-        self.streams[-1].toggle_source_id()
+        # self.streams.append(ImageStreamControl(0))
+        self.streams.append(ImageStreamControl(1))
+        self.streams.append(ImageStreamControl(2))
+        # self.streams[-1].toggle_source_id()
 
         # print(self.streams)
-        self.image_stream_control = self.streams[0]
+        self.activate_stream()
 
         # time.sleep(10)
+        self.set_all_settings()
 
+    # def init_all_streams(self):
+    #     # for stream in self.stre
+    #     self.set_all_settings()
+
+    def set_all_settings(self):
+        width = 640
+        height = 480
+        for stream in self.streams:
+            stream.capture.set(3, width)
+            stream.capture.set(4, height)
 
     def start_all_capturing(self):
         for image_stream_control in self.streams:
             if image_stream_control.start_capturing_blocking() == False:
                 image_stream_control.stop_capturing()
 
+    def on_stop(self):
+        for image_stream_control in self.streams:
+            image_stream_control.on_stop()
+
+    def activate_stream(self):
+        self.image_stream_control = self.streams[self.stream_id]
+
+    def switch_camera(self):
+        self.stream_id += 1
+        if self.stream_id >= len(self.streams):
+            self.stream_id = 0
+        self.activate_stream()
+
+    def toggle_capturing(self):
+        for image_stream_control in self.streams:
+            image_stream_control.toggle_capturing()
 
 
 class multicopterApp(App):
@@ -288,15 +317,24 @@ class multicopterApp(App):
     # timeit individual steps and display on widgets
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     def redraw_capture(self, dt):
+        frames = []
         for image_stream_control in self.capture_control.streams:
             # frame = self.capture_control.frame
-            frame = image_stream_control.frame.val
-            self.root.lb_webcam_resolution = str(frame.shape)
-
+            frame = image_stream_control.frame
             if frame is not None:
-                self.root.img_webcam.texture = convert_to_texture(frame)
+                frames.append([frame])
+                #
+                # self.root.lb_webcam_resolution = str(frame.shape)
+                # self.root.img_webcam.texture = convert_to_texture(frame)
+                #
 
-            return
+
+                self.root.lb_webcam_resolution = str(frame.shape)
+
+        preview = fh.joinIm(frames,1)
+        self.root.img_webcam.texture = convert_to_texture(preview )
+
+        # print('redraw')
         # frame = self.capture_control.image_stream_control.frame
         # self.root.lb_webcam_resolution = str(frame.shape)
         #

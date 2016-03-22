@@ -78,9 +78,9 @@ class Chain():
 
             # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
             # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
-            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
+            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
 
-            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
+            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
 
         if self.name in self.load_data_chain_names:
             self.load_data()
@@ -144,7 +144,7 @@ class ChainControl():
 
     def do_chain(self):
         start = time.time()
-        self._step_control.step_all(self.capture_control.image_stream_control.frame.val, self.resolution_multiplier )
+        self._step_control.step_all(self.capture_control.image_stream_control.frame, self.resolution_multiplier )
         end = time.time()
         self.add_exec_times(end-start)
 
@@ -173,10 +173,9 @@ class ImageStreamControl():
     # frame = np.ones( (32,24,3,), np.uint8 ) * 128
     # frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
 
-    def __init__(self):
-        print('initiialized')
-        self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
-        # self.frame = np.ones( (32,24,3,), np.uint8 ) * 128
+    def __init__(self, source_id=0):
+        # self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
+        self.frame = np.ones( (32,24,3,), np.uint8 ) * 128
 
         self.capturing = LockedValue(False)
 
@@ -185,7 +184,7 @@ class ImageStreamControl():
 
         self.init_capture()
 
-        self.source_id = 0
+        self.source_id = source_id
 
         self.sleepTime = 0.0
 
@@ -204,9 +203,11 @@ class ImageStreamControl():
         self.capture_lock.acquire()
         self.capture.open(self.source_id)
         if self.capture.isOpened() != True:
-            raise('Cannot open capture source_id ', self.source_id)
-        print('Opened capture source_id ' + str(self.source_id))
+            print('Source[', self.source_id, '] Cannot open capture.')
+            return False
+        print('Source[', self.source_id, '] Opened capture.')
         self.capture_lock.release()
+        return True
 
     def toggle_source_id(self):
         self.capture_lock.acquire()
@@ -218,7 +219,7 @@ class ImageStreamControl():
             self.capture.open(self.source_id)
 
             if self.capture.isOpened() != True:
-                print('Cannot open capture source_id ', self.source_id)
+                print('Source[', self.source_id, '] Cannot open capture.')
                 self.source_id = -1
                 continue
 
@@ -227,7 +228,7 @@ class ImageStreamControl():
                 print('Source cannot be read from, source_id ', self.source_id)
                 self.source_id = -1
                 continue
-            print('Opened capture source_id ' + str(self.source_id))
+            print('Source[', self.source_id, '] Opened capture')
             try_next = False
         self.capture_lock.release()
 
@@ -238,33 +239,38 @@ class ImageStreamControl():
 
     def start_capturing(self, blocking = True):
         if blocking == False:
-            self.open_capture()
+            if self.open_capture() == False:
+                return False
             self.capturing = True
             self.thread = threading.Thread(target=self.capture_loop)
             self.thread.start()
+            return True
         else:
-            self.start_capturing_blocking()
+            return self.start_capturing_blocking()
 
-    def start_capturing_blocking(self, min_height = 50, iterations = 1000000):
-        self.start_capturing(blocking=False)
+    def start_capturing_blocking(self, min_height = 50, iterations = 9999999):
+        if self.start_capturing(blocking=False) == False:
+            return False
 
-        print('Captured frame with dimensions', self.frame.val.shape,
-              '. Waiting until the heighth is greater than', min_height, 'px')
+        print('Source[', self.source_id, '] Captured frame with dimensions', self.frame.shape,
+              '. Waiting until the height is greater than', min_height, 'px')
         looping = iterations + 1
 
         while looping > 1:
-            if self.frame.val.shape[0] < min_height:
-                pass
-            else:
-                print('Captured frame with dimensions', self.frame.val.shape,
-                      '. Continuing with program execution.')
-                return True
+            if self.frame is not None:
+                if self.frame.shape[0] < min_height:
+                    pass
+                else:
+                    print('Source[', self.source_id, '] Captured frame with dimensions', self.frame.shape,
+                          '. Continuing with program execution.')
+                    return True
             looping -= 1
-        print('Did not captured frame with greater heighth than',
+        print('Source[', self.source_id, '] Did not captured frame with greater height than',
               min_height, 'px in ', iterations, 'iterations.')
         return False
 
     def stop_capturing(self):
+        print('Source[', self.source_id, '] Stopped capturing.')
         self.capturing = False
 
     def toggle_capturing(self):
@@ -287,9 +293,12 @@ class ImageStreamControl():
         self.capture_lock.acquire()
         if self.capture.isOpened() != True:
             # self.open_capture()
-            raise('Cannot read frame as the capture is not opened')
+            print('Source[', self.source_id, '] Cannot read frame as the capture is not opened')
+            self.capture_lock.release()
+            return False
         else:
             ret, frame = self.capture.read()
-        self.capture_lock.release()
-        self.frame.val = frame
+            self.capture_lock.release()
+            self.frame = frame
+            return True
         # print(self.frame.shape)
