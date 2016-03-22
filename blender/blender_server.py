@@ -167,6 +167,11 @@ class BlenderServer():
 
         print(len(self.real_cam_set),'real camera location data initialized.')
 
+    def print_objects(self):
+        for obj in bpy.data.objects:
+            print(obj)
+        printl()
+
     def create_projections(self):
         for cam in self.real_cam_set:
             print('creating projection')
@@ -194,22 +199,12 @@ class BlenderServer():
                     print('boolean modifier')
                     self.booleanSum(self.pobj, rcam.proj)
 
-        for obj in bpy.data.objects:
-            print(obj)
 
-        # scene = bpy.context.scene
+
         for rcam in self.real_cam_set:
-            # scene.objects.unlink(rcam.proj)
-            # bpy.data.objects.remove(rcam.proj)
-            # scene.update()
-
             rcam.delete_projection()
 
 
-        # printl()
-
-        for obj in bpy.data.objects:
-            print(obj)
 
 
     def execfile(self, filepath):

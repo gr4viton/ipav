@@ -28,7 +28,7 @@ import time
 import findHomeography as fh
 from thisCV import *
 
-from thread_controls import CaptureControl, FindtagControl, Chain
+from thread_controls import ImageStreamControl, ChainControl, Chain
 
 
 def convert_to_texture(im):
@@ -200,6 +200,29 @@ class Multicopter(GridLayout):
         self.step_widgets_control = StepWidgetControl(self.layout_steps)
 
 
+class CaptureControl():
+
+
+    def __init__(self):
+        self.image_stream_control = ImageStreamControl()
+
+
+    def start_all_capturing(self):
+
+        self.image_stream_control.start_capturing()
+
+        minHeight = 50
+        print('Captured frame with dimensions',self.image_stream_control.frame.shape,
+              '. Waiting until the heighth is greater than', minHeight, 'px')
+        while self.image_stream_control.frame.shape[0] < minHeight:
+            pass
+        print('Captured frame with dimensions',self.image_stream_control.frame.shape,
+              '. Continuing with program execution.')
+        # time.sleep(0.5)
+
+        pass
+
+
 class multicopterApp(App):
     # frame = []
     # running_findtag = False
@@ -224,17 +247,7 @@ class multicopterApp(App):
         # Config.set('graphics', 'fullscreen', 1)
 
         self.capture_control = CaptureControl()
-        self.capture_control.start_capturing()
-
-        minHeight = 50
-        print('Captured frame with dimensions',self.capture_control.frame.shape,
-              '. Waiting until the heighth is greater than', minHeight, 'px')
-        while self.capture_control.frame.shape[0] < minHeight:
-            pass
-        print('Captured frame with dimensions',self.capture_control.frame.shape,
-              '. Continuing with program execution.')
-        # time.sleep(0.5)
-
+        self.capture_control.start_all_capturing()
 
         # selected_chain_name = 'c2'
         # selected_chain_name = '3L'
@@ -246,14 +259,14 @@ class multicopterApp(App):
         current_chain = Chain(selected_chain_name)
 
 
-        self.findtag_control = FindtagControl(self.capture_control, current_chain)
-        self.findtag_control.start_findtagging()
+        self.chain_control = ChainControl(self.capture_control, current_chain)
+        self.chain_control.start_findtagging()
 
 
         self.tag_errors_count = {}
         [self.tag_errors_count.update({str(name): int(0)}) for name, member in tag_error.__members__.items()]
 
-        self.root = root = Multicopter(self.capture_control, self.findtag_control)
+        self.root = root = Multicopter(self.capture_control, self.chain_control)
         self.build_opencv()
 
         # self.capture_control.toggle_source_id() # take the second input source
@@ -278,11 +291,18 @@ class multicopterApp(App):
     # timeit individual steps and display on widgets
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     def redraw_capture(self, dt):
-        frame = self.capture_control.frame
+        # for frame in self.capture_control.frames:
+        #     # frame = self.capture_control.frame
+        #     self.root.lb_webcam_resolution = str(frame.shape)
+        #
+        #     if frame is not None:
+        #         self.root.img_webcam.texture = convert_to_texture(frame)
+        frame = self.capture_control.image_stream_control.frame
         self.root.lb_webcam_resolution = str(frame.shape)
 
         if frame is not None:
             self.root.img_webcam.texture = convert_to_texture(frame)
+
 
     def set_tags_found(self, found = False):
         if(found == False):
@@ -291,24 +311,24 @@ class multicopterApp(App):
             self.root.grid_img_tags.color = (.08, .96 , .24)
 
     def redraw_findtag(self, dt):
-        # step_control = self.findtag_control.step_control
+        # step_control = self.chain_control.step_control
         # if step_control is not None:
         #     self.root.img_steps.texture = convert_to_texture(step_control)
 
-        step_control = self.findtag_control.step_control
+        step_control = self.chain_control.step_control
         self.root.step_widgets_control.update_layout_steps(step_control)
         # self.root.update_layout_steps(step_control)
 
 
-        if len(self.findtag_control.execution_time) > 0:
-            self.root.label_mean_exec_time = str(np.round(self.findtag_control.execution_time[-1], 5) * 1000)
-            self.root.label_mean_exec_time_last = str(np.round(self.findtag_control.mean_execution_time, 5) * 1000)
+        if len(self.chain_control.execution_time) > 0:
+            self.root.label_mean_exec_time = str(np.round(self.chain_control.execution_time[-1], 5) * 1000)
+            self.root.label_mean_exec_time_last = str(np.round(self.chain_control.mean_execution_time, 5) * 1000)
 
 
         for key in self.tag_errors_count.keys():
             self.tag_errors_count[key] = 0
 
-        seen_tags = self.findtag_control.seen_tags
+        seen_tags = self.chain_control.seen_tags
         im_list = []
 
         # take from optionbox
@@ -367,7 +387,7 @@ class multicopterApp(App):
     def on_stop(self):
         print("Stopping capture")
         self.capture_control.on_stop()
-        self.findtag_control.on_stop()
+        self.chain_control.on_stop()
 
 if __name__ == '__main__':
     multicopterApp().run()

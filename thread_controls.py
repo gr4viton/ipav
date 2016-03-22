@@ -92,7 +92,7 @@ class Chain():
         pass
 
 
-class FindtagControl():
+class ChainControl():
     """
     Shared class to control findtag algorythm execution
     """
@@ -144,7 +144,7 @@ class FindtagControl():
 
     def do_chain(self):
         start = time.time()
-        self._step_control.step_all(self.capture_control.frame, self.resolution_multiplier )
+        self._step_control.step_all(self.capture_control.image_stream_control.frame, self.resolution_multiplier )
         end = time.time()
         self.add_exec_times(end-start)
 
@@ -165,7 +165,7 @@ class FindtagControl():
     def set_resolution_div(self, resolution_multiplier):
         self.resolution_multiplier = resolution_multiplier
 
-class CaptureControl():
+class ImageStreamControl():
     """
     Shared class to control source capture execution
     """

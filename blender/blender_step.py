@@ -97,7 +97,18 @@ class blender_module():
         print('>>> pickling data_dict=', data_dict)
         self.send_pickle(pickle.dumps(data_dict))
 
-    def run(self):
+    def delete_image_files(self):
+        path = self.pic_dir
+        for the_file in os.listdir(path):
+            file_path = os.path.join(path, the_file)
+            try:
+                if os.path.isfile(file_path):
+                    os.unlink(file_path)
+                #elif os.path.isdir(file_path): shutil.rmtree(file_path)
+            except Exception as e:
+                print(e)
+
+    def start_server(self):
         print('%'*42, 'blendering')
         # 'blender myscene.blend --background --python myscript.py'
 
@@ -109,10 +120,29 @@ class blender_module():
         print('blender_server process started!')
         # blender.stdin.write(bytes(params, 'UTF-8'))
 
-        # self.print_stdout()
+    def init_room(self):
+        self.send_data_dict({'load_blend': self.blend_path})
+        self.send_data_dict({'init_real_cam_set':True})
 
-        time.sleep(2)
-        # should wait from started tag from server
+    def photogrammetry_object(self, projections):
+        start = time.time()
+
+        self.send_data_dict({'create_cam_projections':True})
+        self.send_data_dict({'photogrammetry_object':True})
+        self.send_data_dict({'render':True})
+        self.send_data_dict({'render':True})
+        self.send_data_dict({'render':True})
+
+        # time.sleep(1)
+        end = time.time()
+        print('pickling data took enormous time [s]:', end-start)
+
+        im = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
+        return im
+
+
+
+    def run_commands(self):
 
         self.send_data_dict({'load_blend': self.blend_path})
         self.send_data_dict({'init_real_cam_set':True})
@@ -121,20 +151,12 @@ class blender_module():
         self.send_data_dict({'photogrammetry_object':True})
 
 
-        # time.sleep(20)
-
-
         looping = True
         # a = 5
         a = 1
         while(looping):
 
-            # self.send_pickle(self.data_pickle)
-            # self.send_data_dict({'exec': self.script_path})
-
-
             self.send_data_dict({'render':True})
-
 
             time.sleep(0.05)
             time.sleep(1)
@@ -143,25 +165,18 @@ class blender_module():
             if a > 1:
                 a -= 1
             else:
-                # self.send_string_command(self.param_exit)
                 self.send_data_dict({'exit':True})
                 looping = False
 
+        time.sleep(3)
+        self.delete_image_files()
 
-        # self.blender.stdin.close()
+    def run(self):
+        self.start_server()
         time.sleep(2)
-        self.delete_images()
+        # should wait from started tag from server
+        self.run_commands()
 
-    def delete_images(self):
-        path = self.pic_dir
-        for the_file in os.listdir(path):
-            file_path = os.path.join(path, the_file)
-            try:
-                if os.path.isfile(file_path):
-                    os.unlink(file_path)
-                #elif os.path.isdir(file_path): shutil.rmtree(file_path)
-            except Exception as e:
-                print(e)
 
     # import_scene
 

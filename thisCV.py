@@ -8,6 +8,10 @@ from subprocess import Popen, PIPE
 # from cv2 import xfeatures2d
 # import common
 import time
+import sys
+import os
+import time
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # global variables
 
@@ -621,30 +625,25 @@ class StepControl():
             return cv2.Laplacian(im,cv2.CV_64F)
 
 
-        print("%"*42,"blendering")
-        # "blender myscene.blend --background --python myscript.py"
-        blender_path = "C:\\PROG\\grafic\\Blender\\blender.exe -b"
-        script_path = "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"
-        blender = Popen(blender_path, stdout=PIPE, stdin=PIPE, stderr=PIPE)
+        sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
+        import blender_step
 
-        cmd = str('--python "'+script_path+'"')
-        print(cmd)
+        bm = blender_step.blender_module()
+        bm.start_server()
+        bm.init_room()
 
-        out = blender.stdout.readline()
-        print(out)
-        out = blender.stdout.readline()
-        print(out)
-        out = blender.stdout.readline()
-        print(out)
-
-        # out,err = blender.communicate('--python "D:\\DEV\\PYTHON\\pyCV\\blender_out\\render.py"')
-        # out,err = blender.communicate(params)
-        # print(err)
         def make_blender_cube(im):
-            # sp.check_output(["echo", "Hello World!"])
+            projections = 'contours of moving objects'
+            imdir = bm.photogrammetry_object(projections)
+            # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
 
-            # out, err = p.communicate("2\n6\n")
-            # print(out)
+            file_paths = [os.path.join(imdir, file) for file in os.listdir(imdir)]
+            sorted_files = sorted(file_paths, key=os.path.getctime)
+            # print('X'*111)
+
+            latest_imfile = sorted_files [-1]
+            # print('latest_imfile', latest_imfile)
+            im = cv2.imread(latest_imfile)
 
             im_out = im
             return im_out
@@ -653,8 +652,9 @@ class StepControl():
             """
             from multiple camera segmented images - only bounding boxes of contours
             center of bounding box -> line intersection = center of object
-
             """
+
+
 
         self.add_available_step('original', make_nothing)
         self.add_available_step('gray', make_gray)
