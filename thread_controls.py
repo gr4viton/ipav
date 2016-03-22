@@ -80,6 +80,7 @@ class Chain():
             # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
             # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
 
+            # self.step_names = ['original', 'resize', 'gray', 'detect red', 'blender cube']
             self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
 
         if self.name in self.load_data_chain_names:
@@ -116,14 +117,14 @@ class ChainControl():
 
 
 
-    def start_findtagging(self):
+    def start_running(self):
         self.chain_running = True
         self.thread = threading.Thread(target=self.chain_loop)
         self.thread.start()
 
     def toggle_findtagging(self):
         if self.chain_running == False:
-            self.start_findtagging()
+            self.start_running()
         else:
             self.chain_running = False
 

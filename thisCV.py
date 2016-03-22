@@ -664,6 +664,13 @@ class StepControl():
             center of bounding box -> line intersection = center of object
             """
 
+        def make_detect_red(im):
+            lowerb = np.array([5, 50, 50])
+            upperb = np.array([15, 255, 255])
+
+            mask = cv2.inRange(im, lowerb, upperb)
+            im = mask
+            return im
 
 
         self.add_available_step('original', make_nothing)
@@ -701,6 +708,8 @@ class StepControl():
 
 
         self.add_available_step('blender cube', make_blender_cube)
+        self.add_available_step('detect red', make_detect_red)
+
 
         # self.available_steps.append(Step('original', make_nothing))
         # self.available_steps.append(Step('gray', make_gray))
