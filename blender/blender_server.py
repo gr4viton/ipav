@@ -36,10 +36,19 @@ class RealCamera():
     # height, width, distance of the plane == aspect ratios, distance
     size = Vector((0,0,0))
 
+    proj = None
+    rcam = None
+
     def __init__(self, pos, rot, size):
         self.pos = Vector(pos)
         self.rot = Vector(rot)
         self.size = Vector(size)
+
+    def __init__(self, pos, rot, size, rcam_obj):
+        self.pos = Vector(pos)
+        self.rot = Vector(rot)
+        self.size = Vector(size)
+        self.rcam = rcam_obj
 
     def init_rot(self, real_point, pixel):
         """
@@ -53,30 +62,80 @@ class RealCamera():
         # z = cursor.z
         cubeobject(location=(1, 1, 1))
 
-    def create_line(self):
+    def create_cone(self):
         new_cone = bpy.ops.mesh.primitive_cone_add(
-            vertices=32, radius1=2, depth=10.0,
+            vertices=4, radius1=2, depth=10.0,
             location=self.pos, rotation=self.rot)
-
-
         print("created new_cone =", new_cone)
         # scn = bpy.context.scene.GetCurrent()
         # scn.objects.new(new_cone, 'cone')
 
+    def delete_object(self, obj):
+        bpy.ops.object.select_all(action='DESELECT')
+        #rcam_d = bpy.data.objects['prj.001']
+        obj.select = True
+        bpy.ops.object.delete()
 
+        scene = bpy.context.scene
+    #    scene.objects.link(rcam_d)
+        scene.update()
+
+    def delete_projection(self):
+        self.delete_obj(self.proj)
+
+    def create_projection(self):
+        if self.rcam:
+
+            # rcam = bpy.data.objects['rcam.001']
+            # print(rcam)
+            #    rcam_d = bpy.data.objects.new('prj.001', rcam.data.copy())
+            #    print(rcam_d)
+            if self.proj:
+                self.delete_projection()
+
+            self.proj = self.rcam.copy()
+            # print(rcam_d)
+
+            #    rcam_d.location += Vector((1,1,1))
+            #    rcam_d.rotation_euler = Vector((pi,0,0))
+            self.proj.scale = Vector((1, 1, 5))
+
+            scene = bpy.context.scene
+            scene.objects.link(self.proj)
+            scene.update()
 
 
 class BlenderServer():
 
     # real_cam_set
     real_cam_set = []
+    # photogrammetry object
+    pobj = None
 
     def __init__(self):
-        path = 'D:/DEV/PYTHON/pyCV/kivyCV_start/blender/real_cam_set.ini'
-        self.init_real_cam_set(path)
+        # path = 'D:/DEV/PYTHON/pyCV/kivyCV_start/blender/real_cam_set.ini'
+        # self.init_real_cam_set_from_conf(path)
+        pass
 
+    def init_real_cam_set(self):
+        """ from blender model
+        - loads position scale and rotation of all rcam.XXX
+        """
+        for obj_key, obj in bpy.data.objects.items():
+            if obj_key[:4] == 'rcam':
+                # print(obj_key)
+                self.real_cam_set.append(RealCamera(
+                    obj.location,
+                    obj.rotation_euler,
+                    obj.dimensions,
+                    obj
+                ))
+                # print(obj.location)
 
-    def init_real_cam_set(self, path):
+                # print(obj.rotation_euler)
+                # print(obj.dimensions)
+
+    def init_real_cam_set_from_conf(self, path):
         print ('Initializing real cameras location data.')
         vector_delimiter = '|'
         number_delimiter = ';'
@@ -93,10 +152,25 @@ class BlenderServer():
 
         print(len(self.real_cam_set),'real camera location data initialized.')
 
-    def create_cam_lines(self):
+    def create_projections(self):
         for cam in self.real_cam_set:
-            print('creating line')
-            cam.create_line()
+            print('creating projection')
+            cam.create_projection()
+
+    def photogrammetry_object(self):
+        print('photogrammetrying object')
+        self.pobj = None
+        for rcam in self.real_cam_set:
+            if rcam.proj:
+                if self.pobj is None:
+                    # first projection
+                    print('first projection')
+                    self.pobj = rcam.proj
+                else:
+                    print('boolean modifier')
+                    self.booleanSum(self.pobj, rcam.proj)
+                    # rcam.delete_projection()
+
 
     def execfile(self, filepath):
         import os
@@ -106,6 +180,29 @@ class BlenderServer():
             }
         with open(filepath, 'rb') as file:
             exec(compile(file.read(), filepath, 'exec'), global_namespace)
+
+    def booleanSum(self, target, other_object):
+
+       bpy.ops.object.select_all(action='DESELECT')
+
+       # Select the new other_object.
+       target.select = True
+       bpy.context.scene.objects.active = target
+
+       other_object.select = True
+       bpy.ops.object.make_single_user(object=True, obdata=True, material=False, texture=False, animation=False)
+       # Add a modifier
+       bpy.ops.object.modifier_add(type='BOOLEAN')
+
+       mod = target.modifiers
+       mod[0].name = "booleanSum"
+       mod[0].object = other_object
+       mod[0].operation = 'INTERSECT'
+
+       # Apply modifier
+       print('to apply modifier')
+       bpy.ops.object.modifier_apply(apply_as='DATA', modifier=mod[0].name)
+
 
     def csgSubtract(self, target, opObj):
        '''subtract opObj from the target'''
@@ -201,7 +298,7 @@ class BlenderServer():
 
                 if loaded_pickle:
                     loaded_pickle += pickle.STOP
-                    print('loaded_pickle =', loaded_pickle)
+                    print('<<< loaded_pickle =', loaded_pickle)
                     data_dict = pickle.loads(loaded_pickle)
                     print('data_dict =', data_dict )
 
@@ -221,8 +318,14 @@ class BlenderServer():
                         #     looping = False
                         #     break
 
-                        if data_dict.get('create_cam_lines', None) == True:
-                            self.create_cam_lines()
+                        if data_dict.get('init_real_cam_set', None) == True:
+                            self.init_real_cam_set()
+
+                        if data_dict.get('create_cam_projections', None) == True:
+                            self.create_projections()
+
+                        if data_dict.get('photogrammetry_object', None) == True:
+                            self.photogrammetry_object()
 
                         if data_dict.get('render', None) == True:
                             self.render_to_file()

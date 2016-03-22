@@ -115,8 +115,11 @@ class blender_module():
         # should wait from started tag from server
 
         self.send_data_dict({'load_blend': self.blend_path})
+        self.send_data_dict({'init_real_cam_set':True})
         # time.sleep(10)
-        self.send_data_dict({'create_cam_lines':True})
+        self.send_data_dict({'create_cam_projections':True})
+        self.send_data_dict({'photogrammetry_object':True})
+
 
         # time.sleep(20)
 
