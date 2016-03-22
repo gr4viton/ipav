@@ -78,9 +78,9 @@ class Chain():
 
             # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
             # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
-            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
+            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
 
-            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
+            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
 
         if self.name in self.load_data_chain_names:
             self.load_data()
@@ -165,6 +165,9 @@ class ChainControl():
     def set_resolution_div(self, resolution_multiplier):
         self.resolution_multiplier = resolution_multiplier
 
+
+
+
 class ImageStreamControl():
     """
     Shared class to control source capture execution
@@ -225,7 +228,7 @@ class ImageStreamControl():
 
             ret, frame = self.capture.read()
             if ret == False:
-                print('Source cannot be read from, source_id ', self.source_id)
+                print('Source[', self.source_id, '] Cannot be read from')
                 self.source_id = -1
                 continue
             print('Source[', self.source_id, '] Opened capture')
@@ -233,9 +236,10 @@ class ImageStreamControl():
         self.capture_lock.release()
 
     def close_capture(self):
-        self.capture_lock.acquire()
+        # self.capture_lock.acquire()
         self.capture.release()
-        self.capture_lock.release()
+        print('Source[', self.source_id, '] Released capture.')
+        # self.capture_lock.release()
 
     def start_capturing(self, blocking = True):
         if blocking == False:

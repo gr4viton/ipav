@@ -632,12 +632,22 @@ class StepControl():
         bm.start_server()
         bm.init_room()
 
+
+# predavat dictionary - multiple possible images, text overlay
         def make_blender_cube(im):
             projections = 'contours of moving objects'
-            imdir = bm.photogrammetry_object(projections)
-            # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
 
-            file_paths = [os.path.join(imdir, file) for file in os.listdir(imdir)]
+
+
+            imdir = bm.photogrammetry_object(projections)
+
+
+            # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
+            dir_files = os.listdir(imdir)
+            if dir_files == []:
+                return im
+            file_paths = [os.path.join(imdir, file) for file in dir_files]
+
             sorted_files = sorted(file_paths, key=os.path.getctime)
             # print('X'*111)
 

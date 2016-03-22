@@ -204,9 +204,10 @@ class CaptureControl():
     streams = []
     stream_id = 0
     def __init__(self):
-        # self.streams.append(ImageStreamControl(0))
-        self.streams.append(ImageStreamControl(1))
-        self.streams.append(ImageStreamControl(2))
+        # self.streams.append(ImageStreamControl(0)) # over
+        # self.streams.append(ImageStreamControl(1)) # clips
+        self.streams.append(ImageStreamControl(2)) # high def
+        # self.streams.append(ImageStreamControl(3))
         # self.streams[-1].toggle_source_id()
 
         # print(self.streams)
@@ -220,8 +221,11 @@ class CaptureControl():
     #     self.set_all_settings()
 
     def set_all_settings(self):
-        width = 640
-        height = 480
+        # width = 640
+        # height = 480
+        width, height = [640, 480]
+        width, height = [800, 600]
+        width, height = [1024, 768]
         for stream in self.streams:
             stream.capture.set(3, width)
             stream.capture.set(4, height)
