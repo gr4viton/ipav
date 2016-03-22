@@ -125,7 +125,8 @@ class blender_module():
 
 
         looping = True
-        a = 5
+        # a = 5
+        a = 1
         while(looping):
 
             # self.send_pickle(self.data_pickle)
@@ -139,7 +140,7 @@ class blender_module():
             time.sleep(1)
             # time.sleep(4)
 
-            if a > 0:
+            if a > 1:
                 a -= 1
             else:
                 # self.send_string_command(self.param_exit)

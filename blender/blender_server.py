@@ -70,18 +70,31 @@ class RealCamera():
         # scn = bpy.context.scene.GetCurrent()
         # scn.objects.new(new_cone, 'cone')
 
-    def delete_object(self, obj):
-        bpy.ops.object.select_all(action='DESELECT')
-        #rcam_d = bpy.data.objects['prj.001']
-        obj.select = True
-        bpy.ops.object.delete()
+    def delete_object(self, object):
+    #     bpy.ops.object.select_all(action='DESELECT')
+    #     #rcam_d = bpy.data.objects['prj.001']
+    #     object.select = True
+    #     bpy.ops.object.delete()
+    #
+    #     scene = bpy.context.scene
+    # #    scene.objects.link(rcam_d)
+    #     scene.update()
+
 
         scene = bpy.context.scene
-    #    scene.objects.link(rcam_d)
+        scene.objects.unlink(object)
+        bpy.data.objects.remove(object)
         scene.update()
 
+        # object.hide
+        # when it is unlinked from scene, it won't be saved
+        object = None
+
+        # object.delete()
+
     def delete_projection(self):
-        self.delete_obj(self.proj)
+        self.delete_object(self.proj)
+        self.proj = None
 
     def create_projection(self):
         if self.rcam:
@@ -96,6 +109,8 @@ class RealCamera():
             self.proj = self.rcam.copy()
             # print(rcam_d)
 
+
+            self.proj.name = 'prj' + self.rcam.name[-4:]
             #    rcam_d.location += Vector((1,1,1))
             #    rcam_d.rotation_euler = Vector((pi,0,0))
             self.proj.scale = Vector((1, 1, 5))
@@ -157,19 +172,44 @@ class BlenderServer():
             print('creating projection')
             cam.create_projection()
 
+    def duplicate(self, template, name):
+        copy = template.copy()
+        copy.name = name
+        scene = bpy.context.scene
+        scene.objects.link(copy)
+        scene.update()
+        return copy
+
     def photogrammetry_object(self):
         print('photogrammetrying object')
+        bpy.ops.object.mode_set(mode='OBJECT')
         self.pobj = None
         for rcam in self.real_cam_set:
             if rcam.proj:
                 if self.pobj is None:
                     # first projection
                     print('first projection')
-                    self.pobj = rcam.proj
+                    self.pobj = self.duplicate(rcam.proj, 'pobj')
                 else:
                     print('boolean modifier')
                     self.booleanSum(self.pobj, rcam.proj)
-                    # rcam.delete_projection()
+
+        for obj in bpy.data.objects:
+            print(obj)
+
+        # scene = bpy.context.scene
+        for rcam in self.real_cam_set:
+            # scene.objects.unlink(rcam.proj)
+            # bpy.data.objects.remove(rcam.proj)
+            # scene.update()
+
+            rcam.delete_projection()
+
+
+        # printl()
+
+        for obj in bpy.data.objects:
+            print(obj)
 
 
     def execfile(self, filepath):
@@ -301,50 +341,60 @@ class BlenderServer():
                     print('<<< loaded_pickle =', loaded_pickle)
                     data_dict = pickle.loads(loaded_pickle)
                     print('data_dict =', data_dict )
+                    try:
 
-                    if data_dict:
-                        script = data_dict.get('exec', None)
-                        if script:
-                            print("Executing:", script)
-                            self.execfile(script)
+                        if data_dict:
 
-                        blend = data_dict.get('load_blend', None)
-                        if blend:
-                            self.load_file(blend)
+                            script = data_dict.get('exec', None)
+                            if script:
+                                print("Executing:", script)
+                                self.execfile(script)
+
+                            blend = data_dict.get('load_blend', None)
+                            if blend:
+                                self.load_file(blend)
 
 
-                        # exitit = data_dict.get('exit', None)
-                        # if exitit == True:
-                        #     looping = False
-                        #     break
+                            # exitit = data_dict.get('exit', None)
+                            # if exitit == True:
+                            #     looping = False
+                            #     break
 
-                        if data_dict.get('init_real_cam_set', None) == True:
-                            self.init_real_cam_set()
+                            if data_dict.get('init_real_cam_set', None) == True:
+                                self.init_real_cam_set()
 
-                        if data_dict.get('create_cam_projections', None) == True:
-                            self.create_projections()
+                            if data_dict.get('create_cam_projections', None) == True:
+                                self.create_projections()
 
-                        if data_dict.get('photogrammetry_object', None) == True:
-                            self.photogrammetry_object()
+                            if data_dict.get('photogrammetry_object', None) == True:
+                                self.photogrammetry_object()
 
-                        if data_dict.get('render', None) == True:
-                            self.render_to_file()
+                            if data_dict.get('render', None) == True:
+                                self.render_to_file()
 
-                        if data_dict.get('exit', None) == True:
-                            looping = False
-                            break
+                            if data_dict.get('exit', None) == True:
+                                looping = False
+                                break
 
-                        # if 'exit' in data_dict:
-                        #     if data_dict['exit'] == True:
-                        #         looping = False
-                        #         break
+                            # if 'exit' in data_dict:
+                            #     if data_dict['exit'] == True:
+                            #         looping = False
+                            #         break
 
-                        # elif 'exec' in data_dict:
-                        #     script = data_dict.get('exec')
-                        #     print("Executing:", script)
-                        #     execfile(script)
-                        else:
-                            printl()
+                            # elif 'exec' in data_dict:
+                            #     script = data_dict.get('exec')
+                            #     print("Executing:", script)
+                            #     execfile(script)
+                            else:
+                                printl()
+
+                    except OSError as err:
+                        print("OS error: {0}".format(err))
+                    # except :
+                    #     print("Unexpected error:", sys.exc_info()[0])
+                        # print(sys.exc_traceback)
+                        # print(sys.exc_value)
+
 
                 # sys.stdout.flush()
 
