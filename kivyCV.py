@@ -204,9 +204,13 @@ class CaptureControl():
     streams = []
     stream_id = 0
     def __init__(self):
+
+        ids = [0,1,2,3,4]
+        [self.streams.append(ImageStreamControl(id)) for id in ids]
         # self.streams.append(ImageStreamControl(0)) # over
-        self.streams.append(ImageStreamControl(1)) # clips
+        # self.streams.append(ImageStreamControl(1)) # clips
         # self.streams.append(ImageStreamControl(2)) # high def
+
         # self.streams.append(ImageStreamControl(3))
         # self.streams[-1].toggle_source_id()
 

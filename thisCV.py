@@ -564,6 +564,20 @@ class StepControl():
 
             return im_out
 
+        def make_stack(im, code=cv2.COLOR_RGB2HLS_FULL):
+            im_gray = make_gray(im)
+            if code != 0:
+                im_code = cv2.cvtColor(im, cv2.COLOR_RGB2HLS_FULL)
+            else:
+                im_code = im
+
+            a, b, c = cv2.split(im_code)
+            im1 = fh.joinIm([[a],[b]])
+
+            im2 = fh.joinIm([[c], [im_gray]])
+            im_out = fh.joinIm([[im1], [im2]], vertically=1)
+
+            return im_out
 
         def make_hls_stack(im):
             im_gray = make_gray(im)
@@ -665,11 +679,80 @@ class StepControl():
             """
 
         def make_detect_red(im):
-            lowerb = np.array([5, 50, 50])
-            upperb = np.array([15, 255, 255])
+            # Convert BGR to HSV
+            hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
 
-            mask = cv2.inRange(im, lowerb, upperb)
-            im = mask
+            # define range of blue color in HSV
+            blue = [[110,50,50],[130,255,255]]
+            orange = [[24,50,50],[42,255,255]]
+            red = [[0,80,80],[24,255,255]]
+
+            color = red
+            lower_blue = np.array(color[0])
+            upper_blue = np.array(color[1])
+
+            # Threshold the HSV image to get only blue colors
+            mask = cv2.inRange(hsv, lower_blue, upper_blue)
+
+            im_out = mask
+            return im_out
+
+        def make_detect_red2(im):
+            # a = np.array([31, 67, 72], dtype=np.uint8)
+            # b = np.array([28, 52, 76], dtype=np.uint8)
+            x = 255/100
+            a = np.array([24, 34*x, 26*x], dtype=np.uint8)
+            b = np.array([39, 100*x, 100*x], dtype=np.uint8)
+
+            # red/(r+g+b)
+            #216
+
+            lowerb, upperb = [a,b]
+            # lowerb, upperb = [b,a]
+
+            # im_float = np.array(im, dtype=np.float)
+            im_float = im
+            im_hsv = cv2.cvtColor(im_float, cv2.COLOR_BGR2HSV)
+            h,s,v = cv2.split(im_hsv)
+            print('hue',np.min(h), np.max(h))
+            print(im_hsv.dtype)
+
+            im_color = h
+            # im_uint8 = np.array(im_color, dtype=np.uint8)
+            im_uint8 = im_color
+
+            blue, green, red = cv2.split(im)
+            # im_color = red / (red/255 * green/255 * blue/255)
+            # im_color = red / (red/255 + green/255 + blue/255)
+            # im_color = red / (red + green + blue + 1) * 255
+            im_color = red / (green + blue + 1) * 255
+            im_color = 255 / (red + green + blue + 1)
+
+            im_color = red / (red - green/2 - blue/2 + 1) * 255
+            im_color = red - green/2 - blue/2
+            im_color = 1/ (red - green/2 - blue/2)
+            im_color = red/ (red - green - blue) * 255
+            # im_color = red/ (red - green/2 - blue/2)
+            im_color = red/ (red - green/3- blue/3)
+            # im_color = 255 - red/ (red - green/2 - blue/2)
+
+            # red_float = red
+            # RMAX = 127
+            #
+            # red.convertTo(red_float, cv2.CV_32F)
+            # red_float = red_float*RMAX/255+128;
+            # red_float.convertTo(red,cv2.CV_8U);
+            #
+            # im_color = red
+            # im_color = (red/255 + green/255 + blue/255)*255
+
+
+            # im = im_uint8
+
+            lowerb, upperb = [100,180]
+            mask = cv2.inRange(im_color, lowerb, upperb)
+            print('mask', np.min(mask), np.max(mask))
+            im = mask * 1
             return im
 
 
@@ -691,7 +774,10 @@ class StepControl():
         self.add_available_step('flooded w/white', lambda im: make_flood(im, 255))
         self.add_available_step('flooded w/black', lambda im: make_flood(im, 0))
 
-        self.add_available_step('hls stack', make_hls_stack)
+        # self.add_available_step('hls stack', make_hls_stack)
+        self.add_available_step('hls stack', lambda im: make_stack(im, cv2.COLOR_RGB2HLS))
+        self.add_available_step('rgb stack', lambda im: make_stack(im, 0))
+        self.add_available_step('bgr stack', lambda im: make_stack(im, cv2.COLOR_RGB2BGR))
         self.add_available_step('hls saturation', make_hls_saturation)
         self.add_available_step('erase color', make_erase_color)
 
