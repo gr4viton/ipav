@@ -107,7 +107,6 @@ class StepWidget(GridLayout):
         self.kivy_image.texture = self.texture
 
     def set_drawing(self, value):
-        # print(value)
         self.drawing = value
         if value == True:
             self.toggle_object.state = 'down'
@@ -121,6 +120,16 @@ class StepWidget(GridLayout):
             # self.kivy_image.size_hint = (0.1, 0.1)
             self.size_hint_x = 0.33/9
             # self.size_hint_y = 0.2
+
+    def show_info(self, value):
+        self.show_info = value
+        if value == True:
+            # self.toggle_object.state = 'down'
+            pass
+        if value == False:
+            # self.toggle_object.state = 'normal'
+            pass
+
 
     def toggle_drawing(self):
         if self.toggle_object.state == 'down':
@@ -329,6 +338,9 @@ class multicopterApp(App):
         Config.set('graphics', 'top', 15)
         Config.set('graphics', 'left', 4)
         Config.set('graphics', 'multisamples', 0) # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
+
+
+        Config.set('input','mouse','mouse,disable_multitouch')
 
         # Config.set('graphics', 'fullscreen', 'fake')
         # Config.set('graphics', 'fullscreen', 1)

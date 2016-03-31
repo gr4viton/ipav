@@ -300,18 +300,29 @@
             pos: self.x + self.margin, self.y + self.margin + 1
             size: self.width - 2 * self.margin , self.height - 2 * self.margin
 #            self.thickness
-    ToggleButton:
-        id: toggle
-        text: root.name
+    GridLayout:
+        cols: 2
         size_hint_y: 0.15
-        state: 'down'
-        on_state: root.set_drawing(self.state == 'down')
+        ToggleButton:
+#            id: toggle
+            text: root.name
+            size_hint_x: 0.9
+            state: 'down'
+            on_state: root.set_drawing(self.state == 'down')
+
+        ToggleButton:
+            id: toggle
+            text: 'info'
+            size_hint_x: 0.1
+#            state: 'up'
+            on_state: root.show_info(self.state == 'down')
 
     Image:
         id: kivy_image
         size_hint_y: 0.8
 #        size_hint_x: 1
         background_normal: 'True'
+
     Label:
         id: stat_label
         valign: 'top'
