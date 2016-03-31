@@ -299,6 +299,7 @@ class StepControl():
 
     def add_available_step(self, name, function):
         self.available_steps[name] = Step(name, function)
+        self.available_step_fcn[name] = function
 
     def select_steps(self, current_chain):
         self.chain = current_chain
@@ -316,7 +317,10 @@ class StepControl():
 
         # create steps list for this current_chain algorithm
         self.steps = []
-        [self.steps.append(self.available_steps[step_name]) for step_name in self.chain.step_names]
+
+        # [self.steps.append(self.available_steps[step_name].copy()) for step_name in self.chain.step_names]
+        # [self.steps.append(Step(step_name, self.available_step_fcn[step_name])) for step_name in self.chain.step_names]
+        [self.steps.append(Step(step_name, self.available_steps[step_name].function)) for step_name in self.chain.step_names]
 
 
     def __init__(self, resolution_multiplier, current_chain):
@@ -342,6 +346,7 @@ class StepControl():
     def define_available_steps(self):
 
         self.available_steps = {}
+        self.available_step_fcn = {}
 
         def make_nothing(im):
             return im
@@ -637,7 +642,8 @@ class StepControl():
             return np.uint8(abs_sob)
 
         def make_laplacian(im):
-            return cv2.Laplacian(im,cv2.CV_64F)
+            im2 = im.copy()
+            return cv2.Laplacian(im2,cv2.CV_64F)
 
 
 
