@@ -714,7 +714,7 @@ class StepControl():
             im_float = im
             im_hsv = cv2.cvtColor(im_float, cv2.COLOR_BGR2HSV)
             h,s,v = cv2.split(im_hsv)
-            print('hue',np.min(h), np.max(h))
+            print('hue', np.min(h), np.max(h))
             print(im_hsv.dtype)
 
             im_color = h
