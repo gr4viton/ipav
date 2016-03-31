@@ -48,7 +48,7 @@
 #            text: 'Switch cameras'
             text: 'Toggle computing'
             size_hint_y: .1
-            on_press: root.findtag_control.toggle_findtagging()
+            on_press: root.chain_control.toggle_findtagging()
             # pos_hint: {'center_x':.5, 'center_y': .5}
         Button:
             text: 'Toggle capturing'
@@ -58,6 +58,11 @@
             text: 'Switch cameras'
             size_hint_y: .1
             on_press: root.capture_control.switch_camera();
+            # pos_hint: {'center_x':.5, 'center_y': .5}
+        Button:
+            text: 'Load chain'
+            size_hint_y: .1
+            on_press: root.chain_control.show_load_chain();
             # pos_hint: {'center_x':.5, 'center_y': .5}
 
         Image:
@@ -109,7 +114,7 @@
                 value: 0.5
                 min: 0.05
                 max: 2
-                on_value: root.findtag_control.set_resolution_div(self.value);
+                on_value: root.chain_control.set_resolution_div(self.value);
 
 
 
@@ -156,7 +161,7 @@
             Label:
                 text: root.label_mean_exec_time
 #                size_hint_y: 0.2
-    #            text: root.findtag_control.mean_exec_time
+    #            text: root.chain_control.mean_exec_time
 #        Label:
 #            text:
 #                'splitter.width: {}\nparent.width: {}\nmax_size: {}'\

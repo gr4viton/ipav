@@ -508,61 +508,62 @@ class StepControl():
 
 
 
-        # Init SURF detector
-        surf = cv2.xfeatures2d.SURF_create()
-
-        def make_surf(im):
-            kp = surf.detect(im, None)
-
-            col = 142
-            im_out = np.zeros(im.shape)
-            flags = cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG + (
-                    cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            cv2.drawKeypoints(im, kp, im_out, color=col, flags=flags)
-
-            return im_out
-
-        # Init SIFT detector
-        sift = cv2.xfeatures2d.SIFT_create()
-
-        def make_sift(im):
-            kp = sift.detect(im, None)
-
-            col = 142
-            im_out = np.zeros(im.shape)
-            flags = cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG + (
-                    cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-            cv2.drawKeypoints(im, kp, im_out, color=col, flags=flags)
-
-            return im_out
-
-        freakExtractor = cv2.xfeatures2d.FREAK_create()
-        def make_freak(im):
-            keypoints, descriptors = freakExtractor.compute(im, keypoints)
-
-        # Initiate FAST object with default values
-        fast = cv2.FastFeatureDetector_create(nonmaxSuppression=0) # 8ms
-        fast = cv2.FastFeatureDetector_create(nonmaxSuppression=1) # 3ms
-        # fast.setBool('nonmaxSuppression',1)
-
-
-        def make_fast(im):
-
-            # find and draw the keypoints
-            kp = fast.detect(im, None)
-
-            col = 255
-            im_out = np.zeros(im.shape)
-            flags = cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG + (
-                    cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-
-            keypoints, descriptors = freakExtractor.compute(im, kp)
-
-            cv2.drawKeypoints(im, kp, im_out, color=col, flags=flags)
-
-
-            return im_out
+        # # Init SURF detector
+        #
+        # surf = cv2.xfeatures2d.SURF_create()
+        #
+        # def make_surf(im):
+        #     kp = surf.detect(im, None)
+        #
+        #     col = 142
+        #     im_out = np.zeros(im.shape)
+        #     flags = cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG + (
+        #             cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        #     cv2.drawKeypoints(im, kp, im_out, color=col, flags=flags)
+        #
+        #     return im_out
+        #
+        # # Init SIFT detector
+        # sift = cv2.xfeatures2d.SIFT_create()
+        #
+        # def make_sift(im):
+        #     kp = sift.detect(im, None)
+        #
+        #     col = 142
+        #     im_out = np.zeros(im.shape)
+        #     flags = cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG + (
+        #             cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        #     cv2.drawKeypoints(im, kp, im_out, color=col, flags=flags)
+        #
+        #     return im_out
+        #
+        # freakExtractor = cv2.xfeatures2d.FREAK_create()
+        # def make_freak(im):
+        #     keypoints, descriptors = freakExtractor.compute(im, keypoints)
+        #
+        # # Initiate FAST object with default values
+        # fast = cv2.FastFeatureDetector_create(nonmaxSuppression=0) # 8ms
+        # fast = cv2.FastFeatureDetector_create(nonmaxSuppression=1) # 3ms
+        # # fast.setBool('nonmaxSuppression',1)
+        #
+        #
+        # def make_fast(im):
+        #
+        #     # find and draw the keypoints
+        #     kp = fast.detect(im, None)
+        #
+        #     col = 255
+        #     im_out = np.zeros(im.shape)
+        #     flags = cv2.DRAW_MATCHES_FLAGS_DRAW_OVER_OUTIMG + (
+        #             cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+        #
+        #
+        #     keypoints, descriptors = freakExtractor.compute(im, kp)
+        #
+        #     cv2.drawKeypoints(im, kp, im_out, color=col, flags=flags)
+        #
+        #
+        #     return im_out
 
         def make_stack(im, code=cv2.COLOR_RGB2HLS_FULL):
             im_gray = make_gray(im)
@@ -639,12 +640,15 @@ class StepControl():
             return cv2.Laplacian(im,cv2.CV_64F)
 
 
-        sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
-        import blender_step
 
-        bm = blender_step.blender_module()
-        bm.start_server()
-        bm.init_room()
+
+        sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
+
+        # import blender_step
+        #
+        # bm = blender_step.blender_module()
+        # bm.start_server()
+        # bm.init_room()
 
 
 # predavat dictionary - multiple possible images, text overlay
@@ -783,11 +787,11 @@ class StepControl():
 
 
         # self.add_available_step('orb', make_orb)
-        self.add_available_step('sift', make_sift)
-        self.add_available_step('surf', make_surf)
-
-        self.add_available_step('freak', make_freak)
-        self.add_available_step('fast', make_fast)
+        # self.add_available_step('sift', make_sift)
+        # self.add_available_step('surf', make_surf)
+        #
+        # self.add_available_step('freak', make_freak)
+        # self.add_available_step('fast', make_fast)
         self.add_available_step('sobel horizontal', lambda im: make_sobel(im, vertical=0, ksize=5))
         self.add_available_step('sobel vertical', lambda im: make_sobel(im, vertical=1, ksize=5))
         self.add_available_step('laplacian', make_laplacian)

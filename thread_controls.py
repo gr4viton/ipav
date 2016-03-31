@@ -69,21 +69,36 @@ class Chain():
 
     data = LockedValue()
 
-    def __init__(self, name):
+    delimiter = ','
+    strip_chars = ' \t'
+    def load_steps_from_file(self, path):
+        with open (path, "r") as myfile:
+            string = myfile.read
+        self.load_steps_from_string(string)
+
+    def load_steps_from_string(self, string):
+        self.step_names = string.replace('\n', self.delimiter).split(self.delimiter)
+        print(self.step_names)
+        self.step_names = [step_name.strip(self.strip_chars) for step_name in self.step_names]
+        print(self.step_names)
+
+    def __init__(self, name, path=''):
         self.name = name
         self.tag_search = name in self.tag_names
 
+        if path != '':
+            self.load_steps_from_file(path)
+        else:
+            if self.name in ['standard']:
 
-        if self.name in ['standard']:
+                # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
+                # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
+                self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
 
-            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
-            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
-            # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
-
-            self.step_names = ['original', 'resize', 'gray', 'detect red', 'blender cube']
-            self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
-            self.step_names = ['original', 'resize', 'detect red']
-            # self.step_names = ['original', 'resize', 'rgb stack']
+                # self.step_names = ['original', 'resize', 'gray', 'detect red', 'blender cube']
+                # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
+                # self.step_names = ['original', 'resize', 'detect red']
+                # self.step_names = ['original', 'resize', 'rgb stack']
 
         if self.name in self.load_data_chain_names:
             self.load_data()
@@ -115,8 +130,32 @@ class ChainControl():
         self.execution_time_len = 50
         self.execution_time = []
         self.resolution_multiplier = 0.5
+
         self._step_control = StepControl(self.resolution_multiplier, self.current_chain)
 
+    def reset_step_control(self):
+        self._step_control.select_steps(self.current_chain)
+
+    def add_show_load_chain(self, show_load_chain_fnc):
+        self.show_load_chain_fnc = show_load_chain_fnc
+
+    def show_load_chain(self):
+        self.show_load_chain_fnc()
+
+    def load_chain(self, string):
+        self.on_stop()
+        time.sleep(1)
+
+        self.current_chain = Chain('new_chain')
+        self.current_chain.load_steps_from_string(string)
+
+        self.reset_step_control()
+        self.start_running()
+        # string = self.show_load_chain_fnc()
+
+    def get_available_steps(self):
+        # print(self._step_control.available_steps)
+        return self._step_control.available_steps
 
 
     def start_running(self):

@@ -8,6 +8,8 @@ from kivy.uix.image import Image
 from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
+from kivy.uix.popup import Popup
+from kivy.uix.textinput import TextInput
 
 from kivy.graphics import Color, Rectangle
 from kivy.uix.floatlayout import FloatLayout
@@ -191,11 +193,61 @@ class Multicopter(GridLayout):
 
     tag_error_count_text = StringProperty('No tags found')
 
-    def __init__(self, capture_control, findtag_control, **kwargs):
+    chain_string = ''
+
+    def load_and_close_popup(self, whatever):
+        self.chain_string = self.chain_string_text.text
+        self.chain_control.load_chain(self.chain_string)
+        self.load_popup.dismiss()
+
+    def show_step_names(self, whatever):
+        available_steps_dict = self.chain_control.get_available_steps()
+        available_steps_list = [key for key in available_steps_dict.keys()]
+        self.available_step_string = '\n'.join(available_steps_list)
+
+        print(self.available_step_string)
+        text_input = TextInput(text=self.available_step_string, readonly=True)
+        popup = Popup(title='Available step names', content=text_input)
+        popup.open()
+
+    def init_load_popup(self):
+
+        layout = GridLayout(cols=1)
+        layout.add_widget(Label(text='Insert chain step names separated by commas'))
+        self.chain_string_text =TextInput(text='original, gray')
+        # self.chain_string_text =TextInput(text=self.chain_string)
+        layout.add_widget(self.chain_string_text )
+
+        btn_close = Button(text='Close withouth change')
+        btn_show = Button(text='Show available step names')
+        btn_change = Button(text='Change chain steps and close')
+
+        layout.add_widget(btn_show)
+        layout.add_widget(btn_close)
+        layout.add_widget(btn_change)
+
+        self.load_popup = Popup(title='Change chain steps', content=layout,
+                                auto_dismiss=False,
+                                size_hint=(1, 0.3), )
+
+        btn_close.bind(on_press=self.load_popup.dismiss)
+        btn_show.bind(on_press=self.show_step_names)
+        btn_change.bind(on_press=self.load_and_close_popup)
+    #     lambda im: make_flood(im, 0)
+
+    def show_load_chain(self):
+        self.load_popup.open()
+
+
+    def __init__(self, capture_control, chain_control, **kwargs):
         # make sure we aren't overriding any important functionality
         super(Multicopter, self).__init__(**kwargs)
+
+        self.init_load_popup()
+
         self.capture_control = capture_control
-        self.findtag_control = findtag_control
+        self.chain_control = chain_control
+        self.chain_control.add_show_load_chain(self.show_load_chain)
 
         self.step_widgets_control = StepWidgetControl(self.layout_steps)
 
@@ -205,7 +257,8 @@ class CaptureControl():
     stream_id = 0
     def __init__(self):
 
-        ids = [0,1,2,3,4]
+        # ids = [0,1,2,3,4]
+        ids = [0]
         [self.streams.append(ImageStreamControl(id)) for id in ids]
         # self.streams.append(ImageStreamControl(0)) # over
         # self.streams.append(ImageStreamControl(1)) # clips
