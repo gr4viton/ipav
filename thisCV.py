@@ -252,12 +252,21 @@ class Step():
         self.execution_times = []
         self.mean_execution_time = 0
 
-    def run(self, input):
+    def run(self, data_prev):
+        self.data_prev = data_prev
+        self.user_input = False # e.g. from snippet or gui
+        if self.user_input == True:
+            data_prev[dd.kernel] = (42,42) # from user
+            data_prev[dd.take_all_def] = False
+        else:
+            data_prev[dd.take_all_def] = True
+
         start = time.time()
-        self.ret = self.function(input)
+        self.data_post = self.function(data_prev)
         end = time.time()
         self.add_exec_times(end-start)
-        return self.ret
+
+        return self.data_post
 
     def get_info_string(self):
         return self.str_mean_execution_time()
@@ -281,14 +290,16 @@ class AutoNumber(enum.Enum):
         obj._value_ = value
         return obj
 
-class dd(enum.Enum):
+class dd(AutoNumber):
     """
     DataDictParameterNames
     """
     im = ()
     kernel = ()
     resolution = ()
-
+    sigma = ()
+    take_all_def = ()
+    fxfy = ()
 
 
 class StepControl():
@@ -359,9 +370,12 @@ class StepControl():
     #     pass
 
     def run_all(self, im):
+        data = {}
+        data[dd.im] = im
+        # print(data)
         for step in self.steps:
-            im = step.run(im)
-        self.ret = im
+            data = step.run(data)
+        self.ret = data
 
     def step_all(self, im, resolution_multiplier):
         self.resolution_multiplier = resolution_multiplier
@@ -376,18 +390,59 @@ class StepControl():
         self.available_step_fcn = {}
 
 
-        def make_nothing(data_dict):
-            # im = data_dict{im}
-            data_dict[dd.resolution] = data_dict[dd.im].shape
-            # dict = {'resolution': im.shape}
-            # return im, dict
-            return data_dict
+        def make_nothing(data):
+            # print(data)
+            im = data[dd.im]
+            data[dd.resolution] = im.shape
+            # if data["take_all_def"] == True or data[dd.kernel] == None:
+            #     kernel = [5,5] # default kernel value
+            #     data[dd.kernel] = kernel
 
-        def make_resize(im):
-            return cv2.resize(im.copy(), (0, 0), fx=self.resolution_multiplier, fy=self.resolution_multiplier)
+            # im_out = gray(im, kernel)
+
+            # data[dd.im] = im_out.copy()
+
+            return data
+
+        def make_gauss(data):
+            im = data[dd.im]
+            data[dd.resolution] = data[dd.im].shape
+            take_def = data[dd.take_all_def] == True
+            if take_def or data[dd.kernel] == None:
+                kernel = (9,9) # default kernel value
+                data[dd.kernel] = kernel
+            if take_def or data[dd.sigma] == None:
+                sigma = 1
+                data[dd.sigma] = sigma
+
+            im_out = cv2.GaussianBlur(im.copy(), kernel, sigmaX=sigma)
+
+            data[dd.im] = im_out.copy() # ?? do i need a copy?
+            return data
+
+        # def make_gauss(im, a=5, sigma=1):
+        #     return cv2.GaussianBlur(im.copy(), (a, a), sigmaX=sigma)
+
+        def make_resize(data):
+            im = data[dd.im]
+            data[dd.resolution] = data[dd.im].shape
+            take_def = data[dd.take_all_def] == True
+            if take_def or data[dd.fxfy] == None:
+                fxfy = [self.resolution_multiplier, self.resolution_multiplier]
+                data[dd.fxfy] = fxfy
+
+            im_out = cv2.resize(im.copy(), (0, 0), fx=fxfy[0], fy=fxfy[1])
+            data[dd.im] = im_out.copy() # ?? do i need a copy?
+            return data
+
+        # def make_resize(im):
+        #     return cv2.resize(im.copy(), (0, 0), fx=self.resolution_multiplier, fy=self.resolution_multiplier)
+
+
 
         def make_gray(im):
             return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+
 
         clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))
         def make_clahe(im):
@@ -395,9 +450,6 @@ class StepControl():
 
         def make_blur(im, a=75):
             return cv2.bilateralFilter(im, 9, a, a)
-
-        def make_gauss(im, a=5, sigma=1):
-            return cv2.GaussianBlur(im.copy(), (a, a), sigmaX=sigma)
 
         def make_median(im, a=5):
             return cv2.medianBlur(im, a)
@@ -802,7 +854,9 @@ class StepControl():
         self.add_available_step('gray', make_gray)
         self.add_available_step('clahed', make_clahe)
         self.add_available_step('blurred', make_blur)
+
         self.add_available_step('gaussed', make_gauss)
+        self.add_available_step('gauss', make_gauss)
 
         self.add_available_step('median', make_median)
 

@@ -116,7 +116,7 @@ class StepWidget(GridLayout):
             if self.informing:
                 self.update_info_label(step)
             if self.drawing: # called only if intended to draw
-                im = np.uint8(step.ret.copy())
+                im = np.uint8(step.data_post[dd.im].copy())
                 if self.texture_shape != im.shape:
                     self.recreate_texture(im)
                 else:
@@ -209,7 +209,7 @@ class StepWidgetControl():
                 self.layout_steps.remove_widget( self.layout_steps.children[-1])
                 print('removed widget')
 
-        [widget.recreate_widget(np.uint8(step.ret), step.name)
+        [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name)
          for (widget, step) in zip(self.layout_steps.children, step_control.steps)]
 
     def update_layout_steps(self, step_control):

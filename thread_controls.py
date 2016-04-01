@@ -94,12 +94,15 @@ class Chain():
                 # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
                 # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
                 self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
+                self.step_names = ['original', 'gauss', 'resize']
 
                 # self.step_names = ['original', 'resize', 'gray', 'detect red', 'blender cube']
                 # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
                 # self.step_names = ['original', 'resize', 'detect red']
                 # self.step_names = ['original', 'resize', 'rgb stack']
 
+                string = 'original, resize, gauss, resize'
+                self.load_steps_from_string(string)
         if self.name in self.load_data_chain_names:
             self.load_data()
 
