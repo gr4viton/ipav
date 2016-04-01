@@ -56,9 +56,16 @@ class StepWidget(GridLayout):
     name = StringProperty()
     drawing = ObjectProperty('down')
     kivy_image = ObjectProperty()
-    stat_label = ObjectProperty()
+
+    info_label_bottom = ObjectProperty()
+    info_label_right = ObjectProperty()
+    time_label = ObjectProperty()
+
+    toggle_show_img_object = ObjectProperty()
     toggle_object = ObjectProperty()
     # layout_steps_height = NumericProperty(1600)
+
+    otherwhere = -6666
 
     def __init__(self, **kwargs):
         super(StepWidget, self).__init__(**kwargs)
@@ -69,6 +76,11 @@ class StepWidget(GridLayout):
         self.texture = Texture.create(size = init_shape, colorfmt='bgr')
         self.texture_shape = init_shape
         self.name = 'default name'
+        self.info_position = 'b'
+
+        self.informing = True
+        self.narrowed = False
+
         # self.kivy_image = ImageButton(self.toggle_drawing)
         # self.kivy_image = ImageButton()
         # self.add_widget(self.kivy_image)
@@ -79,22 +91,39 @@ class StepWidget(GridLayout):
             size=(cv_image.shape[1], cv_image.shape[0]), colorfmt='bgr')
         self.update_texture(cv_image)
 
-    def recreate_widget(self, cv_image, name):
+    def recreate_widget(self, cv_image, name, info_position='r'):
         self.recreate_texture(cv_image)
+        self.recreate_info_label()
         self.name = name
-        print('Recreated widget:',name,'\nwith dimensions:',cv_image.shape)
+        self.info_position = info_position
+        print('Recreated widget:', cv_image.shape, '[px] name: [', name,'] info_pos:', info_position)
+
+    def recreate_info_label(self):
+        if self.info_position == 'b':
+            self.info_label = self.info_label_bottom
+            self.info_label_right.size_hint_x = 0
+        elif self.info_position == 'r':
+            self.info_label = self.info_label_right
+
+    def info_label_hide(self, which):
+        if which == 'all':
+            self.info_label_right.size_hint_x = 0
+
 
     def update_widget(self, step):
-        self.update_stat(step)
-        if self.drawing: # called only if intended to draw
-            im = np.uint8(step.ret.copy())
-            if self.texture_shape != im.shape:
-                self.recreate_texture(im)
-            else:
-                self.update_texture(im)
+        if not self.narrowed:
+            self.time_label.text = step.str_mean_execution_time('')
+            if self.informing:
+                self.update_info_label(step)
+            if self.drawing: # called only if intended to draw
+                im = np.uint8(step.ret.copy())
+                if self.texture_shape != im.shape:
+                    self.recreate_texture(im)
+                else:
+                    self.update_texture(im)
 
-    def update_stat(self, step):
-        self.stat_label.text = step.str_mean_execution_time()
+    def update_info_label(self, step):
+        self.info_label.text = step.get_info_string()
 
     def update_texture(self, im):
         self.update_texture_from_rgb(fh.colorify(im))
@@ -106,37 +135,57 @@ class StepWidget(GridLayout):
         # print(im_rgb.shape)
         self.kivy_image.texture = self.texture
 
-    def set_drawing(self, value):
-        self.drawing = value
-        if value == True:
-            self.toggle_object.state = 'down'
-            # self.kivy_image.size_hint = (1, 0.9)
-            # self.kivy_image.width = 100
-            self.size_hint_x = 0.33
-            # self.size_hint_y = 1
-        if value == False:
-            self.toggle_object.state = 'normal'
-            # self.kivy_image.width = 40
-            # self.kivy_image.size_hint = (0.1, 0.1)
-            self.size_hint_x = 0.33/9
-            # self.size_hint_y = 0.2
+    def sync_info(self, value):
+        self.informing = value
 
-    def show_info(self, value):
-        self.show_info = value
+
+    def set_narrow(self, value):
+        self.narrowed = not value
         if value == True:
             # self.toggle_object.state = 'down'
+            self.size_hint_x = 0.33
+        if value == False:
+            # self.toggle_object.state = 'normal'
+            self.size_hint_x = 0.33/9
+
+    def show_img(self, value):
+        self.img_showed = value
+        if value == True:
+            self.toggle_show_img_object.state = 'down'
+            self.kivy_image.y = self.kivy_image_y
+        if value == False:
+            self.toggle_show_img_object.state = 'normal'
+            self.kivy_image_y = self.kivy_image.y
+            self.kivy_image.y = self.otherwhere
+
+    def show_info(self, value):
+        self.info_showed = value
+        if value == True:
+            # self.toggle_object.state = 'down'
+
             pass
         if value == False:
             # self.toggle_object.state = 'normal'
             pass
 
+    def set_drawing(self, value):
+        self.drawing = value
+        if value == True:
+            self.toggle_object.state = 'down'
+        if value == False:
+            self.toggle_object.state = 'normal'
+
+    def toggle_show_img(self, whatever):
+        if self.toggle_show_img_object.state == 'down':
+            self.show_img(False)
+        else:
+            self.show_img(True)
 
     def toggle_drawing(self):
         if self.toggle_object.state == 'down':
             self.set_drawing(False)
         else:
             self.set_drawing(True)
-
 
 class StepWidgetControl():
 

@@ -278,9 +278,14 @@
 #        ctx.GridLayout
 
 <StepWidget>:
+    toggle_show_img_object: toggle_show_img
     toggle_object: toggle
     kivy_image: kivy_image
-    stat_label: stat_label
+
+    info_label_bottom: info_label_bottom
+    info_label_right: info_label_right
+    time_label: time_label
+
 #    layout_steps_height: 1500
 #    size_hint_y: 0.4
     size_hint_y: None
@@ -304,33 +309,57 @@
         cols: 2
         size_hint_y: 0.15
         ToggleButton:
-#            id: toggle
             text: root.name
             size_hint_x: 0.9
             state: 'down'
-            on_state: root.set_drawing(self.state == 'down')
+            on_state: root.set_narrow(self.state == 'down')
+        GridLayout:
+            cols: 2
+            size_hint_x: 0.4
+            Label:
+                id: time_label
+                valign: 'top'
+                size_hint_x: 0.4
+#                font_size: 10
+            GridLayout:
+                cols: 2
+                size_hint_x: 0.7
+                ToggleButton:
+                    text: 'info'
+        #            state: 'down'
+                    on_state: root.show_info(self.state == 'down')
 
-        ToggleButton:
-            id: toggle
-            text: 'info'
-            size_hint_x: 0.1
-#            state: 'up'
-            on_state: root.show_info(self.state == 'down')
+                ToggleButton:
+                    text: 'sync'
+                    state: 'down'
+                    on_state: root.sync_info(self.state == 'down')
 
-    Image:
-        id: kivy_image
-        size_hint_y: 0.8
-#        size_hint_x: 1
-        background_normal: 'True'
+                ToggleButton:
+                    id: toggle_show_img
+                    text: 'img'
+                    state: 'down'
+                    on_state: root.show_img(self.state == 'down')
+
+                ToggleButton:
+                    id: toggle
+                    text: 'draw'
+                    state: 'down'
+                    on_state: root.set_drawing(self.state == 'down')
+    GridLayout:
+        cols:2
+        Image:
+            id: kivy_image
+            size_hint_y: 0.8
+
+            size_hint_x: 1
+            background_normal: 'True'
+
+        Label:
+            id: info_label_right
+            valign: 'top'
 
     Label:
-        id: stat_label
+        id: info_label_bottom
         valign: 'top'
         size_hint_y: 0.08
-    #    on_touch_down: root.drawing = (toggle.state == 'down')
-    #    on_press: print('jasd')
-        #self.toggle_drawing()
-    #    root.drawing = (toggle_object.state == 'down')
 
-#    GridLayout
-#        cols: 1

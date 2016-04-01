@@ -238,8 +238,11 @@ def add_text(im, text, col = 255, hw = (1, 20)):
     cv2.putText(im, text, hw , font, 1, 0, 5)
     cv2.putText(im, text, hw, font, 1, col)
 
-class Step():
 
+
+
+class Step():
+    """ Step class - this is usefull comment, literally"""
     def __init__(self, name, function):
         self.name = name
         self.function = function
@@ -255,6 +258,9 @@ class Step():
         self.add_exec_times(end-start)
         return self.ret
 
+    def get_info_string(self):
+        return self.str_mean_execution_time()
+
     def add_exec_times(self, tim):
         if len(self.execution_times) > self.execution_time_len:
             self.execution_times.pop(0)
@@ -263,8 +269,8 @@ class Step():
             self.execution_times.append(tim)
         self.mean_execution_time = np.sum(self.execution_times) / len(self.execution_times)
 
-    def str_mean_execution_time(self):
-        return '{0:.2f} ms'.format(round(self.mean_execution_time * 1000,2))
+    def str_mean_execution_time(self, sufix=' ms'):
+        return '{0:.2f}'.format(round(self.mean_execution_time * 1000,2)) + sufix
 
 class StepControl():
 
@@ -349,6 +355,8 @@ class StepControl():
         self.available_step_fcn = {}
 
         def make_nothing(im):
+            # dict = {'resolution': im.shape}
+            # return im, dict
             return im
 
         def make_resize(im):
