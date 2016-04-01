@@ -1,10 +1,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % logKivyCV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+[x] not only im as step input and output
+] make it step-safe = copies of data image
+
 [] step textual info
 [] show step image and info at the same time
 
-[] not only im as step input and output
+
 
 [] chain string not in popup but in the gui
 [] add steps to chain by clicking 

@@ -253,7 +253,7 @@ class Step():
         self.mean_execution_time = 0
 
     def run(self, data_prev):
-        self.data_prev = data_prev
+        self.data_prev = data_prev.copy()
         self.user_input = False # e.g. from snippet or gui
         if self.user_input == True:
             data_prev[dd.kernel] = (42,42) # from user
