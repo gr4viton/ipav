@@ -11,6 +11,7 @@ import time
 import sys
 import os
 import time
+import enum
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # global variables
@@ -272,6 +273,24 @@ class Step():
     def str_mean_execution_time(self, sufix=' ms'):
         return '{0:.2f}'.format(round(self.mean_execution_time * 1000,2)) + sufix
 
+
+class AutoNumber(enum.Enum):
+    def __new__(cls):
+        value = len(cls.__members__) + 1
+        obj = object.__new__(cls)
+        obj._value_ = value
+        return obj
+
+class dd(enum.Enum):
+    """
+    DataDictParameterNames
+    """
+    im = ()
+    kernel = ()
+    resolution = ()
+
+
+
 class StepControl():
 
     buffer = None
@@ -350,14 +369,19 @@ class StepControl():
 
 
     def define_available_steps(self):
-
+        """
+        dd = data_dict
+        """
         self.available_steps = {}
         self.available_step_fcn = {}
 
-        def make_nothing(im):
+
+        def make_nothing(data_dict):
+            # im = data_dict{im}
+            data_dict[dd.resolution] = data_dict[dd.im].shape
             # dict = {'resolution': im.shape}
             # return im, dict
-            return im
+            return data_dict
 
         def make_resize(im):
             return cv2.resize(im.copy(), (0, 0), fx=self.resolution_multiplier, fy=self.resolution_multiplier)
