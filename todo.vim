@@ -4,13 +4,13 @@
 [x] not only im as step input and output
 x] make it step-safe = copies of data image = StepData class
 
-[] step textual info
-] resolution
-[] show step image and info at the same time
-
-
+[x] step textual info
+x] resolution
+[x] show step image and info at the same time
+[x] hide info
 
 [] chain string not in popup but in the gui
+
 [] add steps to chain by clicking 
 ] available steps panel
 [] actualizing current chain string on startup

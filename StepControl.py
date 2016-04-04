@@ -23,10 +23,6 @@ from Step import Step
 # function definitions
 
 
-
-
-
-
 class StepControl():
 
     buffer = None
@@ -51,7 +47,6 @@ class StepControl():
                 self.buffer = im.copy()
             # else:
             #     return self.buffer
-
 
     def get_buffer(self, im):
         if self.buffer is None:
@@ -115,58 +110,42 @@ class StepControl():
         self.available_step_fcn = {}
 
 
+        def add_default(data, param, value):
+            if data[dd.take_all_def] == True or data[param] == None:
+                data[param] = value
+            return data[param]
+
+
         def make_nothing(data):
-            # print(data)
-            im = data[dd.im]
-            data[dd.resolution] = im.shape
-            # if data["take_all_def"] == True or data[dd.kernel] == None:
-            #     kernel = [5,5] # default kernel value
-            #     data[dd.kernel] = kernel
-
-            # im_out = gray(im, kernel)
-
-            # data[dd.im] = im_out.copy()
-
+            data[dd.resolution] = data[dd.im].shape
             return data
 
+
         def make_gauss(data):
-            im = data[dd.im]
-            data[dd.resolution] = data[dd.im].shape
-            take_def = data[dd.take_all_def] == True
-            if take_def or data[dd.kernel] == None:
-                kernel = (9,9) # default kernel value
-                data[dd.kernel] = kernel
-            if take_def or data[dd.sigma] == None:
-                sigma = 1
-                data[dd.sigma] = sigma
-
-            im_out = cv2.GaussianBlur(im.copy(), kernel, sigmaX=sigma)
-
-            data[dd.im] = im_out.copy() # ?? do i need a copy?
+            kernel = add_default(data, dd.kernel, (5,5))
+            sigma = add_default(data, dd.sigma, (1,1))
+            data[dd.im] = cv2.GaussianBlur(data[dd.im], kernel, sigmaX=sigma[0], sigmaY=sigma[1])
             return data
 
         # def make_gauss(im, a=5, sigma=1):
         #     return cv2.GaussianBlur(im.copy(), (a, a), sigmaX=sigma)
 
         def make_resize(data):
-            im = data[dd.im]
-            data[dd.resolution] = data[dd.im].shape
-            take_def = data[dd.take_all_def] == True
-            if take_def or data[dd.fxfy] == None:
-                fxfy = [self.resolution_multiplier, self.resolution_multiplier]
-                data[dd.fxfy] = fxfy
-
-            im_out = cv2.resize(im.copy(), (0, 0), fx=fxfy[0], fy=fxfy[1])
-            data[dd.im] = im_out.copy() # ?? do i need a copy?
+            fxfy = add_default(data, dd.fxfy, [self.resolution_multiplier, self.resolution_multiplier])
+            data[dd.im] = cv2.resize(data[dd.im], (0, 0), fx=fxfy[0], fy=fxfy[1])
             return data
 
         # def make_resize(im):
         #     return cv2.resize(im.copy(), (0, 0), fx=self.resolution_multiplier, fy=self.resolution_multiplier)
 
+        def make_gray(data):
+            data[dd.im] = cv2.cvtColor(data[dd.im], cv2.COLOR_BGR2GRAY)
+            return data
 
+        # def make_color_transform(data)
 
-        def make_gray(im):
-            return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        # def make_gray(im):
+        #     return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
 
         clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))

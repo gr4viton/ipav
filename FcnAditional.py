@@ -1,3 +1,15 @@
+import numpy as np
+import cv2
+import findHomeography as fh
+
+def rgb_to_str(rgb):
+    """Returns: string representation of RGB without alpha
+
+    Parameter rgb: the color object to display
+    Precondition: rgb is an RGB object"""
+    return '[ '+str(rgb[0])+', '+str(rgb[1])+', '+str(rgb[2])+' ]'
+
+
 
 def imclearborder(im, radius, buffer, mask):
     # Given a black and white image, first find all of its contours

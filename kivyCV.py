@@ -67,7 +67,8 @@ class StepWidget(GridLayout):
     toggle_object = ObjectProperty()
     # layout_steps_height = NumericProperty(1600)
 
-    otherwhere = -6666
+    elsewhere = -6666
+
 
     def __init__(self, **kwargs):
         super(StepWidget, self).__init__(**kwargs)
@@ -78,7 +79,8 @@ class StepWidget(GridLayout):
         self.texture = Texture.create(size = init_shape, colorfmt='bgr')
         self.texture_shape = init_shape
         self.name = 'default name'
-        self.info_position = 'b'
+        self.info_label_position = 'b'
+        self.info_label_hide('all')
 
         self.informing = True
         self.narrowed = False
@@ -93,23 +95,52 @@ class StepWidget(GridLayout):
             size=(cv_image.shape[1], cv_image.shape[0]), colorfmt='bgr')
         self.update_texture(cv_image)
 
-    def recreate_widget(self, cv_image, name, info_position='r'):
+    def recreate_widget(self, cv_image, name, info_position='b'):
         self.recreate_texture(cv_image)
         self.recreate_info_label()
         self.name = name
-        self.info_position = info_position
+        self.info_label_position = info_position
         print('Recreated widget:', cv_image.shape, '[px] name: [', name,'] info_pos:', info_position)
 
     def recreate_info_label(self):
-        if self.info_position == 'b':
+        if self.info_label_position == 'b':
             self.info_label = self.info_label_bottom
             self.info_label_right.size_hint_x = 0
-        elif self.info_position == 'r':
+        elif self.info_label_position == 'r':
             self.info_label = self.info_label_right
+
+    def info_label_show(self, which):
+        if which == 'all':
+            self.info_label_show('b')
+            self.info_label_show('r')
+        elif which == 'current':
+            print('showin\' current', self.info_label_position)
+            self.info_label_show(self.info_label_position)
+        elif which == 'b':
+            print('showin\' current')
+            self.info_label_bottom.y = self.info_label_bottom_y
+            self.info_label_bottom.size_hint_y = 0.2
+        elif which == 'r':
+            self.info_label_right.y = self.info_label_right_y
+            self.info_label_bottom.size_hint_x = 0.3
+
 
     def info_label_hide(self, which):
         if which == 'all':
-            self.info_label_right.size_hint_x = 0
+            # self.info_label_right.size_hint_x = 0
+            self.info_label_hide('b')
+            self.info_label_hide('r')
+        elif which == 'current':
+            self.info_label_hide(self.info_label_position)
+        elif which == 'b':
+            self.info_label_bottom_y = self.info_label_bottom.y
+            self.info_label_bottom.y = self.elsewhere
+            self.info_label_bottom.size_hint_y = 0
+        elif which == 'r':
+            self.info_label_right_y = self.info_label_right.y
+            self.info_label_right.y = self.elsewhere
+            self.info_label_right.size_hint_y = 0
+
 
 
     def update_widget(self, step):
@@ -158,17 +189,16 @@ class StepWidget(GridLayout):
         if value == False:
             self.toggle_show_img_object.state = 'normal'
             self.kivy_image_y = self.kivy_image.y
-            self.kivy_image.y = self.otherwhere
+            self.kivy_image.y = self.elsewhere
 
     def show_info(self, value):
         self.info_showed = value
         if value == True:
-            # self.toggle_object.state = 'down'
-
-            pass
+            # self.toggle_show_img_object.state = 'down'
+            self.info_label_show('current')
         if value == False:
-            # self.toggle_object.state = 'normal'
-            pass
+            # self.toggle_show_img_object.state = 'normal'
+            self.info_label_hide('current')
 
     def set_drawing(self, value):
         self.drawing = value
@@ -227,12 +257,6 @@ class StepWidgetControl():
 
 
 
-def rgb_to_str(rgb):
-    """Returns: string representation of RGB without alpha
-
-    Parameter rgb: the color object to display
-    Precondition: rgb is an RGB object"""
-    return '[ '+str(rgb[0])+', '+str(rgb[1])+', '+str(rgb[2])+' ]'
 
 class Multicopter(GridLayout):
     gl_left = ObjectProperty()
@@ -334,7 +358,7 @@ class multicopterApp(App):
         Config.set('graphics', 'multisamples', 0) # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
 
 
-        Config.set('input','mouse','mouse,disable_multitouch')
+        Config.set('input', 'mouse', 'mouse,disable_multitouch')
 
         # Config.set('graphics', 'fullscreen', 'fake')
         # Config.set('graphics', 'fullscreen', 1)

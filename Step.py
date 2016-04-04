@@ -30,8 +30,9 @@ class Step():
         return self.data_post
 
     def get_info_string(self):
-        info = self.str_mean_execution_time()
-        info += "\n" + str(self.data_post[dd.im].shape)
+        info = ""
+        # info += self.str_mean_execution_time()
+        info += str(self.data_post[dd.im].shape) + 'px'
         return info
 
     def add_exec_times(self, tim):
