@@ -2,9 +2,10 @@
 % logKivyCV
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 [x] not only im as step input and output
-] make it step-safe = copies of data image
+x] make it step-safe = copies of data image = StepData class
 
 [] step textual info
+] resolution
 [] show step image and info at the same time
 
 
@@ -24,6 +25,8 @@
 ] multiple cells for one step 
 ] different widths - not grid layout
 ] chain time order
+
+[] low res pictures to see them with bigger resolution but with visible pixels
 
 [] step properties from textual chain string 
 [] step properties change on fly via info / bubble

@@ -13,7 +13,6 @@ class Step():
         self.mean_execution_time = 0
 
     def run(self, data_prev):
-        # self.data_prev = {}
         self.data_prev = data_prev.copy()
 
         self.user_input = False # e.g. from snippet or gui
@@ -31,7 +30,9 @@ class Step():
         return self.data_post
 
     def get_info_string(self):
-        return self.str_mean_execution_time()
+        info = self.str_mean_execution_time()
+        info += "\n" + str(self.data_post[dd.im].shape)
+        return info
 
     def add_exec_times(self, tim):
         if len(self.execution_times) > self.execution_time_len:
