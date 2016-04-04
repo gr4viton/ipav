@@ -148,9 +148,24 @@ class StepControl():
         #     return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
 
+        def make_invert(data):
+            data[dd.im] = (255 - data[dd.im])
+            return data
+
+        # def make_invert(im):
+        #     return (255 - im)
+
+        def make_clahe(data):
+            data[dd.im] = clahe.apply(data[dd.im])
+            return data
+
         clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))
-        def make_clahe(im):
-            return clahe.apply(im)
+        def make_clahe(data):
+            data[dd.im] = clahe.apply(data[dd.im])
+            return data
+
+        # def make_clahe(im):
+        #     return clahe.apply(im)
 
         def make_blur(im, a=75):
             return cv2.bilateralFilter(im, 9, a, a)
@@ -172,8 +187,6 @@ class StepControl():
             return cv2.copyMakeBorder(im[a:-a, a:-a], a, a, a, a,
                                       cv2.BORDER_CONSTANT, value=color)
 
-        def make_invert(im):
-            return (255 - im)
 
         def make_flood(im, color = 0):
             # im = im.copy()

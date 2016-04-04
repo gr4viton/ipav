@@ -19,6 +19,8 @@ x] resolution
 
 [] chain string in popup 
 x] add steps to chain by clicking 
+] on_text in not popup - should open popup
+] enter in popup = USE
 ] groups of step methods (filters ...)
 ] add to cursor position
 ] log of previous chains - like console command history

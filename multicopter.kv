@@ -272,8 +272,10 @@
                     readonly: 'True'
 
                     on_double_tap: root.show_load_chain()
-
+                    padding: 2,0,2,0
+#                    halign: 'middle'
                     text: root.label_chain_string_text
+#                    text_size: self.size
 
                 Button:
                     size_hint_x: 0.05
@@ -348,6 +350,9 @@
         TextInput:
 #            text: 'original, gray'
             text: root.chain_string_text
+            padding: 2,0,2,0
+#            valign: 'middle'
+#            text_size: self.si`ze
         GridLayout:
             cols:2
             size_hint_y: 5
@@ -388,11 +393,13 @@
 
             GridLayout:
                 cols: 1
+                Label:
+                    text: 'Available step names:'
+                    size_hint_y: 0.1
                 GridLayout:
                     cols: 3
                     id: layout_available_steps
-                    Button:
-                        text: 'Show available step names'
+
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
