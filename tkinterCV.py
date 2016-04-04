@@ -15,7 +15,7 @@ from PIL import Image, ImageTk
 import time
 import tkinter as tk
 # import Tkinter as tk % windows school py 2.7
-from thisCV import *
+from StepControl import *
 
 import findHomeography as fh
 

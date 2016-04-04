@@ -30,7 +30,7 @@ import threading
 import time
 
 import findHomeography as fh
-from thisCV import *
+from StepControl import *
 
 from thread_controls import ImageStreamControl, ChainControl, Chain
 
