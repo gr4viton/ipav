@@ -78,11 +78,11 @@ class Chain():
 
     def load_steps_from_string(self, string):
         self.step_names = string.replace('\n', self.delimiter).split(self.delimiter)
-        print(self.step_names)
+        # print(self.step_names)
         self.step_names = [step_name.strip(self.strip_chars) for step_name in self.step_names]
-        print(self.step_names)
+        # print(self.step_names)
 
-    def __init__(self, name, path=''):
+    def __init__(self, name, start_chain=True, path='', ):
         self.name = name
         self.tag_search = name in self.tag_names
 
@@ -101,8 +101,11 @@ class Chain():
                 # self.step_names = ['original', 'resize', 'detect red']
                 # self.step_names = ['original', 'resize', 'rgb stack']
 
-                string = 'original, resize, gauss, resize'
-                self.load_steps_from_string(string)
+                # string = 'original, resize, gauss, resize'
+                string = 'original'
+                if start_chain:
+                    self.load_steps_from_string(string)
+
         if self.name in self.load_data_chain_names:
             self.load_data()
 

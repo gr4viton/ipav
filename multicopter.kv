@@ -50,14 +50,6 @@
 #                size: self.size
 
         Button:
-            text: "Hide all steps"
-            size_hint_y: 0.1
-            on_press: root.step_widgets_control.show('none')
-        Button:
-            text: "Show all steps"
-            size_hint_y: 0.1
-            on_press: root.step_widgets_control.show('all')
-        Button:
 #            text: 'Switch cameras'
             text: 'Toggle computing'
             size_hint_y: .1
@@ -77,6 +69,63 @@
             size_hint_y: .1
             on_press: root.chain_control.show_load_chain();
             # pos_hint: {'center_x':.5, 'center_y': .5}
+
+        GridLayout:
+            cols:1
+            size_hint_y: 0.5
+            padding: (2,2,2,2)
+            spacing: (2,2)
+            margin: 5
+            color: .08, .16 , .24
+            canvas.before:
+                Color:
+                    rgb: self.color
+                Rectangle:
+                    pos: self.x + self.margin, self.y + self.margin + 1
+                    size: self.width - 2 * self.margin , self.height - 2 * self.margin
+
+            Label:
+                size_hint_y: 0.3
+                text: 'All steps operations'
+            GridLayout:
+                cols:2
+                hint_y: 1
+                Button:
+                    text: "Hide"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.show('none')
+                Button:
+                    text: "Show"
+#                    size_hint_y: 0.1
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.show('all')
+
+                Button:
+                    text: "Freeze"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.draw('none')
+                Button:
+                    text: "Redraw"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.draw('all')
+
+                Button:
+                    text: "Blank"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.info('none')
+                Button:
+                    text: "Info"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.info('all')
+
+                Button:
+                    text: "Narrow"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.narrow('none')
+                Button:
+                    text: "Wide"
+                    size_hint_y: self.parent.hint_y
+                    on_press: root.step_widgets_control.narrow('all')
 
         Image:
             id: img_webcam
@@ -282,29 +331,98 @@
 #
 #    GridLayout:
 #        ctx.GridLayout
+#
 
-<ChangeChain>:
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<ChangeChainWidget>:
+    layout_available_steps: layout_available_steps
+
     title: 'Change chain steps'
-    auto_dismiss: 'False'
-    size_hint: (1, 0.3)
+#    auto_dismiss: 'False'
+    size_hint: (1, 0.7)
     GridLayout:
         cols: 1
         Label:
-            text:'Insert chain step names separated by commas'
+            text: 'Insert chain step names separated by commas'
+            halign: 'left'
         TextInput:
-            text: 'original, gray'
-        Button:
-            text:'Close withouth change')
-            on_press: self.load_popup.dismiss
-        Button:
-            text: 'Show available step names')
-            on_press: self.show_step_names
-        Button:
-            text:'Change chain steps and close')
-            on_press: self.load_and_close_popup
+#            text: 'original, gray'
+            text: root.chain_string_text
+        GridLayout:
+            cols:2
+            size_hint_y: 5
+            GridLayout:
+#            StackLayout:
+                cols: 1
+                size_hint_x: 0.3
+#                orientation: 'tb-lr'
+                Button:
+                    text: 'Dismiss'
+                    on_press: root.dismiss()
+#                Button:
+#                    text: 'Show available step names'
+#                    on_press: root.show_step_names()
+                Button:
+                    text: 'Use'
+                    on_press: root.update_chain_string()
+
+                GridLayout:
+                    cols: 1
+                    Label:
+                        text: 'Where to add new step in string:'
+#                    BoxLayout:
+                    CheckBoxLabel:
+                        group: 'add_step'
+                        text: 'to the end'
+                        active: 'False'
+#                        active: 'True'
+#                        on_select
+                    CheckBoxLabel:
+                        group: 'add_step'
+                        text: 'after the cursor'
+#                        active: 'False'
+                    CheckBoxLabel:
+                        group: 'add_step'
+                        text: 'at the beginning'
+#                        active: 'False'
+
+            GridLayout:
+                cols: 1
+                GridLayout:
+                    cols: 3
+                    id: layout_available_steps
+                    Button:
+                        text: 'Show available step names'
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<CheckBoxLabel@BoxLayout>:
+    text: ''
+    active: 'False'
+    group: ''
+    on_active: checkbox.on_active
+    checkbox: checkbox
+#    BoxLayout:
+    CheckBox:
+        id: checkbox
+        size_hint_x: 0.2
+        active: root.active
+        group: root.group
+        halign: 'right'
+        text_size: self.size
+#        on_active: root.on_active
+
+    Button:
+        text: root.text
+        halign: 'left'
+        text_size: self.size
+#        on_touch_up: root.checkbox.on_press()
+        on_press: root.checkbox.on_state(checkbox, root.checkbox.active != True) # does not work
+        background_color: 1, 1, 1, 0
 
 
 
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <StepWidget>:
     toggle_show_img_object: toggle_show_img
     toggle_object: toggle
@@ -385,7 +503,7 @@
             size_hint_y: 0.8
             Image:
                 id: kivy_image
-#                size_hint_y: 1
+                size_hint_y: 1
 #                size_hint_x: 1
 #                background_normal: 'True'
 

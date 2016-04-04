@@ -20,16 +20,16 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 
-from findHomeography import Error as tag_error
-from CaptureControl import CaptureControl
-
 import cv2
 import numpy as np
 # import sys
 import threading
 import time
 
-import findHomeography as fh
+from findHomeography import Error as tag_error
+from CaptureControl import CaptureControl
+from StepWidget import StepWidgetControl
+from ChangeChainWidget import ChangeChainWidget
 from StepControl import *
 
 from thread_controls import ImageStreamControl, ChainControl, Chain
@@ -53,206 +53,6 @@ def convert_rgb_to_texture(im_rgb):
 #         # self.toggle_drawing = toggle_drawing
 #     pass
 
-class StepWidget(GridLayout):
-
-    name = StringProperty()
-    drawing = ObjectProperty('down')
-    kivy_image = ObjectProperty()
-
-    info_label_bottom = ObjectProperty()
-    info_label_right = ObjectProperty()
-    time_label = ObjectProperty()
-
-    toggle_show_img_object = ObjectProperty()
-    toggle_object = ObjectProperty()
-    # layout_steps_height = NumericProperty(1600)
-
-    elsewhere = -6666
-
-
-    def __init__(self, **kwargs):
-        super(StepWidget, self).__init__(**kwargs)
-        # self.layout_steps = kwargs['parent']
-        self.name = ''
-        self.drawing = True
-        init_shape = (0, 0)
-        self.texture = Texture.create(size = init_shape, colorfmt='bgr')
-        self.texture_shape = init_shape
-        self.name = 'default name'
-        self.info_label_position = 'b'
-        self.info_label_hide('all')
-
-        self.informing = True
-        self.narrowed = False
-
-        # self.kivy_image = ImageButton(self.toggle_drawing)
-        # self.kivy_image = ImageButton()
-        # self.add_widget(self.kivy_image)
-
-    def recreate_texture(self, cv_image):
-        self.texture_shape = cv_image.shape
-        self.texture = Texture.create(
-            size=(cv_image.shape[1], cv_image.shape[0]), colorfmt='bgr')
-        self.update_texture(cv_image)
-
-    def recreate_widget(self, cv_image, name, info_position='b'):
-        self.recreate_texture(cv_image)
-        self.recreate_info_label()
-        self.name = name
-        self.info_label_position = info_position
-        print('Recreated widget:', cv_image.shape, '[px] name: [', name,'] info_pos:', info_position)
-
-    def recreate_info_label(self):
-        if self.info_label_position == 'b':
-            self.info_label = self.info_label_bottom
-            self.info_label_right.size_hint_x = 0
-        elif self.info_label_position == 'r':
-            self.info_label = self.info_label_right
-
-    def info_label_show(self, which):
-        if which == 'all':
-            self.info_label_show('b')
-            self.info_label_show('r')
-        elif which == 'current':
-            print('showin\' current', self.info_label_position)
-            self.info_label_show(self.info_label_position)
-        elif which == 'b':
-            print('showin\' current')
-            self.info_label_bottom.y = self.info_label_bottom_y
-            self.info_label_bottom.size_hint_y = 0.2
-        elif which == 'r':
-            self.info_label_right.y = self.info_label_right_y
-            self.info_label_bottom.size_hint_x = 0.3
-
-
-    def info_label_hide(self, which):
-        if which == 'all':
-            # self.info_label_right.size_hint_x = 0
-            self.info_label_hide('b')
-            self.info_label_hide('r')
-        elif which == 'current':
-            self.info_label_hide(self.info_label_position)
-        elif which == 'b':
-            self.info_label_bottom_y = self.info_label_bottom.y
-            self.info_label_bottom.y = self.elsewhere
-            self.info_label_bottom.size_hint_y = 0
-        elif which == 'r':
-            self.info_label_right_y = self.info_label_right.y
-            self.info_label_right.y = self.elsewhere
-            self.info_label_right.size_hint_y = 0
-
-
-
-    def update_widget(self, step):
-        if not self.narrowed:
-            self.time_label.text = step.str_mean_execution_time('')
-            if self.informing:
-                self.update_info_label(step)
-            if self.drawing: # called only if intended to draw
-                im = np.uint8(step.data_post[dd.im].copy())
-                if self.texture_shape != im.shape:
-                    self.recreate_texture(im)
-                else:
-                    self.update_texture(im)
-
-    def update_info_label(self, step):
-        self.info_label.text = step.get_info_string()
-
-    def update_texture(self, im):
-        self.update_texture_from_rgb(fh.colorify(im))
-
-    def update_texture_from_rgb(self, im_rgb):
-        buf1 = cv2.flip(im_rgb, 0)
-        buf = buf1.tostring()
-        self.texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
-        # print(im_rgb.shape)
-        self.kivy_image.texture = self.texture
-
-    def sync_info(self, value):
-        self.informing = value
-
-
-    def set_narrow(self, value):
-        self.narrowed = not value
-        if value == True:
-            # self.toggle_object.state = 'down'
-            self.size_hint_x = 0.33
-        if value == False:
-            # self.toggle_object.state = 'normal'
-            self.size_hint_x = 0.33/9
-
-    def show_img(self, value):
-        self.img_showed = value
-        if value == True:
-            self.toggle_show_img_object.state = 'down'
-            self.kivy_image.y = self.kivy_image_y
-        if value == False:
-            self.toggle_show_img_object.state = 'normal'
-            self.kivy_image_y = self.kivy_image.y
-            self.kivy_image.y = self.elsewhere
-
-    def show_info(self, value):
-        self.info_showed = value
-        if value == True:
-            # self.toggle_show_img_object.state = 'down'
-            self.info_label_show('current')
-        if value == False:
-            # self.toggle_show_img_object.state = 'normal'
-            self.info_label_hide('current')
-
-    def set_drawing(self, value):
-        self.drawing = value
-        if value == True:
-            self.toggle_object.state = 'down'
-        if value == False:
-            self.toggle_object.state = 'normal'
-
-    def toggle_show_img(self, whatever):
-        if self.toggle_show_img_object.state == 'down':
-            self.show_img(False)
-        else:
-            self.show_img(True)
-
-    def toggle_drawing(self):
-        if self.toggle_object.state == 'down':
-            self.set_drawing(False)
-        else:
-            self.set_drawing(True)
-
-class StepWidgetControl():
-
-    def __init__(self, layout_steps):
-        self.layout_steps = layout_steps
-
-    def show(self, command):
-        if command == 'all':
-            [widget.set_drawing(True) for widget in self.layout_steps.children]
-        elif command == 'none':
-            [widget.set_drawing(False) for widget in self.layout_steps.children]
-
-    def layout_steps_add_widgets(self, step_control):
-        diff = len(step_control.steps) - len(self.layout_steps.children)
-        if diff > 0: # create widgets
-            for num in range(0, np.abs(diff)):
-                self.layout_steps.add_widget(StepWidget())
-                print('added widget')
-        else:
-            for num in range(0, np.abs(diff)):
-                self.layout_steps.remove_widget( self.layout_steps.children[-1])
-                print('removed widget')
-
-        [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name)
-         for (widget, step) in zip(self.layout_steps.children, step_control.steps)]
-
-    def update_layout_steps(self, step_control):
-
-        if step_control is not None:
-            if len(step_control.steps) != len(self.layout_steps.children):
-                self.layout_steps_add_widgets(step_control)
-            else:
-                [widget.update_widget(step)
-                 for (step, widget)
-                 in zip(step_control.steps, self.layout_steps.children)]
 
 
 class Multicopter(GridLayout):
@@ -275,60 +75,31 @@ class Multicopter(GridLayout):
     tag_error_count_text = StringProperty('No tags found')
 
     label_chain_string_text = StringProperty('...loading...')
+    # popup_chain_string_text = StringProperty('...loading...')
     chain_string = ''
 
-    def load_and_close_popup(self, whatever):
-        self.chain_string = self.chain_string_text.text
+    def update_chain_string_from_popup(self, whatever=None):
+        # preprocessing error checking
+        self.set_chain_string(self.change_chain_widget.chain_string_text)
+        print('Updating')
+
+    def set_chain_string(self, new_chain_string,  whatever=None):
+        self.chain_string = new_chain_string
+        self.popup_chain_string_text = self.chain_string
         self.chain_control.load_chain(self.chain_string)
-        self.load_popup.dismiss()
+        self.change_chain_widget.dismiss()
         self.label_chain_string_text = self.chain_string
         print("Chain string =[", self.chain_string, ']')
 
-
-    def show_step_names(self, whatever):
-        available_steps_dict = self.chain_control.get_available_steps()
-        available_steps_list = [key for key in available_steps_dict.keys()]
-        self.available_step_string = '\n'.join(available_steps_list)
-
-        print(self.available_step_string)
-        text_input = TextInput(text=self.available_step_string, readonly=True)
-        popup = Popup(title='Available step names', content=text_input)
-        popup.open()
-
-    def init_load_popup(self):
-
-        layout = GridLayout(cols=1)
-        layout.add_widget(Label(text='Insert chain step names separated by commas'))
-        self.chain_string_text =TextInput(text='original, gray')
-        # self.chain_string_text =TextInput(text=self.chain_string)
-        layout.add_widget(self.chain_string_text )
-
-        btn_close = Button(text='Close withouth change')
-        btn_show = Button(text='Show available step names')
-        btn_change = Button(text='Change chain steps and close')
-
-        layout.add_widget(btn_show)
-        layout.add_widget(btn_close)
-        layout.add_widget(btn_change)
-
-        self.load_popup = Popup(title='Change chain steps', content=layout,
-                                auto_dismiss=False,
-                                size_hint=(1, 0.3), )
-
-        btn_close.bind(on_press=self.load_popup.dismiss)
-        btn_show.bind(on_press=self.show_step_names)
-        btn_change.bind(on_press=self.load_and_close_popup)
-    #     lambda im: make_flood(im, 0)
-
-    def show_load_chain(self):
-        self.load_popup.open()
-
+    def show_load_chain(self, whatever=None):
+        # self.load_popup.open()
+        self.change_chain_widget.open()
 
     def __init__(self, capture_control, chain_control, **kwargs):
         # make sure we aren't overriding any important functionality
         super(Multicopter, self).__init__(**kwargs)
 
-        self.init_load_popup()
+        # self.init_load_popup()
 
         self.capture_control = capture_control
         self.chain_control = chain_control
@@ -336,6 +107,14 @@ class Multicopter(GridLayout):
 
         self.step_widgets_control = StepWidgetControl(self.layout_steps)
 
+        new_chain_string = 'original, gray'
+        available_steps_dict = self.chain_control.get_available_steps()
+        self.change_chain_widget = ChangeChainWidget(new_chain_string,
+                                                     self.update_chain_string_from_popup,
+                                                     available_steps_dict)
+
+        self.set_chain_string(new_chain_string )
+        self.update_chain_string_from_popup()
 
 
 class multicopterApp(App):
@@ -374,7 +153,7 @@ class multicopterApp(App):
         Chain.chain_names = ['2L', '3L', 'c2', 'standard']
         Chain.tag_names = ['2L', '3L', 'c2']
         Chain.load_data_chain_names = Chain.tag_names
-        current_chain = Chain(selected_chain_name)
+        current_chain = Chain(selected_chain_name, start_chain = False)
 
 
         self.chain_control = ChainControl(self.capture_control, current_chain)

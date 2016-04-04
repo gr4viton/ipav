@@ -9,10 +9,17 @@ x] resolution
 [x] show step image and info at the same time
 [x] hide info
 
-[] chain string showed in the gui label
+[x] chain string showed in the gui label
+[x] load chain on start from chain string (to see in label)
+
+[x] change string from popup !
+[] on_text does not update ChangeChainWidget stringProperty!
+
+[] Hide/show on all images not functional
+
 [] chain string in popup 
-] add steps to chain by clicking 
-] available steps panel in popup
+x] add steps to chain by clicking 
+] groups of step methods (filters ...)
 ] add to cursor position
 ] log of previous chains - like console command history
 [] actualizing current chain string on startup
@@ -20,7 +27,7 @@ x] resolution
 
 [] make enums 
 ] from step method names
-] from data dict param names
+x] from data dict param names
 
 [] chain layout 
 ] num of cols slider
