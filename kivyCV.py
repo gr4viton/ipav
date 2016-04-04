@@ -255,9 +255,6 @@ class StepWidgetControl():
                  in zip(step_control.steps, self.layout_steps.children)]
 
 
-
-
-
 class Multicopter(GridLayout):
     gl_left = ObjectProperty()
     gl_middle = ObjectProperty()
@@ -277,12 +274,16 @@ class Multicopter(GridLayout):
 
     tag_error_count_text = StringProperty('No tags found')
 
+    label_chain_string_text = StringProperty('...loading...')
     chain_string = ''
 
     def load_and_close_popup(self, whatever):
         self.chain_string = self.chain_string_text.text
         self.chain_control.load_chain(self.chain_string)
         self.load_popup.dismiss()
+        self.label_chain_string_text = self.chain_string
+        print("Chain string =[", self.chain_string, ']')
+
 
     def show_step_names(self, whatever):
         available_steps_dict = self.chain_control.get_available_steps()

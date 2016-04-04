@@ -16,6 +16,8 @@
     grid_img_tags: grid_img_tags
     # lb_webcam_resolution: lb_webcam_resolution
 
+    #label_chain_string_text: label_chain_string_text
+
 #    ScrollView:
 #        Label:
 #            text: str('looooooong text '*1000)
@@ -23,6 +25,17 @@
 #            text_size: self.width, None
 #            size_hint_y: None
 #            height: self.texture_size[1]
+#    GridLayout:
+#        cols: 2
+#        size_hint_y: 0.9
+#
+#        TextInput:
+#            text: 'ah'
+#            size_hint_y: 0.1
+#        TextInput:
+#            text: 'ah'
+#            size_hint_y: 0.1
+
     GridLayout:
 #        size_hint_x: 1
         cols:1
@@ -117,8 +130,7 @@
                 on_value: root.chain_control.set_resolution_div(self.value);
 
 
-
-        GridLayout:
+        GridLayout: # Info tab
             cols: 2
             size_hint_y: None
             padding: (2,2,2,2)
@@ -167,59 +179,12 @@
 #                'splitter.width: {}\nparent.width: {}\nmax_size: {}'\
 #                .format(spl.width, root.width, spl.max_size)
 
-    Splitter:
-        id: spl
-
-        max_size: self.parent.width - 50
-        size: 1100, 400
-        size_hint: None,1
-
-
-        GridLayout:
-            cols: 2
-#            width: 1100
-#            size_hint_x: 1
-#            orientation: 'vertical'
-#            id: gl_middle
-#            id: sla_steps
-            padding: 5
-#            ScrollView:
-#                size: root.size
-    #            do_scroll: 1
-#            ScrollView:
-#                viewport_size: root.size
-#                do_scroll_x: False
-
-            GridLayout:
-                cols:2
-                id: grid_steps
-                ScrollView:
-                    id: scroll_steps
-    #                    do_scroll_y: 'True'
-    #                    size_hint: 1, None
-    #                    size: grid_steps.size
-    #                    minimum_height
-                    StackLayout:
-                        height: self.minimum_height -0
-                        size_hint_y: None
-#                        size_hint_x: 1
-    #                        allow_stretch: True
-    #                        height: scroll_steps.height
-    #                        size_hint_y: 1
-                        id: layout_steps
-    #                        minimum_height = self.height
-                        orientation: 'lr-tb'
-        #                orientation: 'tb-lr'
-    #                        size_hint_x: 1
-
-            GridLayout:
+            GridLayout: # img tags
                 id: grid_img_tags
                 cols: 1
-####                size_hint_x: 0.2
                 size_hint_x: 0
                 margin: 1
                 color: 0.08, 0.16 , 0.24
-#####                padding: (2,2,2,2)
                 canvas.before:
                     Color:
                         rgb: self.color
@@ -236,9 +201,50 @@
                     id: img_tags
                     color: 0,0,0
 
-#                    id: lb_tag_error_count
-    #        Button:
-    #            text: 'Save the matrix??'
+
+    Splitter:
+        id: spl
+
+        max_size: self.parent.width - 50
+        size: 1100, 400
+        size_hint: None,1
+
+
+        GridLayout: # right tab
+            cols: 1
+            padding: 5
+            GridLayout:
+                size_hint_y: 0.04
+                cols: 3
+                Label:
+                    text: 'Chain:'
+                    size_hint_x: 0.05
+                TextInput:
+                    readonly: 'True'
+
+                    on_double_tap: root.show_load_chain()
+
+                    text: root.label_chain_string_text
+
+                Button:
+                    size_hint_x: 0.05
+                    text: 'conf'
+                    on_press: root.show_load_chain()
+
+            GridLayout: # step window
+                cols:1
+                id: grid_steps
+                ScrollView: # step scrolling
+                    id: scroll_steps
+
+                    StackLayout:
+                        height: self.minimum_height -0
+                        size_hint_y: None
+                        id: layout_steps
+                        orientation: 'lr-tb'
+        #                orientation: 'tb-lr'
+    #                        size_hint_x: 1
+
 
 #        Splitter:
 #            vertical: 0
@@ -276,6 +282,28 @@
 #
 #    GridLayout:
 #        ctx.GridLayout
+
+<ChangeChain>:
+    title: 'Change chain steps'
+    auto_dismiss: 'False'
+    size_hint: (1, 0.3)
+    GridLayout:
+        cols: 1
+        Label:
+            text:'Insert chain step names separated by commas'
+        TextInput:
+            text: 'original, gray'
+        Button:
+            text:'Close withouth change')
+            on_press: self.load_popup.dismiss
+        Button:
+            text: 'Show available step names')
+            on_press: self.show_step_names
+        Button:
+            text:'Change chain steps and close')
+            on_press: self.load_and_close_popup
+
+
 
 <StepWidget>:
     toggle_show_img_object: toggle_show_img
@@ -346,6 +374,7 @@
                     text: 'draw'
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')
+
     GridLayout:
         cols:1
         size_hint_y: 0.85

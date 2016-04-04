@@ -9,10 +9,12 @@ x] resolution
 [x] show step image and info at the same time
 [x] hide info
 
-[] chain string not in popup but in the gui
-
-[] add steps to chain by clicking 
-] available steps panel
+[] chain string showed in the gui label
+[] chain string in popup 
+] add steps to chain by clicking 
+] available steps panel in popup
+] add to cursor position
+] log of previous chains - like console command history
 [] actualizing current chain string on startup
 [] chain string auto update on enter
 
