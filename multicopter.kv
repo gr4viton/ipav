@@ -255,14 +255,14 @@
         id: spl
 
         max_size: self.parent.width - 50
-        size: 1100, 400
+        size: 1170, 400
         size_hint: None,1
 
 
         GridLayout: # right tab
             cols: 1
             padding: 5
-            GridLayout:
+            GridLayout: # top chain string layout
                 size_hint_y: 0.04
                 cols: 3
                 Label:
@@ -282,18 +282,20 @@
                     text: 'conf'
                     on_press: root.show_load_chain()
 
-            GridLayout: # step window
+            GridLayout: # step window layout
                 cols:1
                 id: grid_steps
                 ScrollView: # step scrolling
                     id: scroll_steps
 
                     StackLayout:
-                        height: self.minimum_height -0
+                        height: self.minimum_height - 0
                         size_hint_y: None
                         id: layout_steps
                         orientation: 'lr-tb'
-        #                orientation: 'tb-lr'
+#                        orientation: 'tb-rl'
+#                        orientation: 'rl-bt'
+#                        orientation: 'tb-lr'
     #                        size_hint_x: 1
 
 
@@ -391,7 +393,7 @@
                         text: 'at the beginning'
 #                        active: 'False'
 
-            GridLayout:
+            GridLayout: # available steps buttons
                 cols: 1
                 Label:
                     text: 'Available step names:'
@@ -431,8 +433,13 @@
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <StepWidget>:
-    toggle_show_img_object: toggle_show_img
-    toggle_object: toggle
+
+    tbt_show_info: tbt_show_info
+    tbt_informing: tbt_informing
+    tbt_draw: tbt_draw
+    tbt_show_img: tbt_show_img
+    tbt_narrow: tbt_narrow
+
     kivy_image: kivy_image
 
     info_label_bottom: info_label_bottom
@@ -442,13 +449,16 @@
 #    layout_steps_height: 1500
 #    size_hint_y: 0.4
     size_hint_y: None
+#    size_hint_x: 1/3
+    size_hint_x: None
+    width: 282
 #    height: self.minimum_height * 4
-    height: 300
+    height: 250
 #    size_hint_y: layout_steps_height / 400
-    size_hint_x: 1/3
+
     cols: 1
-    padding: (2,2,2,2)
-    spacing: (2,2)
+    padding: (4,4,4,4)
+    spacing: (4,4)
     margin: 1
     color: .08,.16 , .24
     canvas.before:
@@ -463,6 +473,7 @@
         size_hint_y: 0.15
 
         ToggleButton:
+            id: tbt_narrow
             text: root.name
             size_hint_x: 0.9
             state: 'down'
@@ -479,23 +490,25 @@
                 cols: 2
                 size_hint_x: 0.7
                 ToggleButton:
+                    id: tbt_show_info
                     text: 'info'
 #                    state: 'down'
                     on_state: root.show_info(self.state == 'down')
 
                 ToggleButton:
+                    id: tbt_informing
                     text: 'sync'
                     state: 'down'
                     on_state: root.sync_info(self.state == 'down')
 
                 ToggleButton:
-                    id: toggle_show_img
+                    id: tbt_show_img
                     text: 'img'
                     state: 'down'
                     on_state: root.show_img(self.state == 'down')
 
                 ToggleButton:
-                    id: toggle
+                    id: tbt_draw
                     text: 'draw'
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')

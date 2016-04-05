@@ -35,8 +35,12 @@ class StepWidget(GridLayout):
     info_label_right = ObjectProperty()
     time_label = ObjectProperty()
 
-    toggle_show_img_object = ObjectProperty()
-    toggle_object = ObjectProperty()
+    tbt_narrow = ObjectProperty()
+    tbt_show_info = ObjectProperty()
+    tbt_informing = ObjectProperty()
+    tbt_show_img = ObjectProperty()
+    tbt_draw = ObjectProperty()
+
     # layout_steps_height = NumericProperty(1600)
 
     elsewhere = -6666
@@ -82,42 +86,6 @@ class StepWidget(GridLayout):
         elif self.info_label_position == 'r':
             self.info_label = self.info_label_right
 
-    def info_label_show(self, which):
-        if which == 'all':
-            self.info_label_show('b')
-            self.info_label_show('r')
-            self.info_showed = True
-        elif which == 'current':
-            # print('showin\' current', self.info_label_position)
-            self.info_label_show(self.info_label_position)
-        elif which == 'b':
-            # print('showin\' current')
-            self.info_label_bottom.y = self.info_label_bottom_y
-            self.info_label_bottom.size_hint_y = 0.2
-        elif which == 'r':
-            self.info_label_right.y = self.info_label_right_y
-            self.info_label_bottom.size_hint_x = 0.3
-
-
-    def info_label_hide(self, which):
-        if which == 'all':
-            # self.info_label_right.size_hint_x = 0
-            self.info_label_hide('b')
-            self.info_label_hide('r')
-            self.info_showed = False
-        elif which == 'current':
-            self.info_label_hide(self.info_label_position)
-        elif which == 'b':
-            self.info_label_bottom_y = self.info_label_bottom.y
-            self.info_label_bottom.y = self.elsewhere
-            self.info_label_bottom.size_hint_y = 0
-        elif which == 'r':
-            self.info_label_right_y = self.info_label_right.y
-            self.info_label_right.y = self.elsewhere
-            self.info_label_right.size_hint_y = 0
-
-
-
     def update_widget(self, step):
         if not self.narrowed:
             self.time_label.text = step.str_mean_execution_time('')
@@ -143,6 +111,42 @@ class StepWidget(GridLayout):
         # print(im_rgb.shape)
         self.kivy_image.texture = self.texture
 
+
+    def info_label_show(self, which):
+        if which == 'all':
+            self.info_label_show('b')
+            self.info_label_show('r')
+            self.info_showed = True
+            self.tbt_show_info.state = 'down'
+        elif which == 'current':
+            # print('showin\' current', self.info_label_position)
+            self.info_label_show(self.info_label_position)
+        elif which == 'b':
+            # print('showin\' current')
+            self.info_label_bottom.y = self.info_label_bottom_y
+            self.info_label_bottom.size_hint_y = 0.2
+        elif which == 'r':
+            self.info_label_right.y = self.info_label_right_y
+            self.info_label_bottom.size_hint_x = 0.3
+
+
+    def info_label_hide(self, which):
+        if which == 'all':
+            # self.info_label_right.size_hint_x = 0
+            self.info_label_hide('b')
+            self.info_label_hide('r')
+            self.info_showed = False
+            self.tbt_show_info.state = 'normal'
+        elif which == 'current':
+            self.info_label_hide(self.info_label_position)
+        elif which == 'b':
+            self.info_label_bottom_y = self.info_label_bottom.y
+            self.info_label_bottom.y = self.elsewhere
+            self.info_label_bottom.size_hint_y = 0
+        elif which == 'r':
+            self.info_label_right_y = self.info_label_right.y
+            self.info_label_right.y = self.elsewhere
+            self.info_label_right.size_hint_y = 0
     def sync_info(self, value):
         self.informing = value
 
@@ -150,16 +154,20 @@ class StepWidget(GridLayout):
     def set_narrow(self, value):
         self.narrowed = not value
         if value == True:
-            # self.toggle_object.state = 'down'
-            self.size_hint_x = 0.33
+            self.tbt_narrow.state = 'down'
+            # self.size_hint_x = 0.33
+            # self.width = 282
+            self.width /= 3
         if value == False:
-            # self.toggle_object.state = 'normal'
-            self.size_hint_x = 0.33/9
+            self.tbt_narrow.state = 'normal'
+            # self.size_hint_x = 0.33/9
+            self.width = 282/3
+            self.width *= 3
 
     def show_img(self, value):
         self.img_showed = value
         if value == True:
-            # self.toggle_show_img_object.state = 'down'
+            self.tbt_show_img.state = 'down'
             if self.info_showed == True:
                 b = self.info_label_bottom.height
             else:
@@ -168,35 +176,37 @@ class StepWidget(GridLayout):
 
 
         if value == False:
-            # self.toggle_show_img_object.state = 'normal'
+            self.tbt_show_img.state = 'normal'
             # self.kivy_image_y = self.kivy_image.y
             self.kivy_image.y = self.elsewhere
             # self.kivy_image.size_hint_y = 0
 
+    def toggle_show_img(self, whatever=None):
+        if self.tbt_show_img.state == 'down':
+            self.show_img(False)
+        else:
+            self.show_img(True)
+
+
+
     def show_info(self, value):
         self.info_showed = value
         if value == True:
-            # self.toggle_show_img_object.state = 'down'
+            # self.tbt_show_img.state = 'down'
             self.info_label_show('current')
         if value == False:
-            # self.toggle_show_img_object.state = 'normal'
+            # self.tbt_show_img.state = 'normal'
             self.info_label_hide('current')
 
     def set_drawing(self, value):
         self.drawing = value
         if value == True:
-            self.toggle_object.state = 'down'
+            self.tbt_draw.state = 'down'
         if value == False:
-            self.toggle_object.state = 'normal'
-
-    def toggle_show_img(self, whatever=None):
-        if self.toggle_show_img_object.state == 'down':
-            self.show_img(False)
-        else:
-            self.show_img(True)
+            self.tbt_draw.state = 'normal'
 
     def toggle_drawing(self):
-        if self.toggle_object.state == 'down':
+        if self.tbt_draw.state == 'down':
             self.set_drawing(False)
         else:
             self.set_drawing(True)

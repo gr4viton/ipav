@@ -107,7 +107,7 @@ class Multicopter(GridLayout):
 
         self.step_widgets_control = StepWidgetControl(self.layout_steps)
 
-        new_chain_string = 'original, gray'
+        new_chain_string = 'original, gray, resize, resize, resize, resize, resize, resize, resize'
         available_steps_dict = self.chain_control.get_available_steps()
         self.change_chain_widget = ChangeChainWidget(new_chain_string,
                                                      self.update_chain_string_from_popup,
@@ -124,7 +124,7 @@ class multicopterApp(App):
     def build(self):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
-        w = 1300
+        w = 1360
         Config.set('kivy', 'show_fps', 1)
         Config.set('kivy', 'desktop', 1)
         # Config.set('kivy', 'name', 'a')
