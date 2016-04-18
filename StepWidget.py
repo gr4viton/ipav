@@ -251,7 +251,7 @@ class StepWidgetControl():
                 print('removed widget')
 
         [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name)
-         for (widget, step) in zip(self.layout_steps.children, step_control.steps)]
+         for (widget, step) in zip(self.layout_steps.children, step_control.steps[::-1])]
 
     def update_layout_steps(self, step_control):
 

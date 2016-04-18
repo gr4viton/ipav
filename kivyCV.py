@@ -20,6 +20,7 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 
+
 import cv2
 import numpy as np
 # import sys
@@ -54,6 +55,27 @@ def convert_rgb_to_texture(im_rgb):
 #     pass
 
 
+# class ChainStringTextInput(TextInput):
+#     # def insert_text(self, substring, from_undo=False):
+#     #     s = substring.upper()
+#     #     s = ''
+#     #     # self.on_double_tap()
+#     #     return super(ChainStringTextInput, self).insert_text(s, from_undo=from_undo)
+#
+#     def on_text(self, instance, value):
+#         # self.on_quad_touch()
+#         # print('The widget', instance, 'have:', value)
+#         # print('\n')
+#         value = 'asdasd'
+#         # self.on_double_tap()
+#
+#     def _on_focus(self, instance, value, *largs):
+#         super(ChainStringTextInput, self)._on_focus(instance, value, *largs)
+#
+
+# import functools.partial as partial
+
+
 
 class Multicopter(GridLayout):
     gl_left = ObjectProperty()
@@ -75,24 +97,36 @@ class Multicopter(GridLayout):
     tag_error_count_text = StringProperty('No tags found')
 
     label_chain_string_text = StringProperty('...loading...')
+    # chain_string = StringProperty('...loading...') - in change_chain_widget.chain_string
+
     # popup_chain_string_text = StringProperty('...loading...')
     chain_string = ''
 
     def update_chain_string_from_popup(self, whatever=None):
+        new_string = self.change_chain_widget.chain_string_input.text
         # preprocessing error checking
-        self.set_chain_string(self.change_chain_widget.chain_string_text)
-        print('Updating')
+        # print('Updating chain string to: [', self.change_chain_widget.chain_string, ']')
+        print('Updating chain string to: [', new_string, ']')
+        self.set_chain_string(new_string)
 
     def set_chain_string(self, new_chain_string,  whatever=None):
+        print('Previous self.chain_string = ', self.chain_string)
+        print('New = ', new_chain_string)
         self.chain_string = new_chain_string
-        self.popup_chain_string_text = self.chain_string
-        self.chain_control.load_chain(self.chain_string)
+
+        self.change_chain_widget.chain_string_input.text = new_chain_string
+
+        self.chain_control.load_chain(new_chain_string)
         self.change_chain_widget.dismiss()
-        self.label_chain_string_text = self.chain_string
-        print("Chain string =[", self.chain_string, ']')
+
+        self.label_chain_string_text = new_chain_string
+        print("Chain string =[", new_chain_string, ']')
 
     def show_load_chain(self, whatever=None):
         # self.load_popup.open()
+        self.change_chain_widget.open()
+
+    def show_load_chain_key(self, keyboard, keycode, text, modifiers):
         self.change_chain_widget.open()
 
     def __init__(self, capture_control, chain_control, **kwargs):
@@ -107,14 +141,16 @@ class Multicopter(GridLayout):
 
         self.step_widgets_control = StepWidgetControl(self.layout_steps)
 
-        new_chain_string = 'original, gray, resize, resize, resize, resize, resize, resize, resize'
+        new_chain_string = 'original, gray, resize'
+
         available_steps_dict = self.chain_control.get_available_steps()
+
         self.change_chain_widget = ChangeChainWidget(new_chain_string,
                                                      self.update_chain_string_from_popup,
                                                      available_steps_dict)
-
         self.set_chain_string(new_chain_string )
-        self.update_chain_string_from_popup()
+
+        # self.update_chain_string_from_popup()
 
 
 class multicopterApp(App):

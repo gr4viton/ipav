@@ -25,14 +25,17 @@ from StepData import *
 
 class ChangeChainWidget(Popup):
 
-    chain_string_text = StringProperty('')
+    chain_string = StringProperty('')
+    chain_string_input = ObjectProperty()
     layout_available_steps = ObjectProperty()
 
     chain_delimiter = ','
-    def __init__(self, new_chain_string, update_chain_string_from_popup, available_steps_dict,  **kwargs):
+    def __init__(self, new_chain_string, update_chain_string_from_popup,
+                 available_steps_dict,  **kwargs):
+
         super(ChangeChainWidget, self).__init__(**kwargs)
 
-        self.chain_string_text = new_chain_string
+        self.chain_string = new_chain_string
         self.update_chain_string_from_popup = update_chain_string_from_popup
 
         self.create_available_step_widgets(available_steps_dict)
@@ -47,7 +50,7 @@ class ChangeChainWidget(Popup):
         if where == '':
             where = self.where
         if where=='end':
-            self.chain_string_text += self.chain_delimiter + ' ' + str(step_name)
+            self.chain_string += self.chain_delimiter + ' ' + str(step_name)
 
     def add_step_widget(self, step_name):
         self.layout_available_steps.add_widget(

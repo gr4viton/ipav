@@ -268,14 +268,28 @@
                 Label:
                     text: 'Chain:'
                     size_hint_x: 0.05
+
                 TextInput:
                     readonly: 'True'
-
+#                    multiline: 'False'
                     on_double_tap: root.show_load_chain()
-                    padding: 2,0,2,0
-#                    halign: 'middle'
+                    on_focus: root.show_load_chain()
+#                    on_quad_touch: root.update_chain_string_from_popup()
+#                    on_double_tap: root.update_chain_string_from_popup()
+
                     text: root.label_chain_string_text
-#                    text_size: self.size
+
+#                TextInput:
+##                    readonly: 'True'
+#
+#                    on_double_tap: root.show_load_chain()
+##                    on_text_validate: root.show_load_chain()
+#                    on_value: root.show_load_chain()
+#
+#                    padding: 2,0,2,0
+##                    halign: 'middle'
+#                    text: root.label_chain_string_text
+##                    text_size: self.size
 
                 Button:
                     size_hint_x: 0.05
@@ -336,10 +350,13 @@
 #    GridLayout:
 #        ctx.GridLayout
 #
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#<ChainStringTextInput>:
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <ChangeChainWidget>:
     layout_available_steps: layout_available_steps
+    chain_string_input: chain_string_input
 
     title: 'Change chain steps'
 #    auto_dismiss: 'False'
@@ -350,9 +367,13 @@
             text: 'Insert chain step names separated by commas'
             halign: 'left'
         TextInput:
+            id: chain_string_input
 #            text: 'original, gray'
-            text: root.chain_string_text
+            text: root.chain_string
             padding: 2,0,2,0
+#            on_text: print(self.text)
+#            on_text: print(root.chain_string_text)
+
 #            valign: 'middle'
 #            text_size: self.si`ze
         GridLayout:
