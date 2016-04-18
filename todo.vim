@@ -13,13 +13,15 @@ x] resolution
 [x] load chain on start from chain string (to see in label)
 
 [x] change string from popup !
-[] on_text does not update ChangeChainWidget stringProperty!
+[x] on_text does not update ChangeChainWidget stringProperty!
 
 [] Hide/show on all images not functional
 
 [] chain string in popup 
 x] add steps to chain by clicking 
-] on_text in not popup - should open popup
+x] on_focus in not popup - should open popup
+x] click on button - adds on end
+
 ] enter in popup = USE
 ] groups of step methods (filters ...)
 ] add to cursor position

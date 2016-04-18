@@ -49,8 +49,10 @@ class ChangeChainWidget(Popup):
     def add_step(self, step_name, where=''):
         if where == '':
             where = self.where
+
         if where=='end':
-            self.chain_string += self.chain_delimiter + ' ' + str(step_name)
+            # self.add_step_string(str(step_name))
+            self.chain_string_input.text += self.chain_delimiter + ' ' + str(step_name)
 
     def add_step_widget(self, step_name):
         self.layout_available_steps.add_widget(
@@ -68,6 +70,6 @@ class ChangeChainWidget(Popup):
         # popup.open()
 
 
-
-    def update_chain_string(self):
+    def update_chain_string(self, whatever=None):
+        print(whatever)
         self.update_chain_string_from_popup()

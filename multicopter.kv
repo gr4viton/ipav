@@ -367,15 +367,22 @@
             text: 'Insert chain step names separated by commas'
             halign: 'left'
         TextInput:
+
             id: chain_string_input
 #            text: 'original, gray'
             text: root.chain_string
+#            on_enter: root.when_on_enter()
+#            on_text_validate: root.update_chain_string()
+
             padding: 2,0,2,0
+            multiline: 'False'
 #            on_text: print(self.text)
 #            on_text: print(root.chain_string_text)
 
 #            valign: 'middle'
 #            text_size: self.si`ze
+
+
         GridLayout:
             cols:2
             size_hint_y: 5
