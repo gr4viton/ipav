@@ -121,11 +121,11 @@
                 Button:
                     text: "Narrow"
                     size_hint_y: self.parent.hint_y
-                    on_press: root.step_widgets_control.narrow('none')
+                    on_press: root.step_widgets_control.narrow('all')
                 Button:
                     text: "Wide"
                     size_hint_y: self.parent.hint_y
-                    on_press: root.step_widgets_control.narrow('all')
+                    on_press: root.step_widgets_control.narrow('none')
 
         Image:
             id: img_webcam
@@ -367,7 +367,6 @@
             text: 'Insert chain step names separated by commas'
             halign: 'left'
         TextInput:
-
             id: chain_string_input
 #            text: 'original, gray'
             text: root.chain_string
@@ -505,7 +504,7 @@
             text: root.name
             size_hint_x: 0.9
             state: 'down'
-            on_state: root.set_narrow(self.state == 'down')
+            on_state: root.set_narrow(self.state != 'down')
         GridLayout:
             cols: 2
             size_hint_x: 0.4

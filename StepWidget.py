@@ -154,12 +154,12 @@ class StepWidget(GridLayout):
     def set_narrow(self, value):
         self.narrowed = not value
         if value == True:
-            self.tbt_narrow.state = 'down'
+            self.tbt_narrow.state = 'normal'
             # self.size_hint_x = 0.33
             # self.width = 282
-            self.width /= 3
+            self.width = 282/3
         if value == False:
-            self.tbt_narrow.state = 'normal'
+            self.tbt_narrow.state = 'down'
             # self.size_hint_x = 0.33/9
             self.width = 282/3
             self.width *= 3
@@ -174,12 +174,12 @@ class StepWidget(GridLayout):
                 b = 0
             self.kivy_image.y = self.kivy_image_y + b
 
-
         if value == False:
             self.tbt_show_img.state = 'normal'
             # self.kivy_image_y = self.kivy_image.y
             self.kivy_image.y = self.elsewhere
             # self.kivy_image.size_hint_y = 0
+
 
     def toggle_show_img(self, whatever=None):
         if self.tbt_show_img.state == 'down':
@@ -250,8 +250,14 @@ class StepWidgetControl():
                 self.layout_steps.remove_widget( self.layout_steps.children[-1])
                 print('removed widget')
 
+        ziplist = list(zip(self.layout_steps.children, step_control.steps))
+
+        # ziplist = ziplist[::-1]
+        # print(ziplist)
+        # print(ziplist[::-1])
+
         [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name)
-         for (widget, step) in zip(self.layout_steps.children, step_control.steps[::-1])]
+         for (widget, step) in ziplist]
 
     def update_layout_steps(self, step_control):
 
@@ -259,6 +265,6 @@ class StepWidgetControl():
             if len(step_control.steps) != len(self.layout_steps.children):
                 self.layout_steps_add_widgets(step_control)
             else:
-                [widget.update_widget(step)
-                 for (step, widget)
-                 in zip(step_control.steps, self.layout_steps.children)]
+                ziplist = list(zip(self.layout_steps.children, step_control.steps))
+                # ziplist = ziplist[::-1]
+                [widget.update_widget(step) for (widget, step) in ziplist]

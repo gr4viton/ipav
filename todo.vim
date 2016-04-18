@@ -15,12 +15,16 @@ x] resolution
 [x] change string from popup !
 [x] on_text does not update ChangeChainWidget stringProperty!
 
+[] narrow wide - reversed!!! !!!!!!!!!!!!!!!!!!!!!!!!
+
 [] Hide/show on all images not functional
 
 [] chain string in popup 
 x] add steps to chain by clicking 
 x] on_focus in not popup - should open popup
 x] click on button - adds on end
+x] focus on textInput on popup open 
+x] chain_string_label correct actualization from actual step_names on popup chain_string change
 
 ] enter in popup = USE
 ] groups of step methods (filters ...)
@@ -28,6 +32,9 @@ x] click on button - adds on end
 ] log of previous chains - like console command history
 [] actualizing current chain string on startup
 [] chain string auto update on enter
+
+
+[] general arguments from dir of opencv functions - with defaults also
 
 [] make enums 
 ] from step method names

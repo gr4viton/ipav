@@ -171,7 +171,8 @@ class C_observedTag:
         #         if z is float('nan'):
         #             self.set_error(Error.no_square_points)
 
-        [self.set_error(Error.square_points_float_nan) for corner_pt in corner_pts for z in corner_pt if np.isnan(z)]
+        [self.set_error(Error.square_points_float_nan) for corner_pt in corner_pts
+         for z in corner_pt if np.isnan(z)]
         if self.error != Error.flawless:
             return self.error
 

@@ -17,3 +17,6 @@ class DataDictParameterNames(AutoNumber):
     sigma = ()
     take_all_def = ()
     fxfy = ()
+    neighborhood_diameter = ()
+    sigmaColor = ()
+    sigmaSpace = ()

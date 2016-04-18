@@ -76,7 +76,8 @@ class StepControl():
 
         # [self.steps.append(self.available_steps[step_name].copy()) for step_name in self.chain.step_names]
         # [self.steps.append(Step(step_name, self.available_step_fcn[step_name])) for step_name in self.chain.step_names]
-        [self.steps.append(Step(step_name, self.available_steps[step_name].function)) for step_name in self.chain.step_names]
+        [self.steps.append(Step(step_name, self.available_steps[step_name].function))
+         for step_name in self.chain.step_names]
 
 
     def __init__(self, resolution_multiplier, current_chain):
@@ -155,10 +156,6 @@ class StepControl():
         # def make_invert(im):
         #     return (255 - im)
 
-        def make_clahe(data):
-            data[dd.im] = clahe.apply(data[dd.im])
-            return data
-
         clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))
         def make_clahe(data):
             data[dd.im] = clahe.apply(data[dd.im])
@@ -167,14 +164,38 @@ class StepControl():
         # def make_clahe(im):
         #     return clahe.apply(im)
 
-        def make_blur(im, a=75):
-            return cv2.bilateralFilter(im, 9, a, a)
+        def make_blur(data):
+            neighborhood_diameter = add_default(data, dd.neighborhood_diameter, 5)
+            sigmaColor = add_default(data, dd.sigmaColor, 100)
+            sigmaSpace = add_default(data, dd.sigmaSpace, 100)
+            data[dd.im] = cv2.bilateralFilter(data[dd.im], d=neighborhood_diameter,
+                                              sigmaColor=sigmaColor,
+                                              sigmaSpace=sigmaSpace)
+            return data
 
+
+        # def make_blur(im, a=75):
+        #     return cv2.bilateralFilter(im, 9, a, a)
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         def make_median(im, a=5):
             return cv2.medianBlur(im, a)
 
-        def make_otsu(im):
-            return threshIT(im,'otsu').copy()
+
+
+        def make_otsu(data):
+            # print(dir( cv2.threshold))
+            # print(cv2.threshold.__getattribute__())
+
+            # neighborhood_diameter = add_default(data, dd.neighborhood_diameter, 5)
+            # sigmaColor = add_default(data, dd.sigmaColor, 100)
+            # sigmaSpace = add_default(data, dd.sigmaSpace, 100)
+            #
+            ret, otsu = cv2.threshold(data[dd.im], 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            data[dd.im] = otsu
+        # def make_otsu(im):
+        #     return threshIT(im,'otsu').copy()
+            return data
 
         def make_otsu_inv(im):
             return threshIT(im,'otsu_inv').copy()
@@ -579,6 +600,10 @@ class StepControl():
 
         self.add_available_step('resize', make_resize)
         self.add_available_step('invert', make_invert)
+
+
+
+        self.add_available_step('otsu', make_otsu)
 
         self.add_available_step('thresholded', make_otsu)
         self.add_available_step('thresholded inverted', make_otsu_inv)

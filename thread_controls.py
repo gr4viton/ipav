@@ -77,9 +77,11 @@ class Chain():
         self.load_steps_from_string(string)
 
     def load_steps_from_string(self, string):
-        self.step_names = string.replace('\n', self.delimiter).split(self.delimiter)
+        self.step_names_list = string.replace('\n', self.delimiter).split(self.delimiter)
         # print(self.step_names)
-        self.step_names = [step_name.strip(self.strip_chars) for step_name in self.step_names]
+        self.step_names_list = [step_name.strip(self.strip_chars) for step_name in self.step_names_list]
+
+        self.step_names = [step for step in self.step_names_list if step != '']
         # print(self.step_names)
 
     def __init__(self, name, start_chain=True, path='', ):
@@ -159,6 +161,8 @@ class ChainControl():
         self.start_running()
         # string = self.show_load_chain_fnc()
 
+        return self.current_chain.step_names
+
     def get_available_steps(self):
         # print(self._step_control.available_steps)
         return self._step_control.available_steps
@@ -192,7 +196,8 @@ class ChainControl():
 
     def do_chain(self):
         start = time.time()
-        self._step_control.step_all(self.capture_control.image_stream_control.frame, self.resolution_multiplier )
+        self._step_control.step_all(self.capture_control.image_stream_control.frame,
+                                    self.resolution_multiplier )
         end = time.time()
         self.add_exec_times(end-start)
 

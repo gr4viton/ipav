@@ -45,6 +45,9 @@ class ChangeChainWidget(Popup):
     #     print('dismissing')
     #     super(ChangeChainWidget, self).on_dismiss(**kwargs)
 
+    def open(self, *largs):
+        super(Popup, self).open(*largs)
+        self.chain_string_input.focus = True
 
     def add_step(self, step_name, where=''):
         if where == '':
@@ -60,7 +63,6 @@ class ChangeChainWidget(Popup):
 
     def create_available_step_widgets(self, available_steps_dict, whatever=None):
         available_steps_list = [key for key in available_steps_dict.keys()]
-
 
         [self.add_step_widget(step_name) for step_name in available_steps_list]
         # self.available_step_string = '\n'.join(available_steps_list)

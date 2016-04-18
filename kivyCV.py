@@ -116,11 +116,13 @@ class Multicopter(GridLayout):
 
         self.change_chain_widget.chain_string_input.text = new_chain_string
 
-        self.chain_control.load_chain(new_chain_string)
+        step_names = self.chain_control.load_chain(new_chain_string)
         self.change_chain_widget.dismiss()
 
-        self.label_chain_string_text = new_chain_string
-        print("Chain string =[", new_chain_string, ']')
+
+        step_names_string = ', '.join(step_names)
+        self.label_chain_string_text = step_names_string
+        print("Chain string =[", step_names_string , ']')
 
     def show_load_chain(self, whatever=None):
         # self.load_popup.open()
@@ -212,7 +214,7 @@ class multicopterApp(App):
         Clock.schedule_interval(self.redraw_capture, self.fps_redraw )
         print('Scheduled redraw_capture with fps = ', 1/self.fps_redraw)
 
-        Clock.schedule_interval(self.redraw_findtag, self.fps_findtag )
+        Clock.schedule_interval(self.redraw_chain, self.fps_findtag )
         print('Scheduled redraw_findtag with fps = ', 1/self.fps_findtag)
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -255,7 +257,7 @@ class multicopterApp(App):
         else:
             self.root.grid_img_tags.color = (.08, .96 , .24)
 
-    def redraw_findtag(self, dt):
+    def redraw_chain(self, dt):
         # step_control = self.chain_control.step_control
         # if step_control is not None:
         #     self.root.img_steps.texture = convert_to_texture(step_control)
