@@ -86,7 +86,6 @@ x] from data dict param names
 ] android
 ] ..
 
-
 [] pyCV doplnit sentence comprehension 
 - suggestions on tab key
 - multiple lines, ignore not known words (then, Firstly..)
@@ -94,4 +93,8 @@ x] from data dict param names
 - graphical clicker 
 - button for implementation of your own (python code), import from python scripts
 - descending ascending widgets, num of cols / rows
+
+[] one step function
+] more images 
+- which show intermediate steps (findtag)
 

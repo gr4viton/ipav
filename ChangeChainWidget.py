@@ -20,6 +20,7 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 
+# from kivy.modules import inspector
 
 from StepData import *
 
@@ -75,3 +76,8 @@ class ChangeChainWidget(Popup):
     def update_chain_string(self, whatever=None):
         print(whatever)
         self.update_chain_string_from_popup()
+
+    def on_text_change(self, instance, value):
+        # print('The widget', instance, 'have:', value)
+        pass
+

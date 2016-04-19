@@ -20,6 +20,7 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 
+from kivy.core.window import WindowBase
 
 import cv2
 import numpy as np
@@ -115,10 +116,10 @@ class Multicopter(GridLayout):
         self.chain_string = new_chain_string
 
         self.change_chain_widget.chain_string_input.text = new_chain_string
+        self.change_chain_widget.chain_string_input.multiline = False
 
         step_names = self.chain_control.load_chain(new_chain_string)
         self.change_chain_widget.dismiss()
-
 
         step_names_string = ', '.join(step_names)
         self.label_chain_string_text = step_names_string
@@ -130,6 +131,7 @@ class Multicopter(GridLayout):
 
     def show_load_chain_key(self, keyboard, keycode, text, modifiers):
         self.change_chain_widget.open()
+
 
     def __init__(self, capture_control, chain_control, **kwargs):
         # make sure we aren't overriding any important functionality
@@ -154,6 +156,29 @@ class Multicopter(GridLayout):
 
         # self.update_chain_string_from_popup()
 
+        # win = WindowBase()
+        # print(win)
+        win = self
+
+
+        # win.bind(children=WindowBase.children,
+        #         on_keyboard=self.keyboard_shortcut)
+        # win.bind(on_keyboard=self._on_keyboard_handler)
+
+    # def _on_keyboard_handler(instance, key, scancode, codepoint, modifier):
+    #     if key == 293:  # F12
+    #         instance.screenshot()
+    #     elif key == 292:  # F11
+    #         instance.rotation += 90
+    #
+    # def keyboard_shortcut(self, win, scancode, *largs):
+    #     modifiers = largs[-1]
+    #     if scancode == 101 and modifiers == ['ctrl']:
+    #         print('asdasd')
+    #         return True
+    #     elif scancode == 27:
+    #         print('meem')
+    #         return True
 
 class multicopterApp(App):
     # frame = []
