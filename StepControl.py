@@ -183,6 +183,14 @@ class StepControl():
 
 
 
+        def make_threshold(data):
+
+            thresh = add_default(data, dd.thresh, 0)
+            maxVal= add_default(data, dd.maxVal, 255)
+            type = add_default(data, dd.sigmaSpace, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            ret, otsu = cv2.threshold(data[dd.im], thresh, maxVal, type)
+            return data
+
         def make_otsu(data):
             # print(dir( cv2.threshold))
             # print(cv2.threshold.__getattribute__())

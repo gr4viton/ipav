@@ -20,7 +20,7 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 
-from kivy.core.window import WindowBase
+# from kivy.core.window import WindowBase
 
 import cv2
 import numpy as np
@@ -158,19 +158,7 @@ class Multicopter(GridLayout):
 
         # win = WindowBase()
         # print(win)
-        win = self
 
-
-        # win.bind(children=WindowBase.children,
-        #         on_keyboard=self.keyboard_shortcut)
-        # win.bind(on_keyboard=self._on_keyboard_handler)
-
-    # def _on_keyboard_handler(instance, key, scancode, codepoint, modifier):
-    #     if key == 293:  # F12
-    #         instance.screenshot()
-    #     elif key == 292:  # F11
-    #         instance.rotation += 90
-    #
     # def keyboard_shortcut(self, win, scancode, *largs):
     #     modifiers = largs[-1]
     #     if scancode == 101 and modifiers == ['ctrl']:
@@ -226,11 +214,27 @@ class multicopterApp(App):
         self.tag_errors_count = {}
         [self.tag_errors_count.update({str(name): int(0)}) for name, member in tag_error.__members__.items()]
 
-        self.root = root = Multicopter(self.capture_control, self.chain_control)
+
+        # win = self
+        # win = self.root
+
+        # print(dir(self))
+        # print(dir(self.root))
+        # win.bind(children=WindowBase.children,
+        #         on_keyboard=self.keyboard_shortcut)
+        # win.bind(on_keyboard=self._on_keyboard_handler)
+
+        self.root = Multicopter(self.capture_control, self.chain_control)
         self.build_opencv()
 
-        # self.capture_control.toggle_source_id() # take the second input source
-        return root
+        return self.root
+
+    # def _on_keyboard_handler(instance, key, scancode, codepoint, modifier):
+    #     print('asd')
+    #     if key == 293:  # F12
+    #         instance.screenshot()
+    #     elif key == 292:  # F11
+    #         instance.rotation += 90
 
     def build_opencv(self):
         self.fps_redraw = 1.0/50.0
