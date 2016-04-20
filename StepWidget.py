@@ -92,17 +92,57 @@ class StepWidget(GridLayout):
             if self.informing:
                 self.update_info_label(step)
             if self.drawing: # called only if intended to draw
-                im = np.uint8(step.data_post[dd.im].copy())
-                if self.texture_shape != im.shape:
-                    self.recreate_texture(im)
+                # do I need a copy?
+                im = step.data_post[dd.im].copy()
+                im_uint8 = self.convert_image(im)
+                if self.texture_shape != im_uint8.shape:
+                    self.recreate_texture(im_uint8)
                 else:
-                    self.update_texture(im)
+                    self.update_texture(im_uint8)
+
+
+    def convert_image(self, im_orig):
+        im_type = im_orig.dtype
+        if im_type != np.uint8:
+            if im_type == np.float:
+                im = self.polarize_image(im_orig)
+            else:
+                im = np.uint8(im_orig)
+        else:
+            im = im_orig
+
+        return im
+
+    def polarize_image(self, im):
+        """create image with color polarization = negative values are with color1 and positive with color2"""
+
+        if len(im.shape) == 2:
+            pos = im.copy()
+            pos[pos<0] = 0
+            pos = np.uint8(pos)
+
+            neg = im.copy()
+            neg[neg>0] = 0
+            neg = np.uint8(-neg)
+
+            nul = np.uint8(0*im)
+
+            b = nul
+            g = pos
+            r = neg
+            im_out = cv2.merge((b,g,r))
+        else:
+            im_out = im
+
+        return im_out
+
+
 
     def update_info_label(self, step):
         self.info_label.text = step.get_info_string()
 
     def update_texture(self, im):
-        self.update_texture_from_rgb(fh.colorify(im))
+        self.update_texture_from_rgb(self.colorify(im))
 
     def update_texture_from_rgb(self, im_rgb):
         buf1 = cv2.flip(im_rgb, 0)
@@ -111,6 +151,12 @@ class StepWidget(GridLayout):
         # print(im_rgb.shape)
         self.kivy_image.texture = self.texture
 
+
+    def colorify(self, im):
+        if len(im.shape) == 2:
+            return cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
+        else:
+            return im.copy()
 
     def info_label_show(self, which):
         if which == 'all':

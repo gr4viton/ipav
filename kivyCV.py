@@ -37,8 +37,14 @@ from StepControl import *
 from thread_controls import ImageStreamControl, ChainControl, Chain
 
 
+def colorify(im):
+    if len(im.shape) == 2:
+        return cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
+    else:
+        return im.copy()
+
 def convert_to_texture(im):
-    return convert_rgb_to_texture(fh.colorify(im))
+    return convert_rgb_to_texture(colorify(im))
 
 def convert_rgb_to_texture(im_rgb):
     buf1 = cv2.flip(im_rgb, 0)

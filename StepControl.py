@@ -57,6 +57,29 @@ class StepControl():
         self.available_steps[name] = Step(name, function)
         self.available_step_fcn[name] = function
 
+    def add_synonyms(self, word, synonyms_word):
+        # self.available_steps = ['abs']
+        # word = 'abs'
+        # synonyms_word = 'abso, abss'
+        if word in self.available_steps:
+            function = self.available_steps[word].function
+            delimiter = ','
+            strip_chars = ' \t'
+
+            synonyms = []
+            print(synonyms_word)
+            for synonym in synonyms_word:
+                if delimiter in synonym:
+                    synonyms.extend(synonym.split(delimiter))
+                else:
+                    synonyms.append(synonym)
+
+            print(synonyms)
+            [self.add_available_step(synonym.strip(strip_chars), function) for synonym in synonyms]
+        else:
+            print('Cannot add synonyms to step_name [',word,'] as it is not defined in available_steps')
+        # if type(synonyms) == type(list):
+
     def select_steps(self, current_chain):
         self.chain = current_chain
 
@@ -177,33 +200,84 @@ class StepControl():
         # def make_blur(im, a=75):
         #     return cv2.bilateralFilter(im, 9, a, a)
 
+        def make_sobel(data):
+            ddepth = add_default(data, dd.ddepth, cv2.CV_64F)
+            dx = add_default(data, dd.dx, 0)
+            dy = add_default(data, dd.dy, 1)
+            ksize = add_default(data, dd.ksize, 5)
+
+            absolute = add_default(data, dd.absolute, False)
+            vertical = add_default(data, dd.vertical, False)
+            horizontal = add_default(data, dd.horizontal, False)
+
+            if vertical:
+                dx = 1
+            if horizontal:
+                dy = 1
+
+            data[dd.im] = cv2.Sobel(data[dd.im], ddepth=ddepth,
+                                              dx=dx, dy=dy, ksize=ksize)
+
+            if absolute:
+                abs_sob = np.absolute(data[dd.im])
+                data[dd.im] = np.uint8(abs_sob)
+
+            return data
+
+
+        # def make_sobel(im, vertical=0, ksize=5):
+        #     # out = im.copy()
+        #     if vertical == 0:
+        #         sob = cv2.Sobel(im, cv2.CV_64F, 0, 1, ksize=ksize)
+        #     else:
+        #         sob = cv2.Sobel(im, cv2.CV_64F, 1, 0, ksize=ksize)
+        #
+        #     abs_sob = np.absolute(sob)
+        #     return np.uint8(abs_sob)
+
+        def make_laplacian(data):
+            ddepth = add_default(data, dd.ddepth, cv2.CV_64F)
+            ksize = add_default(data, dd.ksize, None)
+            data[dd.im] = cv2.Laplacian(data[dd.im], ddepth=ddepth)
+                          # ,ksize=ksize)
+            return data
+
+        # def make_laplacian(im):
+        #     im2 = im.copy()
+        #     return cv2.Laplacian(im2,cv2.CV_64F)
+
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         def make_median(im, a=5):
             return cv2.medianBlur(im, a)
 
-
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         def make_threshold(data):
-
             thresh = add_default(data, dd.thresh, 0)
             maxVal= add_default(data, dd.maxVal, 255)
-            type = add_default(data, dd.sigmaSpace, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            ret, otsu = cv2.threshold(data[dd.im], thresh, maxVal, type)
+            type = add_default(data, dd.type, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+            return_threshold_value, thresholded_im = cv2.threshold(data[dd.im], thresh, maxVal, type)
+            data[dd.return_threshold_value] = return_threshold_value
+            data[dd.im] = thresholded_im
             return data
 
         def make_otsu(data):
-            # print(dir( cv2.threshold))
-            # print(cv2.threshold.__getattribute__())
+            data[dd.type] = cv2.THRESH_BINARY + cv2.THRESH_OTSU
+            return make_threshold(data)
 
-            # neighborhood_diameter = add_default(data, dd.neighborhood_diameter, 5)
-            # sigmaColor = add_default(data, dd.sigmaColor, 100)
-            # sigmaSpace = add_default(data, dd.sigmaSpace, 100)
-            #
-            ret, otsu = cv2.threshold(data[dd.im], 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            data[dd.im] = otsu
-        # def make_otsu(im):
-        #     return threshIT(im,'otsu').copy()
+        def make_absolute(data):
+            data[dd.im] = abs(data[dd.im])
             return data
+
+        # def make_retype(data):
+        #     np.uint8
+
+        def make_uint8(data):
+            data[dd.im] = np.uint8(data[dd.im])
+            return data
+
 
         def make_otsu_inv(im):
             return threshIT(im,'otsu_inv').copy()
@@ -461,20 +535,6 @@ class StepControl():
             # return im_gray
             return im_out
 
-        def make_sobel(im, vertical=0, ksize=5):
-            # out = im.copy()
-            if vertical == 0:
-                sob = cv2.Sobel(im, cv2.CV_64F, 0, 1, ksize=ksize)
-            else:
-                sob = cv2.Sobel(im, cv2.CV_64F, 1, 0, ksize=ksize)
-
-            abs_sob = np.absolute(sob)
-            return np.uint8(abs_sob)
-
-        def make_laplacian(im):
-            im2 = im.copy()
-            return cv2.Laplacian(im2,cv2.CV_64F)
-
 
 
 
@@ -634,9 +694,19 @@ class StepControl():
         #
         # self.add_available_step('freak', make_freak)
         # self.add_available_step('fast', make_fast)
+
+        self.add_available_step('sobel', make_sobel)
+        self.add_available_step('abs', make_absolute)
+        self.add_synonyms('abs',['absolute'])
+
+        self.add_available_step('uint8', make_uint8)
+        self.add_synonyms('uint8', ['ubyte, dec, decimate, uint'])
+
         self.add_available_step('sobel horizontal', lambda im: make_sobel(im, vertical=0, ksize=5))
         self.add_available_step('sobel vertical', lambda im: make_sobel(im, vertical=1, ksize=5))
+
         self.add_available_step('laplacian', make_laplacian)
+        self.add_synonyms('laplacian', ['laplace, lap, lapla'])
 
 
         self.add_available_step('blender cube', make_blender_cube)

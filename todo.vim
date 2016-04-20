@@ -40,6 +40,11 @@ x] chain_string_label correct actualization from actual step_names on popup chai
 ] from step method names
 x] from data dict param names
 
+[] steps 
+] save __name__ - adds current image into data as __name__
+] load __name__ - load image __name__ from data as current image
+] mask __name__ - boolean masks current image with mask __name__ from data
+
 [] chain layout 
 ] num of cols slider
 ] multiple cells for one step 

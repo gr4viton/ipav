@@ -20,3 +20,16 @@ class DataDictParameterNames(AutoNumber):
     neighborhood_diameter = ()
     sigmaColor = ()
     sigmaSpace = ()
+    # make_threshold
+    thresh = ()
+    maxVal = ()
+    type = ()
+    return_threshold_value = ()
+    # make_sobel, make_laplacian
+    ddepth = ()
+    dx = ()
+    dy = ()
+    ksize = ()
+    absolute = ()
+    vertical = ()
+    horizontal = ()

@@ -32,7 +32,12 @@ class Step():
     def get_info_string(self):
         info = ""
         # info += self.str_mean_execution_time()
-        info += str(self.data_post[dd.im].shape) + 'px'
+        im = self.data_post[dd.im]
+        if im is not None:
+            info += str(im.shape) + 'px'
+            info += ', ' + str(im.dtype)
+            if im.dtype == np.float:
+                info += ' (red=negative, green=positive)'
         return info
 
     def add_exec_times(self, tim):

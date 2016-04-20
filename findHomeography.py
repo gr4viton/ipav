@@ -378,11 +378,6 @@ def joinIm(ims, vertically = 0, color = 0):
 def colorifyGray(im):
     return cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
 
-def colorify(im):
-    if len(im.shape) == 2:
-        return cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
-    else:
-        return im.copy()
 
 def drawContour(im, cnt, color = 180, thickness = 1):
     cv2.drawContours(im, cnt, 0, color, thickness)
