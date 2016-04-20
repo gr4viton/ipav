@@ -6,7 +6,12 @@ class CaptureControl():
     def __init__(self):
 
         # ids = [0,1,2,3,4]
-        ids = [0]
+        ids = [0] # latest connection
+        # 0 hd evolve
+        # 1 webcam black
+        # 2 webcam clips
+        # 3 usbcam blue
+
         [self.streams.append(ImageStreamControl(id)) for id in ids]
         # self.streams.append(ImageStreamControl(0)) # over
         # self.streams.append(ImageStreamControl(1)) # clips

@@ -103,3 +103,5 @@ x] from data dict param names
 ] more images 
 - which show intermediate steps (findtag)
 
+
+[] export only images of chain with arrows

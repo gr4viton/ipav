@@ -151,7 +151,10 @@ class Multicopter(GridLayout):
 
         self.step_widgets_control = StepWidgetControl(self.layout_steps)
 
-        new_chain_string = 'original, gray, resize'
+        # new_chain_string = 'original, gray, resize'
+        new_chain_string = 'original, resize, detect red'
+        new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull'
+
 
         available_steps_dict = self.chain_control.get_available_steps()
 

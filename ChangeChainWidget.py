@@ -60,12 +60,26 @@ class ChangeChainWidget(Popup):
 
     def add_step_widget(self, step_name):
         self.layout_available_steps.add_widget(
-            Button(text=step_name, on_press=lambda step_name: self.add_step(step_name=step_name.text)))
+            Button(text=step_name,
+                   size_hint=(None,None),
+                   width=15*len(step_name),
+                   height= 25,
+                   on_press=lambda step_name: self.add_step(step_name=step_name.text)))
 
     def create_available_step_widgets(self, available_steps_dict, whatever=None):
         available_steps_list = [key for key in available_steps_dict.keys()]
 
-        [self.add_step_widget(step_name) for step_name in available_steps_list]
+        # sort the list by ids
+
+        sorted_available_steps_list = \
+            sorted(available_steps_list,
+                   key=lambda step: available_steps_dict[step].id)
+
+        [self.add_step_widget( step_name
+            # '='.join([step_name, str(available_steps_dict[step_name].id)])
+        ) for step_name in sorted_available_steps_list
+         if available_steps_dict[step_name].origin == None]
+
         # self.available_step_string = '\n'.join(available_steps_list)
         # print(self.available_step_string)
         # text_input = TextInput(text=self.available_step_string, readonly=True)

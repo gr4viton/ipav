@@ -140,6 +140,7 @@ class StepWidget(GridLayout):
 
     def update_info_label(self, step):
         self.info_label.text = step.get_info_string()
+        step.data_post[dd.info] = False
 
     def update_texture(self, im):
         self.update_texture_from_rgb(self.colorify(im))

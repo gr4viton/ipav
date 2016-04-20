@@ -11,7 +11,11 @@ class DataDictParameterNames(AutoNumber):
     """
     DataDictParameterNames == dd
     """
+    # = ()
     im = ()
+    info = ()
+    info_text = ()
+    # gauss ..
     kernel = ()
     resolution = ()
     sigma = ()
@@ -36,3 +40,12 @@ class DataDictParameterNames(AutoNumber):
     # make_clear_border, make_color_edge
     width = ()
     value = ()
+    # make_find_contours
+    cnts = ()
+    mode = ()
+    method = ()
+    thickness = ()
+    color = ()
+    colors = ()
+    # make_convex_hull
+    hull = ()
