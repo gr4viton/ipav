@@ -25,6 +25,9 @@ from Step import Step
 
 class StepControl():
 
+    delimiter = ','
+    strip_chars = ' \t'
+
     buffer = None
     seen_tags = None
     mask_ones = None
@@ -56,28 +59,49 @@ class StepControl():
     def add_available_step(self, name, function):
         self.available_steps[name] = Step(name, function)
         self.available_step_fcn[name] = function
+        return name
 
-    def add_synonyms(self, word, synonyms_word):
+    def add_synonyms(self, word_and_synonyms):
+        delimiter = self.delimiter
+        # strip_chars = self.strip_chars
+
+        words = word_and_synonyms.split(delimiter)
+        if len(words) > 1:
+            word = words[0]
+            synonym_word = words[1:]
+            self.add_synonyms_separate(word, synonym_word)
+
+
+    def add_synonyms_separate(self, word, synonyms_word):
         # self.available_steps = ['abs']
         # word = 'abs'
         # synonyms_word = 'abso, abss'
         if word in self.available_steps:
             function = self.available_steps[word].function
-            delimiter = ','
-            strip_chars = ' \t'
+            delimiter = self.delimiter
+            strip_chars = self.strip_chars
 
             synonyms = []
-            print(synonyms_word)
-            for synonym in synonyms_word:
-                if delimiter in synonym:
-                    synonyms.extend(synonym.split(delimiter))
+            # print(synonyms_word)
+            if type(synonyms_word) == type([]):
+                for synonym in synonyms_word:
+                    if delimiter in synonym:
+                        synonyms.extend(synonym.split(delimiter))
+                    else:
+                        synonyms.append(synonym)
+            else:
+                if delimiter in synonyms_word:
+                    synonyms.extend(synonyms_word.split(delimiter))
                 else:
-                    synonyms.append(synonym)
+                    synonyms.append(synonyms_word)
 
-            print(synonyms)
-            [self.add_available_step(synonym.strip(strip_chars), function) for synonym in synonyms]
+
+
+            synonyms = [self.add_available_step(synonym.strip(strip_chars), function) for synonym in synonyms]
+            print('[{}] is now know also as [{}]'.format(word,synonyms))
         else:
-            print('Cannot add synonyms to step_name [',word,'] as it is not defined in available_steps')
+            print('Cannot add synonyms to step_name [', word,
+                  '] as it is not defined in available_steps')
         # if type(synonyms) == type(list):
 
     def select_steps(self, current_chain):
@@ -200,28 +224,36 @@ class StepControl():
         # def make_blur(im, a=75):
         #     return cv2.bilateralFilter(im, 9, a, a)
 
-        def make_sobel(data):
-            ddepth = add_default(data, dd.ddepth, cv2.CV_64F)
-            dx = add_default(data, dd.dx, 0)
-            dy = add_default(data, dd.dy, 1)
-            ksize = add_default(data, dd.ksize, 5)
+        def make_sobel(data,
+                       ksize=5, dx=0, dy=0, ddepth=cv2.CV_64F,
+                       vertical=False, horizontal=False, absolute=False):
 
-            absolute = add_default(data, dd.absolute, False)
-            vertical = add_default(data, dd.vertical, False)
-            horizontal = add_default(data, dd.horizontal, False)
+            ddepth = add_default(data, dd.ddepth, ddepth)
+            dx = add_default(data, dd.dx, dx)
+            dy = add_default(data, dd.dy, dy)
+            ksize = add_default(data, dd.ksize, ksize)
+
+            absolute = add_default(data, dd.absolute, absolute)
+            vertical = add_default(data, dd.vertical, vertical)
+            horizontal = add_default(data, dd.horizontal, horizontal)
 
             if vertical:
                 dx = 1
             if horizontal:
                 dy = 1
 
-            data[dd.im] = cv2.Sobel(data[dd.im], ddepth=ddepth,
+            im_out = cv2.Sobel(data[dd.im], ddepth=ddepth,
                                               dx=dx, dy=dy, ksize=ksize)
 
-            if absolute:
-                abs_sob = np.absolute(data[dd.im])
-                data[dd.im] = np.uint8(abs_sob)
+            if im_out is None:
+                im_out = data[dd.im]
 
+            if absolute:
+                abs_sob = np.absolute(im_out)
+                im_out = np.uint8(abs_sob)
+
+
+            data[dd.im] = im_out
             return data
 
 
@@ -237,9 +269,8 @@ class StepControl():
 
         def make_laplacian(data):
             ddepth = add_default(data, dd.ddepth, cv2.CV_64F)
-            ksize = add_default(data, dd.ksize, None)
-            data[dd.im] = cv2.Laplacian(data[dd.im], ddepth=ddepth)
-                          # ,ksize=ksize)
+            ksize = add_default(data, dd.ksize, 5)
+            data[dd.im] = cv2.Laplacian(data[dd.im], ddepth=ddepth, ksize=ksize)
             return data
 
         # def make_laplacian(im):
@@ -247,9 +278,14 @@ class StepControl():
         #     return cv2.Laplacian(im2,cv2.CV_64F)
 
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        def make_median(im, a=5):
-            return cv2.medianBlur(im, a)
+        def make_median(data):
+            ksize = add_default(data, dd.ksize, 5)
+            data[dd.im] = cv2.medianBlur(data[dd.im], ksize=ksize)
+            return data
+
+
+        # def make_median(im, a=5):
+        #     return cv2.medianBlur(im, a)
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -279,16 +315,31 @@ class StepControl():
             return data
 
 
+        def make_clear_border(data, width=5):
+            im = data[dd.im]
+            width = add_default(data, dd.width, width)
+            im_out = imclearborder(im, width, self.get_buffer(im), self.get_mask(im))
+            data[dd.im] = im_out
+            return data
+
+        # def make_clear_border(im, width = 5):
+        #     return imclearborder(im, width, self.get_buffer(im), self.get_mask(im))
+
+
+
         def make_otsu_inv(im):
             return threshIT(im,'otsu_inv').copy()
 
-        def make_clear_border(im, width = 5):
-            return imclearborder(im, width, self.get_buffer(im), self.get_mask(im))
 
-        def make_remove_frame(im, width = 5, color = 0):
+        def make_color_edge(data, width=5, value=0):
+            im = data[dd.im]
+            width = add_default(data, dd.width, width)
+            value = add_default(data, dd.color, value)
             a = width
-            return cv2.copyMakeBorder(im[a:-a, a:-a], a, a, a, a,
-                                      cv2.BORDER_CONSTANT, value=color)
+            im = cv2.copyMakeBorder(im[a:-a, a:-a], a, a, a, a,
+                                      cv2.BORDER_CONSTANT, value=value)
+            data[dd.im] = im
+            return data
 
 
         def make_flood(im, color = 0):
@@ -661,24 +712,49 @@ class StepControl():
         self.add_available_step('clahed', make_clahe)
         self.add_available_step('blurred', make_blur)
 
-        self.add_available_step('gaussed', make_gauss)
         self.add_available_step('gauss', make_gauss)
+        self.add_synonyms('gauss, gaussed')
 
         self.add_available_step('median', make_median)
 
         self.add_available_step('resize', make_resize)
         self.add_available_step('invert', make_invert)
 
-
-
+        self.add_available_step('threshold', make_threshold)
+        self.add_synonyms('threshold, thresh, thresholded')
         self.add_available_step('otsu', make_otsu)
 
-        self.add_available_step('thresholded', make_otsu)
-        self.add_available_step('thresholded inverted', make_otsu_inv)
-        self.add_available_step('border touch cleared', make_clear_border)
-        self.add_available_step('removed frame', make_remove_frame)
+
+        self.add_available_step('abs', make_absolute)
+        self.add_synonyms('abs, absolute')
+
+        self.add_available_step('uint8', make_uint8)
+        self.add_synonyms('uint8, ubyte, dec, decimate, uint')
+
+        self.add_available_step('sobel', lambda d: make_sobel(d, vertical=True, horizontal=True))
+        self.add_available_step('sobh', lambda d: make_sobel(d, horizontal=True))
+        self.add_available_step('sobv', lambda d: make_sobel(d, vertical=True))
+        self.add_synonyms('sobel, sob, sobvh, sobhv')
+        self.add_synonyms('sobh, sobelh, sobel horizontal')
+        self.add_synonyms('sobv, sobelv, sobel vertical')
+
+
+        self.add_available_step('laplacian', make_laplacian)
+        self.add_synonyms('laplacian, laplace, lap, lapla')
+
+
+
+        self.add_available_step('clear border', make_clear_border)
+        self.add_synonyms('clear border, border touch cleared, remove border touching')
+
+        self.add_available_step('color edge', make_color_edge)
+        self.add_synonyms('color edge, remove frame, color frame, color')
+
         self.add_available_step('flooded w/white', lambda im: make_flood(im, 255))
         self.add_available_step('flooded w/black', lambda im: make_flood(im, 0))
+
+
+        self.add_available_step('thresholded inverted', make_otsu_inv)
 
         # self.add_available_step('hls stack', make_hls_stack)
         self.add_available_step('hls stack', lambda im: make_stack(im, cv2.COLOR_RGB2HLS))
@@ -695,18 +771,6 @@ class StepControl():
         # self.add_available_step('freak', make_freak)
         # self.add_available_step('fast', make_fast)
 
-        self.add_available_step('sobel', make_sobel)
-        self.add_available_step('abs', make_absolute)
-        self.add_synonyms('abs',['absolute'])
-
-        self.add_available_step('uint8', make_uint8)
-        self.add_synonyms('uint8', ['ubyte, dec, decimate, uint'])
-
-        self.add_available_step('sobel horizontal', lambda im: make_sobel(im, vertical=0, ksize=5))
-        self.add_available_step('sobel vertical', lambda im: make_sobel(im, vertical=1, ksize=5))
-
-        self.add_available_step('laplacian', make_laplacian)
-        self.add_synonyms('laplacian', ['laplace, lap, lapla'])
 
 
         self.add_available_step('blender cube', make_blender_cube)

@@ -33,3 +33,6 @@ class DataDictParameterNames(AutoNumber):
     absolute = ()
     vertical = ()
     horizontal = ()
+    # make_clear_border, make_color_edge
+    width = ()
+    value = ()
