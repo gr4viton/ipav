@@ -596,13 +596,13 @@ class StepControl():
 
 
 
-        # sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
-        #
-        # import blender_step
-        #
-        # bm = blender_step.blender_module()
-        # bm.start_server()
-        # bm.init_room()
+        sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
+
+        import blender_step
+
+        bm = blender_step.blender_module()
+        bm.start_server()
+        bm.init_room()
 
 
 # predavat dictionary - multiple possible images, text overlay
@@ -656,8 +656,9 @@ class StepControl():
 
         def get_spaced_colors(n):
             max_value = 16581375 #255**3
+            min_value = 255
             interval = int(max_value / n)
-            colors = [hex(I)[2:].zfill(6) for I in range(0, max_value, interval)]
+            colors = [hex(I)[2:].zfill(6) for I in range(min_value, max_value, interval)]
 
             return [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
 
@@ -833,6 +834,11 @@ class StepControl():
         self.add_available_step('convex hull', make_convex_hull)
         self.add_synonyms('convex hull, hull')
 
+        self.add_available_step('blender', make_blender_cube)
+        self.add_synonyms('blender, blend, blender cube')
+
+        self.add_available_step('detect red', make_detect_red)
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         self.add_available_step('clear border', make_clear_border)
@@ -866,8 +872,6 @@ class StepControl():
         # self.add_available_step('freak', make_freak)
         # self.add_available_step('fast', make_fast)
 
-        self.add_available_step('blender cube', make_blender_cube)
-        self.add_available_step('detect red', make_detect_red)
 
 
 def waitKeyExit():

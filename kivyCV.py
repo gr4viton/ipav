@@ -154,6 +154,7 @@ class Multicopter(GridLayout):
         # new_chain_string = 'original, gray, resize'
         new_chain_string = 'original, resize, detect red'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull'
+        # new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend'
 
 
         available_steps_dict = self.chain_control.get_available_steps()
@@ -168,7 +169,7 @@ class Multicopter(GridLayout):
         # win = WindowBase()
         # print(win)
 
-    # def keyboard_shortcut(self, win, scancode, *largs):
+    # def keyboard_shortcut(self, wi n, scancode, *largs):
     #     modifiers = largs[-1]
     #     if scancode == 101 and modifiers == ['ctrl']:
     #         print('asdasd')
