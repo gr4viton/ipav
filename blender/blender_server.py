@@ -29,97 +29,7 @@ from mathutils import Vector
 from math import pi
 
 import time
-
-
-class RealCamera():
-    pos = Vector((0,0,0))
-    rot = Vector((0,0,0))
-    # height, width, distance of the plane == aspect ratios, distance
-    size = Vector((0,0,0))
-
-    proj = None
-    rcam = None
-
-    def __init__(self, pos, rot, size):
-        self.pos = Vector(pos)
-        self.rot = Vector(rot)
-        self.size = Vector(size)
-
-    def __init__(self, pos, rot, size, rcam_obj):
-        self.pos = Vector(pos)
-        self.rot = Vector(rot)
-        self.size = Vector(size)
-        self.rcam = rcam_obj
-
-    def init_rot(self, real_point, pixel):
-        """
-        initializes rotation from real space point projection to camera plane
-        """
-    def create_iso(self):
-        cubeobject = bpy.ops.mesh.primitive_ico_sphere_add
-        #    cursor = context.scene.cursor_location
-        #   x = cursor.x
-        #  y = cursor.y
-        # z = cursor.z
-        cubeobject(location=(1, 1, 1))
-
-    def create_cone(self):
-        new_cone = bpy.ops.mesh.primitive_cone_add(
-            vertices=4, radius1=2, depth=10.0,
-            location=self.pos, rotation=self.rot)
-        print("created new_cone =", new_cone)
-        # scn = bpy.context.scene.GetCurrent()
-        # scn.objects.new(new_cone, 'cone')
-
-    def delete_object(self, object):
-    #     bpy.ops.object.select_all(action='DESELECT')
-    #     #rcam_d = bpy.data.objects['prj.001']
-    #     object.select = True
-    #     bpy.ops.object.delete()
-    #
-    #     scene = bpy.context.scene
-    # #    scene.objects.link(rcam_d)
-    #     scene.update()
-
-
-        scene = bpy.context.scene
-        scene.objects.unlink(object)
-        bpy.data.objects.remove(object)
-        scene.update()
-
-        # object.hide
-        # when it is unlinked from scene, it won't be saved
-        object = None
-
-        # object.delete()
-
-    def delete_projection(self):
-        self.delete_object(self.proj)
-        self.proj = None
-
-    def create_projection(self):
-        if self.rcam:
-
-            # rcam = bpy.data.objects['rcam.001']
-            # print(rcam)
-            #    rcam_d = bpy.data.objects.new('prj.001', rcam.data.copy())
-            #    print(rcam_d)
-            if self.proj:
-                self.delete_projection()
-
-            self.proj = self.rcam.copy()
-            # print(rcam_d)
-
-
-            self.proj.name = 'prj' + self.rcam.name[-4:]
-            #    rcam_d.location += Vector((1,1,1))
-            #    rcam_d.rotation_euler = Vector((pi,0,0))
-            self.proj.scale = Vector((1, 1, 5))
-
-            scene = bpy.context.scene
-            scene.objects.link(self.proj)
-            scene.update()
-
+from RealCamera import RealCamera
 
 class BlenderServer():
 
@@ -190,6 +100,9 @@ class BlenderServer():
         print('photogrammetrying object')
         bpy.ops.object.mode_set(mode='OBJECT')
         self.pobj = None
+
+        # rcam.
+
         for rcam in self.real_cam_set:
             if rcam.proj:
                 if self.pobj is None:
@@ -362,11 +275,18 @@ class BlenderServer():
                             if data_dict.get('create_cam_projections', None) == True:
                                 self.create_projections()
 
+                            projections = data_dict.get('projections', None)
+                            if projections:
+                                self.projections = projections
+
                             if data_dict.get('photogrammetry_object', None) == True:
                                 self.photogrammetry_object()
 
                             if data_dict.get('render', None) == True:
                                 self.render_to_file()
+
+
+
 
                             if data_dict.get('exit', None) == True:
                                 looping = False

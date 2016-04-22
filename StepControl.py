@@ -596,7 +596,7 @@ class StepControl():
 
 
 
-        sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
+        # sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 
         import blender_step
 
@@ -607,8 +607,9 @@ class StepControl():
 
 # predavat dictionary - multiple possible images, text overlay
         def make_blender_cube(data):
-            projections = 'contours of moving objects'
+            # projections = 'contours of moving objects'
 
+            projections = data[dd.hull]
             imdir = bm.photogrammetry_object(projections)
 
             # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
