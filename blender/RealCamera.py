@@ -10,7 +10,7 @@ import pickle
 import bpy
 import os
 import datetime as dt
-
+import numpy as np
 
 
 sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
@@ -25,7 +25,7 @@ def printl():
     print('_'*42)
 
 import bpy, mathutils, math
-from mathutils import Vector
+from mathutils import Vector, Euler
 from math import pi
 
 import time
@@ -39,15 +39,20 @@ class RealCamera():
 
     proj = None
     rcam = None
+    hull = None
 
-    def __init__(self, pos, rot, size):
+    def __init__(self, name, pos, rot, eul, size):
+        self.name = name
         self.pos = Vector(pos)
         self.rot = Vector(rot)
+        self.eul = Vector(eul)
         self.size = Vector(size)
 
-    def __init__(self, pos, rot, size, rcam_obj):
+    def __init__(self, name, pos, rot, eul, size, rcam_obj):
+        self.name = name
         self.pos = Vector(pos)
         self.rot = Vector(rot)
+        self.eul = eul
         self.size = Vector(size)
         self.rcam = rcam_obj
 
@@ -97,37 +102,97 @@ class RealCamera():
         self.delete_object(self.proj)
         self.proj = None
 
-    def create_projection(self, hull=None):
+
+    def duplicate(self, obj, duplicate_name):
+
+        obj_duplicate = obj.copy()
+        obj_duplicate.name = duplicate_name
+
+        scene = bpy.context.scene
+        scene.objects.link(obj_duplicate)
+        scene.update()
+
+        return obj_duplicate
+
+    def get_contour_projection_object(self):
+            rcam_eul = self.eul
+            rcam_pos = self.pos
+            print('%'*42, rcam_pos)
+            rcam_rot = self.rot
+            rcam_sca = self.size
+
+            # rcam_rot = np.deg2rad(rcam_rot)
+
+            rcam_rot_euler = Euler(rcam_rot, rcam_eul)
+
+            # x = 200
+            # h, v = (640/x, 480/x)
+            # focal = 300/x
+            h, v, focal = rcam_sca
+
+            eye_center = [(h/2, v/2, focal*80)]
+            # eye_center = [(1,1,3)]
+
+            hull = self.hull
+            print(hull)
+
+            hull_xyz = [(x,y,0) for (x,y) in hull]
+
+            verts = eye_center + hull_xyz
+        #    print('verts=\n', '\n'.join([str(v) for v in verts]) )
+
+            start_index = 1
+            hull_max_index = len(hull_xyz) + start_index -1
+
+            faces_eye = [ (x, x+1, 0) for x in range(start_index, hull_max_index)]
+            faces_eye += [(hull_max_index, start_index, 0)]
+
+            faces_canvas = [ (x+1, x, start_index) for x in range(start_index+1, hull_max_index)]
+        #    print('faces_eye[',len(faces_eye),']=',faces_eye)
+        #    print('faces_canvas[',len(faces_canvas),']=',faces_canvas)
+
+            faces = faces_eye + faces_canvas
+
+            mesh_data = bpy.data.meshes.new("hull_mesh")
+            mesh_data.from_pydata(verts, [], faces)
+            mesh_data.update()
+
+            hull_name = "hull_" + self.name
+            hull = bpy.data.objects.new(hull_name, mesh_data)
+
+            scene = bpy.context.scene
+            scene.objects.link(hull)
+            scene.update()
+
+            new_origin = eye_center[0]
+            neg_new_origin = [-x for x in new_origin]
+            hull.data.transform(mathutils.Matrix.Translation(neg_new_origin))
+        #    hull.matrix_world.translation += new_origin
+
+            hull.location = rcam_pos
+            hull.rotation_euler = rcam_rot_euler
+
+            scene.update()
+
+            return hull
+    def create_projection(self):
         if self.rcam:
             if self.proj:
                 self.delete_projection()
 
-            if hull == None:
+
+            if self.hull == None:
                 self.proj = self.rcam.copy()
                 self.proj.scale = Vector((1, 1, 5))
 
             else:
-                verts = [(1.0, 1.0, -1.0),
-                        (1.0, -1.0, -1.0),
-                        (-1.0, -1.0, -1.0),
-                        (-1.0, 1.0, -1.0),
-                         (1.0, 1.0, 1.0),
-                         (1.0, -1.0, 1.0),
-                        (-1.0, -1.0, 1.0),
-                        (-1.0, 1.0, 1.0)]
 
-                faces = [(0, 1, 2, 3),
-                         (4, 7, 6, 5),
-                         (0, 4, 5, 1),
-                         (1, 5, 6, 2),
-                         (2, 6, 7, 3),
-                         (4, 0, 3, 7)]
 
-                mesh_data = bpy.data.meshes.new("cube_mesh_data")
-                mesh_data.from_pydata(verts, [], faces)
-                mesh_data.update()
+                proj = self.get_contour_projection_object()
+                proj_original = self.duplicate(proj, 'hull')
+                self.proj = proj
 
-                self.proj = bpy.data.objects.new("My_Object", mesh_data)
+
                 pass
 
 

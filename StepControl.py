@@ -625,7 +625,11 @@ class StepControl():
             # print('latest_imfile', latest_imfile)
             im = cv2.imread(latest_imfile)
             if im is not None:
+                print('loaded_image from folder blender/pic')
                 data[dd.im] = im
+            else:
+                data[dd.im] = data[dd.im].copy()
+
             return data
 
         def make_bounding_box_center():
@@ -728,6 +732,8 @@ class StepControl():
 
             # print(len(hull))
             data[dd.im] = draw_cnts(data, dd.hull, 0)
+
+            # print("aa",hull)
 
             return data
 

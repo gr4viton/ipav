@@ -10,12 +10,15 @@ class Step():
     def __init__(self, name, function):
         self.name = name
         self.function = function
-        self.execution_time_len = 15
+        self.execution_time_len = 23
         self.execution_time = 0
         self.execution_times = []
         self.mean_execution_time = 0
         self.synonyms = []
         self.origin = None
+
+        self.data_prev = None
+        self.data_post = None
 
         self.id = Step.steps_count
         Step.steps_count +=1
@@ -41,6 +44,8 @@ class Step():
     def get_info_string(self):
         data = self.data_post
         info = ""
+        if data is None:
+            return info
         # info += self.str_mean_execution_time()
         im = data[dd.im]
         if im is not None:

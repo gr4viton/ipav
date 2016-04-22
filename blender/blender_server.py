@@ -51,8 +51,10 @@ class BlenderServer():
             if obj_key[:4] == 'rcam':
                 # print(obj_key)
                 self.real_cam_set.append(RealCamera(
+                    obj.name,
                     obj.location,
                     obj.rotation_euler,
+                    'XYZ',
                     obj.dimensions,
                     obj
                 ))
@@ -68,13 +70,20 @@ class BlenderServer():
         with open(path, 'r') as f:
             for cam_line in f.readlines():
                 # print('cam_line =', cam_line)
-                pos_rot_size = []
+                pos_rot_eul_size = []
                 for vector in cam_line.split(vector_delimiter):
                     # print('vector =', vector)
-                    pos_rot_size.append( [float(value) for value in vector.split(number_delimiter)])
+                    name = None
+                    if number_delimiter in vector:
+                        pos_rot_eul_size.append( [float(value) for value in vector.split(number_delimiter)])
+                    else:
+                        if name == None:
+                            name = vector
+                        else:
+                            pos_rot_eul_size.append(vector)
                     # print('pos_rot_size =', pos_rot_size[-1])
 
-                self.real_cam_set.append(RealCamera(*pos_rot_size))
+                self.real_cam_set.append(RealCamera(name, *pos_rot_eul_size))
 
         print(len(self.real_cam_set),'real camera location data initialized.')
 
@@ -84,9 +93,36 @@ class BlenderServer():
         printl()
 
     def create_projections(self):
+        if len(self.real_cam_set) < 1:
+            return
+        # self.real_cam_set[0].hull = self.projections
+
+        hull = [ [[30, 31]],
+                 [[28, 33]],
+                 [[25, 34]],
+                 [[15, 34]],
+                 [[ 8, 31]],
+                 [[ 6, 30]],
+                 [[ 3, 27]],
+                 [[ 1, 24]],
+                 [[ 1, 20]],
+                 [[ 2, 18]],
+                 [[11,  9]],
+                 [[13,  8]],
+                 [[27,  8]],
+                 [[29, 10]],
+                 [[30, 16]]]
+
+        hull = [x[0] for x in hull]
+        # print(hull)
+
+
+        self.real_cam_set[0].hull = hull
+
         for cam in self.real_cam_set:
             print('creating projection')
             cam.create_projection()
+
 
     def duplicate(self, template, name):
         copy = template.copy()
@@ -184,15 +220,6 @@ class BlenderServer():
         pass
 
 
-
-    def load_file(self, blend):
-        print("Loading file", blend)
-
-        # multiple files opened simultaneously http://stackoverflow.com/questions/28075599/opening-blend-files-using-blenders-python-api
-        path = "D:/DEV/PYTHON/pyCV/kivyCV_start/blender/main.blend"
-        bpy.ops.wm.open_mainfile(filepath=path)
-        sys.stdout.flush()
-
     def render_to_file(self):
         format_str = "%Y-%m-%d %H_%M_%S"
         # format_str = "-%H%M%S %Y-%m-%d"
@@ -201,6 +228,24 @@ class BlenderServer():
         print('path =', path)
         bpy.data.scenes['Scene'].render.filepath = path
         bpy.ops.render.render( write_still=True )
+
+
+    def save_to_mainfile(self):
+        folder = os.path.abspath("D:\DEV\PYTHON\pyCV\_DELETE ME\pics")
+        format_str = "%Y-%m-%d %H_%M_%S"
+        i = dt.datetime.now().strftime(format_str)
+        name = str(i) + 'out.blend'
+        path = os.path.join(folder,name)
+        bpy.ops.wm.save_as_mainfile(filepath=path)
+
+
+    def load_file(self, blend):
+        print("Loading file", blend)
+
+        # multiple files opened simultaneously http://stackoverflow.com/questions/28075599/opening-blend-files-using-blenders-python-api
+        path = "D:/DEV/PYTHON/pyCV/kivyCV_start/blender/main.blend"
+        bpy.ops.wm.open_mainfile(filepath=path)
+        sys.stdout.flush()
 
     def init_render(self):
         self.width = 100
@@ -285,6 +330,8 @@ class BlenderServer():
                             if data_dict.get('render', None) == True:
                                 self.render_to_file()
 
+                            if data_dict.get('save_blend', None) == True:
+                                self.save_to_mainfile()
 
 
 

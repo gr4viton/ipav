@@ -25,7 +25,10 @@ import pickle
 
 class blender_module():
 
-    PORT = 8084
+    # PORT = 8084
+    # PORT = 8082
+    # PORT = 8083
+    PORT = 8089
     HOST = "localhost"
     param_dict = {}
     param_exit = 'exit()'
@@ -130,10 +133,12 @@ class blender_module():
     def photogrammetry_object(self, projections):
         start = time.time()
 
-        self.send_data_dict({'projections': projections})
+        # self.send_data_dict({'projections': projections})
+
         self.send_data_dict({'create_cam_projections': True})
         self.send_data_dict({'photogrammetry_object': True})
         self.send_data_dict({'render': True})
+        self.send_data_dict({'save_blend': True})
 
         # time.sleep(1)
         end = time.time()
@@ -164,6 +169,7 @@ class blender_module():
         while(looping):
 
             self.send_data_dict({'render':True})
+
 
             time.sleep(0.05)
             time.sleep(1)

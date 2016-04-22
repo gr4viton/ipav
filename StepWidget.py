@@ -89,6 +89,8 @@ class StepWidget(GridLayout):
     def update_widget(self, step):
         if not self.narrowed:
             self.time_label.text = step.str_mean_execution_time('')
+            if step.data_post == None:
+                return
             if self.informing:
                 self.update_info_label(step)
             if self.drawing: # called only if intended to draw
@@ -304,7 +306,7 @@ class StepWidgetControl():
         # print(ziplist[::-1])
 
         [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name)
-         for (widget, step) in ziplist]
+         for (widget, step) in ziplist if step.data_post is not None]
 
     def update_layout_steps(self, step_control):
 
