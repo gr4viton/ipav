@@ -175,6 +175,7 @@ class RealCamera():
             scene.update()
 
             return hull
+
     def create_projection(self):
         if self.rcam:
             if self.proj:
@@ -192,16 +193,12 @@ class RealCamera():
                 proj_original = self.duplicate(proj, 'hull')
                 self.proj = proj
 
-
-                pass
-
-
             self.proj.name = 'prj' + self.rcam.name[-4:]
             #    rcam_d.location += Vector((1,1,1))
             #    rcam_d.rotation_euler = Vector((pi,0,0))
 
             scene = bpy.context.scene
-            scene.objects.link(self.proj)
+            # scene.objects.link(self.proj)
             scene.update()
 
 
