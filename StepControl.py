@@ -598,11 +598,11 @@ class StepControl():
 
         # sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 
-        import blender_step
-
-        bm = blender_step.blender_module()
-        bm.start_server()
-        bm.init_room()
+        # import blender_step
+        #
+        # bm = blender_step.blender_module()
+        # bm.start_server()
+        # bm.init_room()
 
 
 # predavat dictionary - multiple possible images, text overlay
