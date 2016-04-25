@@ -509,6 +509,7 @@
             size_hint_x: 0.9
             state: 'down'
             on_state: root.set_narrow(self.state != 'down')
+
         GridLayout:
             cols: 2
             size_hint_x: 0.4
@@ -554,14 +555,15 @@
             size_hint_y: 0.8
             Image:
                 id: kivy_image
-                size_hint_y: 1
+                size_hint_y: 1.1
 #                size_hint_x: 1
 #                background_normal: 'True'
-
+#
             TextInput:
                 id: info_label_right
+                text: 'ahoj'
                 valign: 'top'
-                readonly: 'True'
+#                readonly: 'True'
 #                do_scroll: 'True'
 
 

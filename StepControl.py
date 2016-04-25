@@ -660,6 +660,8 @@ class StepControl():
             return data
 
         def get_spaced_colors(n):
+            if n == 0:
+                return None
             max_value = 16581375 #255**3
             min_value = 255
             interval = int(max_value / n)
@@ -697,6 +699,8 @@ class StepControl():
             thickness =  add_default(data, dd.thickness , 1)
 
             cnts_count = len(cnts)
+            if cnts_count == 0:
+                return im
             colors = get_spaced_colors(cnts_count)
             data[dd.colors] = colors
             # color = add_default(data, dd.color, (0,255,0))
@@ -714,6 +718,7 @@ class StepControl():
             else:
                 color = (0,255,0)
                 cv2.drawContours(im_cnts, cnts, 0, color, thickness)
+
             return im_cnts
 
         def make_convex_hull(data):
