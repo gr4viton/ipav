@@ -474,7 +474,8 @@
     kivy_image: kivy_image
 
     info_label_bottom: info_label_bottom
-    info_label_right: info_label_right
+    info_label_layout: info_label_layout
+#    info_label_right: info_label_right
     time_label: time_label
 
 #    layout_steps_height: 1500
@@ -553,26 +554,30 @@
             cols: 1
 #            size_hint_y: 0.8
             size_hint_y: 0.8
-            Image:
-                id: kivy_image
-                size_hint_y: 1.1
-#                size_hint_x: 1
-#                background_normal: 'True'
+            GridLayout:
+                cols:1
+                Image:
+                    id: kivy_image
+                    size_hint_y: 1.1
+    #                size_hint_x: 1
+    #                background_normal: 'True'
 #
+#            TextInput:
+#                id: info_label_right
+#                text: 'ahoj'
+#                valign: 'top'
+#                size_hint_y: 0
+##                readonly: 'True'
+##                do_scroll: 'True'
+
+        GridLayout:
+            cols: 1
+            id: info_label_layout
             TextInput:
-                id: info_label_right
-                text: 'ahoj'
+                id: info_label_bottom
                 valign: 'top'
-#                readonly: 'True'
-#                do_scroll: 'True'
-
-
-        TextInput:
-            id: info_label_bottom
-            valign: 'top'
-            size_hint_y: 0.2
-            font_size: 12
-            readonly: 'True'
-    #        scroll_y: 'True'
-            do_scroll: 'True'
+                font_size: 12
+                readonly: 'True'
+        #        scroll_y: 'True'
+                do_scroll: 'True'
 

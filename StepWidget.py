@@ -32,7 +32,8 @@ class StepWidget(GridLayout):
     kivy_image = ObjectProperty()
 
     info_label_bottom = ObjectProperty()
-    info_label_right = ObjectProperty()
+    info_label_layout = ObjectProperty()
+    # info_label_right = ObjectProperty()
     time_label = ObjectProperty()
 
     tbt_narrow = ObjectProperty()
@@ -43,7 +44,7 @@ class StepWidget(GridLayout):
 
     # layout_steps_height = NumericProperty(1600)
 
-    elsewhere = -6666
+    elsewhere = +6666
 
 
     def __init__(self, **kwargs):
@@ -55,14 +56,19 @@ class StepWidget(GridLayout):
         self.texture = Texture.create(size = init_shape, colorfmt='bgr')
         self.texture_shape = init_shape
         self.name = 'default name'
-        self.info_label_position = 'b'
-        self.info_label_hide('all')
+
+        self.narrowed = False
+
 
         self.informing = True
-        self.narrowed = False
-        self.kivy_image_y = self.kivy_image.y
+        self.info_showed = False
+        padding = 4
+        self.kivy_image_y_normal = self.kivy_image.y + padding
+        self.kivy_image_y_info = self.kivy_image_y_normal + self.info_label_bottom.y + padding
 
         self.info_label_bottom_y = self.info_label_bottom.y
+        self.info_label_hide()
+
 
         # self.kivy_image = ImageButton(self.toggle_drawing)
         # self.kivy_image = ImageButton()
@@ -80,13 +86,6 @@ class StepWidget(GridLayout):
         self.name = name
         self.info_label_position = info_position
         print('Recreated widget:', cv_image.shape, '[px] name: [', name,'] info_pos:', info_position)
-
-    def recreate_info_label(self):
-        if self.info_label_position == 'b':
-            self.info_label = self.info_label_bottom
-            self.info_label_right.size_hint_x = 0
-        elif self.info_label_position == 'r':
-            self.info_label = self.info_label_right
 
     def update_widget(self, step):
         if not self.narrowed:
@@ -143,7 +142,7 @@ class StepWidget(GridLayout):
 
 
     def update_info_label(self, step):
-        self.info_label.text = step.get_info_string()
+        self.info_label_bottom.text = step.get_info_string()
         step.data_post[dd.info] = False
 
     def update_texture(self, im):
@@ -163,41 +162,8 @@ class StepWidget(GridLayout):
         else:
             return im.copy()
 
-    def info_label_show(self, which):
-        if which == 'all':
-            self.info_label_show('b')
-            self.info_label_show('r')
-            self.info_showed = True
-            self.tbt_show_info.state = 'down'
-        elif which == 'current':
-            # print('showin\' current', self.info_label_position)
-            self.info_label_show(self.info_label_position)
-        elif which == 'b':
-            # print('showin\' current')
-            self.info_label_bottom.y = self.info_label_bottom_y
-            self.info_label_bottom.size_hint_y = 0.2
-        elif which == 'r':
-            self.info_label_right.y = self.info_label_right_y
-            self.info_label_bottom.size_hint_x = 0.3
 
 
-    def info_label_hide(self, which):
-        if which == 'all':
-            # self.info_label_right.size_hint_x = 0
-            self.info_label_hide('b')
-            self.info_label_hide('r')
-            self.info_showed = False
-            self.tbt_show_info.state = 'normal'
-        elif which == 'current':
-            self.info_label_hide(self.info_label_position)
-        elif which == 'b':
-            self.info_label_bottom_y = self.info_label_bottom.y
-            self.info_label_bottom.y = self.elsewhere
-            self.info_label_bottom.size_hint_y = 0
-        elif which == 'r':
-            self.info_label_right_y = self.info_label_right.y
-            self.info_label_right.y = self.elsewhere
-            self.info_label_right.size_hint_y = 0
     def sync_info(self, value):
         self.informing = value
 
@@ -219,17 +185,17 @@ class StepWidget(GridLayout):
         self.img_showed = value
         if value == True:
             self.tbt_show_img.state = 'down'
+
             if self.info_showed == True:
-                b = self.info_label_bottom.height
+                self.kivy_image.y = self.kivy_image_y_info
+
             else:
-                b = 0
-            self.kivy_image.y = self.kivy_image_y + b
+                self.kivy_image.y = self.kivy_image_y_normal
 
         if value == False:
             self.tbt_show_img.state = 'normal'
-            # self.kivy_image_y = self.kivy_image.y
             self.kivy_image.y = self.elsewhere
-            # self.kivy_image.size_hint_y = 0
+
 
 
     def toggle_show_img(self, whatever=None):
@@ -238,16 +204,29 @@ class StepWidget(GridLayout):
         else:
             self.show_img(True)
 
+    def recreate_info_label(self):
+        self.info_label_hide()
 
+
+    def info_label_show(self):
+        self.info_label_bottom.y = self.info_label_bottom_y
+        self.info_label_bottom.size_hint_y = 0.2
+
+
+    def info_label_hide(self):
+        self.info_label_bottom.y = self.elsewhere
+        self.info_label_bottom.size_hint_y = None
+        # self.info_label_bottom.min_height = 0
+        self.info_label_bottom.height = 1000
 
     def show_info(self, value):
         self.info_showed = value
         if value == True:
-            # self.tbt_show_img.state = 'down'
-            self.info_label_show('current')
+            self.tbt_show_info.state = 'down'
+            self.info_label_show()
         if value == False:
-            # self.tbt_show_img.state = 'normal'
-            self.info_label_hide('current')
+            self.tbt_show_info.state = 'normal'
+            self.info_label_hide()
 
     def set_drawing(self, value):
         self.drawing = value
