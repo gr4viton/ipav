@@ -140,14 +140,41 @@ class StepControl():
 
     # def add_operation(self):
     #     pass
-
+    exc_delimiter = ':'
     def run_all(self, im):
         data = StepData()
         data[dd.im] = im
         data[dd.info] = False
         # print(data)
         for step in self.steps:
-            data = step.run(data)
+            try:
+                data = step.run(data)
+            except cv2.error  as ex:
+                exc_string = ex.args[0]
+                error_list = exc_string.split(self.exc_delimiter)
+                error_string = error_list[-1]
+                # error_number = error_list[-2]
+                error_substring = error_string.split(' ')
+                error_number_string = error_substring[1]
+                error_number = int(error_number_string [1:-1])
+                # ''.
+                print(error_number)
+
+                if error_number == -215:
+                    print('Going to do automatic conversion to CV_8UC1 (functions abs and uint8)')
+                    pos = 'pozice curent stepu'
+                    self.add_new_steps(pos, 'uint8, abs')
+                # errno, strerror = ex.args
+                # print(errno, strerror)
+
+                # exc_type, exc_obj, exc_tb = sys.exc_info()
+                # print('Exception happened!\n', ex)
+                # fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                # print(exc_type, fname, exc_tb.tb_lineno)
+
+                # print('starttast')
+                # [print(arg) for arg in ex.args]
+                # if inst.args
             # data[dd.info] = False
         self.ret = data
 
@@ -244,9 +271,9 @@ class StepControl():
             horizontal = add_default(data, dd.horizontal, horizontal)
 
             if vertical:
-                dx = 1
-            if horizontal:
                 dy = 1
+            if horizontal:
+                dx = 1
 
             im_out = cv2.Sobel(data[dd.im], ddepth=ddepth,
                                               dx=dx, dy=dy, ksize=ksize)
@@ -303,6 +330,10 @@ class StepControl():
             return_threshold_value, thresholded_im = cv2.threshold(data[dd.im], thresh, maxVal, type)
             data[dd.return_threshold_value] = return_threshold_value
             data[dd.im] = thresholded_im
+
+
+            info_text(data, 'threshold = {}'. format(return_threshold_value))
+
             return data
 
         def make_otsu(data):
@@ -726,9 +757,11 @@ class StepControl():
                 # calc cnts
                 data = make_find_contours(data)
 
+
             data[dd.info_text] += 'Convex hull'
             cnts = data[dd.cnts]
-
+            if len(cnts) < 1:
+                return data
             # print(len(cnts))
             cnt = cnts[0]
             # print(len(cnt))
@@ -805,8 +838,11 @@ class StepControl():
 
         self.add_available_step('original', make_nothing)
         self.add_available_step('gray', make_gray)
-        self.add_available_step('clahed', make_clahe)
-        self.add_available_step('blurred', make_blur)
+        self.add_available_step('clahe', make_clahe)
+        self.add_synonyms('clahe, clahed')
+
+        self.add_available_step('blur', make_blur)
+        self.add_synonyms('blur, blurred')
 
         self.add_available_step('gauss', make_gauss)
         self.add_synonyms('gauss, gaussed')
@@ -840,7 +876,7 @@ class StepControl():
         self.add_synonyms('laplacian, laplace, lap, lapla')
 
         self.add_available_step('contours', make_find_contours)
-        self.add_synonyms('contours, find contours, cnt, cnts')
+        self.add_synonyms('contours, find contours, cnt, cnts, contour')
 
 
         self.add_available_step('convex hull', make_convex_hull)

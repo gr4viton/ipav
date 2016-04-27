@@ -7,13 +7,13 @@
 #    gl_middle: gl_middle
 #    gl_right: gl_right
     img_webcam: img_webcam
-    img_tags: img_tags
-    txt_numFound: txt_numFound
+#    img_tags: img_tags
+#    txt_numFound: txt_numFound
 #    sla_tags: sla_tags
     layout_steps: layout_steps
 #    img_steps: img_steps # temporal
 #    label_mean_exec_time: label_mean_exec_time
-    grid_img_tags: grid_img_tags
+#    grid_img_tags: grid_img_tags
     # lb_webcam_resolution: lb_webcam_resolution
 
     #label_chain_string_text: label_chain_string_text
@@ -53,7 +53,7 @@
 #            text: 'Switch cameras'
             text: 'Toggle computing'
             size_hint_y: .1
-            on_press: root.chain_control.toggle_findtagging()
+            on_press: root.chain_control.toggle_computing()
             # pos_hint: {'center_x':.5, 'center_y': .5}
         Button:
             text: 'Toggle capturing'
@@ -196,16 +196,16 @@
 #            row_force_default: 'true'
 #            row_default_height: 15
 
-            Label:
-                size_hint_x: 2
-                text: "Found tags"
-                halign: "right"
-                valign: "middle"
-                text_size: self.size
-#                pos_hint_x: 10
-            Label:
-#                size_hint_x: None
-                id: txt_numFound
+#            Label:
+#                size_hint_x: 2
+#                text: "Found tags"
+#                halign: "right"
+#                valign: "middle"
+#                text_size: self.size
+##                pos_hint_x: 10
+#            Label:
+##                size_hint_x: None
+#                id: txt_numFound
 
             Label:
                 text: "Chain last [ms]"
@@ -228,27 +228,27 @@
 #                'splitter.width: {}\nparent.width: {}\nmax_size: {}'\
 #                .format(spl.width, root.width, spl.max_size)
 
-            GridLayout: # img tags
-                id: grid_img_tags
-                cols: 1
-                size_hint_x: 0
-                margin: 1
-                color: 0.08, 0.16 , 0.24
-                canvas.before:
-                    Color:
-                        rgb: self.color
-                    Rectangle:
-                        pos: self.x + self.margin, self.y + self.margin + 1
-                        size: self.width - 2 * self.margin , self.height - 2 * self.margin
-                Label:
-                    halign: 'left'
-#                    font_size: 10
-                    font_size: 0
-                    do_rotation: 90
-                    text: root.tag_error_count_text
-                Image:
-                    id: img_tags
-                    color: 0,0,0
+#            GridLayout: # img tags
+#                id: grid_img_tags
+#                cols: 1
+#                size_hint_x: 0
+#                margin: 1
+#                color: 0.08, 0.16 , 0.24
+#                canvas.before:
+#                    Color:
+#                        rgb: self.color
+#                    Rectangle:
+#                        pos: self.x + self.margin, self.y + self.margin + 1
+#                        size: self.width - 2 * self.margin , self.height - 2 * self.margin
+#                Label:
+#                    halign: 'left'
+##                    font_size: 10
+#                    font_size: 0
+#                    do_rotation: 90
+#                    text: root.tag_error_count_text
+#                Image:
+#                    id: img_tags
+#                    color: 0,0,0
 
 
     Splitter:
@@ -400,25 +400,25 @@
                     text: 'Use'
                     on_press: root.update_chain_string()
 
-                GridLayout:
-                    cols: 1
-                    Label:
-                        text: 'Where to add new step in string:'
-#                    BoxLayout:
-                    CheckBoxLabel:
-                        group: 'add_step'
-                        text: 'to the end'
-                        active: 'False'
-#                        active: 'True'
-#                        on_select
-                    CheckBoxLabel:
-                        group: 'add_step'
-                        text: 'after the cursor'
+#                GridLayout:
+#                    cols: 1
+#                    Label:
+#                        text: 'Where to add new step in string:'
+##                    BoxLayout:
+#                    CheckBoxLabel:
+#                        group: 'add_step'
+#                        text: 'to the end'
 #                        active: 'False'
-                    CheckBoxLabel:
-                        group: 'add_step'
-                        text: 'at the beginning'
-#                        active: 'False'
+##                        active: 'True'
+##                        on_select
+#                    CheckBoxLabel:
+#                        group: 'add_step'
+#                        text: 'after the cursor'
+##                        active: 'False'
+#                    CheckBoxLabel:
+#                        group: 'add_step'
+#                        text: 'at the beginning'
+##                        active: 'False'
 
             GridLayout: # available steps buttons
                 cols: 1

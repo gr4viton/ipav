@@ -6,7 +6,8 @@ class CaptureControl():
     def __init__(self):
 
         # ids = [0,1,2,3,4]
-        ids = [0] # latest connection
+        # ids = [0] # latest connection
+        ids = [0]
         # 0 hd evolve
         # 1 webcam black
         # 2 webcam clips

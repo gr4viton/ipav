@@ -125,7 +125,7 @@ class ChainControl():
 
     step_control = LockedNumpyArray()
     seen_tags = LockedNumpyArray()
-    chain_running = LockedValue(False)
+    chain_computing = LockedValue(False)
 
     # execution_time = LockedValue([])
     mean_execution_time = LockedValue(0)
@@ -158,7 +158,7 @@ class ChainControl():
         self.current_chain.load_steps_from_string(string)
 
         self.reset_step_control()
-        self.start_running()
+        self.start_computing()
         # string = self.show_load_chain_fnc()
 
         return self.current_chain.step_names
@@ -168,19 +168,19 @@ class ChainControl():
         return self._step_control.available_steps
 
 
-    def start_running(self):
-        self.chain_running = True
+    def start_computing(self):
+        self.chain_computing = True
         self.thread = threading.Thread(target=self.chain_loop)
         self.thread.start()
 
-    def toggle_findtagging(self):
-        if self.chain_running == False:
-            self.start_running()
+    def toggle_computing(self):
+        if self.chain_computing == False:
+            self.start_computing()
         else:
-            self.chain_running = False
+            self.chain_computing = False
 
     def on_stop(self):
-        self.chain_running = False
+        self.chain_computing = False
 
     def add_exec_times(self, tim):
         if len(self.execution_time) > self.execution_time_len:
@@ -191,7 +191,7 @@ class ChainControl():
         self.mean_execution_time = np.sum(self.execution_time) / len(self.execution_time)
 
     def chain_loop(self):
-        while self.chain_running:
+        while self.chain_computing:
             self.do_chain()
 
     def do_chain(self):

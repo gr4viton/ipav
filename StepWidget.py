@@ -62,6 +62,8 @@ class StepWidget(GridLayout):
         self.narrowed = False
         self.kivy_image_y = self.kivy_image.y
 
+        self.info_label_bottom_y = self.info_label_bottom.y
+
         # self.kivy_image = ImageButton(self.toggle_drawing)
         # self.kivy_image = ImageButton()
         # self.add_widget(self.kivy_image)

@@ -153,7 +153,10 @@ class Multicopter(GridLayout):
 
         # new_chain_string = 'original, gray, resize'
         new_chain_string = 'original, resize, detect red'
+        new_chain_string = 'original, resize, gray, gauss, otsu, laplacian, abs'
+        new_chain_string = 'original, resize, gray, gauss, otsu, laplacian, abs, uint8, contour'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull'
+        new_chain_string = 'original'
         # new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend'
 
 
@@ -186,6 +189,7 @@ class multicopterApp(App):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
         w = 1360
+        # 1305 714
         Config.set('kivy', 'show_fps', 1)
         Config.set('kivy', 'desktop', 1)
         # Config.set('kivy', 'name', 'a')
@@ -218,7 +222,7 @@ class multicopterApp(App):
 
 
         self.chain_control = ChainControl(self.capture_control, current_chain)
-        self.chain_control.start_running()
+        self.chain_control.start_computing()
 
 
         self.tag_errors_count = {}
@@ -290,11 +294,6 @@ class multicopterApp(App):
         #     self.root.img_webcam.texture = convert_to_texture(frame)
 
 
-    def set_tags_found(self, found = False):
-        if(found == False):
-            self.root.grid_img_tags.color = (.08, .16 , .24)
-        else:
-            self.root.grid_img_tags.color = (.08, .96 , .24)
 
     def redraw_chain(self, dt):
         # step_control = self.chain_control.step_control
@@ -311,6 +310,9 @@ class multicopterApp(App):
             self.root.label_mean_exec_time_last = str(np.round(self.chain_control.mean_execution_time, 5) * 1000)
 
 
+        # self.redraw_findtag()
+
+    def redraw_findtag(self):
         for key in self.tag_errors_count.keys():
             self.tag_errors_count[key] = 0
 
@@ -359,6 +361,13 @@ class multicopterApp(App):
 
         # print(imAllTags.shape)
         # self.root.img_tags.texture = convert_to_texture(imAllTags.copy())
+
+    def set_tags_found(self, found = False):
+        if(found == False):
+            self.root.grid_img_tags.color = (.08, .16 , .24)
+        else:
+            self.root.grid_img_tags.color = (.08, .96 , .24)
+
 
     def set_tag_error_count_text(self):
         list = [str(self.tag_errors_count.get(name)) + ' = ' + str(name)
