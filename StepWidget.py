@@ -31,7 +31,7 @@ class StepWidget(GridLayout):
     drawing = ObjectProperty('down')
     kivy_image = ObjectProperty()
 
-    info_label_bottom = ObjectProperty()
+    # info_label_bottom = ObjectProperty()
     info_label_layout = ObjectProperty()
     # info_label_right = ObjectProperty()
     time_label = ObjectProperty()
@@ -62,11 +62,15 @@ class StepWidget(GridLayout):
 
         self.informing = True
         self.info_showed = False
-        padding = 4
-        self.kivy_image_y_normal = self.kivy_image.y + padding
-        self.kivy_image_y_info = self.kivy_image_y_normal + self.info_label_bottom.y + padding
+        self.padding_y = 4
 
-        self.info_label_bottom_y = self.info_label_bottom.y
+
+        self.kivy_image_y_normal = self.kivy_image.y + self.padding_y
+        self.kivy_image_y_info = self.padding_y + 40
+
+
+        # self.info_label_bottom_y = self.info_label_bottom.y
+        self.info_label_bottom = None
         self.info_label_hide()
 
 
@@ -142,8 +146,9 @@ class StepWidget(GridLayout):
 
 
     def update_info_label(self, step):
-        self.info_label_bottom.text = step.get_info_string()
-        step.data_post[dd.info] = False
+        if self.info_label_bottom is not None:
+            self.info_label_bottom.text = step.get_info_string()
+            step.data_post[dd.info] = False
 
     def update_texture(self, im):
         self.update_texture_from_rgb(self.colorify(im))
@@ -207,17 +212,29 @@ class StepWidget(GridLayout):
     def recreate_info_label(self):
         self.info_label_hide()
 
-
     def info_label_show(self):
-        self.info_label_bottom.y = self.info_label_bottom_y
-        self.info_label_bottom.size_hint_y = 0.2
-
+        children = self.info_label_layout.children
+        if children is not None:
+            self.info_label_layout.add_widget(InfoLabelWidget())
+            children = self.info_label_layout.children
+            if len(children) > 0:
+                self.info_label_bottom =children[0]
+                # print(0.2*self.info_label_bottom.parrent.size)
+                # self.kivy_image_y_info = self.padding_y + self.info_label_bottom.size[1]
+                self.kivy_image_y_info = self.padding_y + 40
+            self.info_label_layout.size_hint_y = 0.2
 
     def info_label_hide(self):
-        self.info_label_bottom.y = self.elsewhere
-        self.info_label_bottom.size_hint_y = None
-        # self.info_label_bottom.min_height = 0
-        self.info_label_bottom.height = 1000
+        children = self.info_label_layout.children
+        if len(children) > 0:
+            self.info_label_layout.remove_widget(children[0])
+            self.info_label_layout.size_hint_y = 0
+            self.info_label_bottom = None
+        #
+        # self.info_label_bottom.y = self.elsewhere
+        # self.info_label_bottom.size_hint_y = None
+        # # self.info_label_bottom.min_height = 0
+        # self.info_label_bottom.height = 1000
 
     def show_info(self, value):
         self.info_showed = value
@@ -242,6 +259,8 @@ class StepWidget(GridLayout):
             self.set_drawing(True)
 
 
+class InfoLabelWidget(TextInput):
+    pass
 
 class StepWidgetControl():
 

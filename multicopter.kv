@@ -473,7 +473,7 @@
 
     kivy_image: kivy_image
 
-    info_label_bottom: info_label_bottom
+#    info_label_bottom: info_label_bottom
     info_label_layout: info_label_layout
 #    info_label_right: info_label_right
     time_label: time_label
@@ -554,11 +554,11 @@
             cols: 1
 #            size_hint_y: 0.8
             size_hint_y: 0.8
-            GridLayout:
-                cols:1
-                Image:
-                    id: kivy_image
-                    size_hint_y: 1.1
+#            GridLayout:
+#                cols:1
+            Image:
+                id: kivy_image
+                size_hint_y: 1.1
     #                size_hint_x: 1
     #                background_normal: 'True'
 #
@@ -573,11 +573,16 @@
         GridLayout:
             cols: 1
             id: info_label_layout
-            TextInput:
-                id: info_label_bottom
-                valign: 'top'
-                font_size: 12
-                readonly: 'True'
-        #        scroll_y: 'True'
-                do_scroll: 'True'
+            size_hint_y: 0
+
+
+#
+<InfoLabelWidget@TextInput>:
+#    text: 'asd'
+    valign: 'top'
+    font_size: 12
+    readonly: 'True'
+#    scroll_y: 'True'
+    do_scroll: 'True'
+    size_hint_y: 0.2
 
