@@ -49,3 +49,4 @@ class DataDictParameterNames(AutoNumber):
     colors = ()
     # make_convex_hull
     hull = ()
+    seconds = ()

@@ -28,10 +28,14 @@ class blender_module():
     # PORT = 8084
     # PORT = 8082
     # PORT = 8083
-    PORT = 8089
+    # PORT = 8089
+    PORT = 8081
     HOST = "localhost"
     param_dict = {}
     param_exit = 'exit()'
+
+    running = False
+    rooming = False
 
     def __init__(self):
         self.init_path()
@@ -124,11 +128,13 @@ class blender_module():
 
         print('blender_server process started!')
         # blender.stdin.write(bytes(params, 'UTF-8'))
+        self.running = True
 
     def init_room(self):
         self.send_data_dict({'load_blend': self.blend_path})
         time.sleep(1)
         self.send_data_dict({'init_real_cam_set':True})
+        self.rooming = True
 
     def photogrammetry_object(self, projections):
         start = time.time()

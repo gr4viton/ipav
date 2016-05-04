@@ -156,8 +156,9 @@ class Multicopter(GridLayout):
         new_chain_string = 'original, resize, gray, gauss, otsu, laplacian, abs'
         new_chain_string = 'original, resize, gray, gauss, otsu, laplacian, abs, uint8, contour'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull'
+        # new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, pause 5'
         # new_chain_string = 'original'
-        # new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend'
+        new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5'
 
 
         available_steps_dict = self.chain_control.get_available_steps()

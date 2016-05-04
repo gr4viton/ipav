@@ -257,6 +257,11 @@ class StepControl():
         # def make_blur(im, a=75):
         #     return cv2.bilateralFilter(im, 9, a, a)
 
+        def make_pause(data, seconds=1):
+            seconds = add_default(data, dd.seconds, seconds)
+            time.sleep(seconds)
+            return data
+
         def make_sobel(data,
                        ksize=5, dx=0, dy=0, ddepth=cv2.CV_64F,
                        vertical=False, horizontal=False, absolute=False):
@@ -629,19 +634,22 @@ class StepControl():
 
         # sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 
-        # import blender_step
-        #
-        # bm = blender_step.blender_module()
-        # bm.start_server()
-        # bm.init_room()
+        import blender_step
+
+        self.bm = blender_step.blender_module()
 
 
 # predavat dictionary - multiple possible images, text overlay
         def make_blender_cube(data):
             # projections = 'contours of moving objects'
+            if not self.bm.running:
+                self.bm.start_server()
+
+            if not self.bm.rooming:
+                self.bm.init_room()
 
             projections = data[dd.hull]
-            imdir = bm.photogrammetry_object(projections)
+            imdir = self.bm.photogrammetry_object(projections)
 
             # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
             dir_files = os.listdir(imdir)
@@ -871,6 +879,9 @@ class StepControl():
         self.add_synonyms('sobh, sobelh, sobel horizontal')
         self.add_synonyms('sobv, sobelv, sobel vertical')
 
+
+        self.add_available_step('pause', lambda d: make_pause(d, seconds=1))
+        self.add_synonyms('pause, pause 5')
 
         self.add_available_step('laplacian', make_laplacian)
         self.add_synonyms('laplacian, laplace, lap, lapla')
