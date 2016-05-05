@@ -88,6 +88,8 @@ class RealCamera():
 
 
         scene = bpy.context.scene
+        # [print(obj) for obj in scene.objects]
+        # if object in scene.objects:
         scene.objects.unlink(object)
         bpy.data.objects.remove(object)
         scene.update()

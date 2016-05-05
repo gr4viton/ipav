@@ -97,27 +97,37 @@ class BlenderServer():
             return
         # self.real_cam_set[0].hull = self.projections
 
-        hull = [ [[30, 31]],
-                 [[28, 33]],
-                 [[25, 34]],
-                 [[15, 34]],
-                 [[ 8, 31]],
-                 [[ 6, 30]],
-                 [[ 3, 27]],
-                 [[ 1, 24]],
-                 [[ 1, 20]],
-                 [[ 2, 18]],
-                 [[11,  9]],
-                 [[13,  8]],
-                 [[27,  8]],
-                 [[29, 10]],
-                 [[30, 16]]]
 
-        hull = [x[0] for x in hull]
+        hull_orig = [[[30, 31]],
+                     [[28, 33]],
+                     [[25, 34]],
+                     [[15, 34]],
+                     [[ 8, 31]],
+                     [[ 6, 30]],
+                     [[ 3, 27]],
+                     [[ 1, 24]],
+                     [[ 1, 20]],
+                     [[ 2, 18]],
+                     [[11,  9]],
+                     [[13,  8]],
+                     [[27,  8]],
+                     [[29, 10]],
+                     [[30, 16]]]
+        if self.projections:
+            print('\n'*5)
+            print(hull_orig)
+            print('%'*50)
+            hull_orig = self.projections[0]
+            print(hull_orig)
+            print('\n'*5)
+
+        hull = [x[0] for x in hull_orig]
         # print(hull)
 
 
         self.real_cam_set[0].hull = hull
+        for rcam in self.real_cam_set:
+            rcam.hull = hull
 
         for cam in self.real_cam_set:
             print('creating projection')
@@ -139,20 +149,41 @@ class BlenderServer():
 
         # rcam.
 
+        # print('real_cam_set', self.real_cam_set)
+        # [print(rcam.proj) for rcam in self.real_cam_set]
+
         for rcam in self.real_cam_set:
             if rcam.proj:
                 if self.pobj is None:
                     # first projection
                     print('first projection')
                     self.pobj = self.duplicate(rcam.proj, 'pobj')
+                    # self.pobj = rcam.proj
                 else:
                     print('boolean modifier')
+                    # print(rcam.proj)
                     self.booleanSum(self.pobj, rcam.proj)
+                    # print(rcam.proj)
+
+        # [print(rcam.proj) for rcam in self.real_cam_set]
+
+        # print('del first proj')
+        # self.real_cam_set[0].delete_projection()
+
+        # for rcam in self.real_cam_set:
+        #     object = rcam.proj
+        #
+        #     scene = bpy.context.scene
+        #     # [print(obj) for obj in scene.objects]
+        #     # if object in scene.objects:
+        #     scene.objects.unlink(object)
+        #     bpy.data.objects.remove(object)
+        #     scene.update()
 
 
-
+        # [print(rcam.proj) for rcam in self.real_cam_set]
         for rcam in self.real_cam_set:
-            rcam.delete_projection()
+             rcam.delete_projection()
 
 
 

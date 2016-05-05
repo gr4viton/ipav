@@ -139,7 +139,7 @@ class blender_module():
     def photogrammetry_object(self, projections):
         start = time.time()
 
-        # self.send_data_dict({'projections': projections})
+        self.send_data_dict({'projections': projections})
 
         self.send_data_dict({'create_cam_projections': True})
         self.send_data_dict({'photogrammetry_object': True})
