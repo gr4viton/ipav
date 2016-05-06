@@ -141,9 +141,9 @@ class StepControl():
     # def add_operation(self):
     #     pass
     exc_delimiter = ':'
-    def run_all(self, im):
-        data = StepData()
-        data[dd.im] = im
+    def run_all(self, data):
+        # data = StepData()
+        # data[dd.im] = im
         data[dd.info] = False
         # print(data)
         for step in self.steps:
@@ -178,9 +178,9 @@ class StepControl():
             # data[dd.info] = False
         self.ret = data
 
-    def step_all(self, im, resolution_multiplier):
-        self.resolution_multiplier = resolution_multiplier
-        self.run_all(im)
+    def step_all(self, data):
+        self.resolution_multiplier = data[dd.resolution_multiplier]
+        self.run_all(data)
 
 
     def define_available_steps(self):
@@ -644,9 +644,11 @@ class StepControl():
             # projections = 'contours of moving objects'
             if not self.bm.running:
                 self.bm.start_server()
+                time.sleep(1.5)
 
             if not self.bm.rooming:
                 self.bm.init_room()
+                time.sleep(1.5)
 
             projections = data[dd.hull]
             imdir = self.bm.photogrammetry_object(projections)
@@ -677,17 +679,26 @@ class StepControl():
             center of bounding box -> line intersection = center of object
             """
 
-        def make_detect_red(data):
+        color_dict_hsv = {}
+        color_dict_hsv['blue'] = [[110,50,50],[130,255,255]]
+        # color_dict_hsv['green'] = [[50,110,50],[255,130,255]]
+        color_dict_hsv['green1'] = [[35,80,50],[108,240,250]]
+
+        color_dict_hsv['green'] = [[35,60,30],[108,240,255]]
+        color_dict_hsv['orange'] = [[24,50,50],[42,255,255]]
+        color_dict_hsv['red'] = [[0,80,80],[24,255,255]]
+
+        def make_detect_color(data, color_name='red'):
             im = data[dd.im]
             # Convert BGR to HSV
             hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
 
             # define range of blue color in HSV
-            blue = [[110,50,50],[130,255,255]]
-            orange = [[24,50,50],[42,255,255]]
-            red = [[0,80,80],[24,255,255]]
 
-            color = red
+            color = color_dict_hsv.get(color_name, None)
+            if not color:
+                return data
+
             lower_blue = np.array(color[0])
             upper_blue = np.array(color[1])
 
@@ -843,8 +854,14 @@ class StepControl():
             im = mask * 1
             return im
 
+        def make_source_image(data, source_id=0):
+            if source_id < len(data[dd.captured]):
+                data[dd.im] = data[dd.captured][source_id]
+            return data
 
         self.add_available_step('original', make_nothing)
+        self.add_synonyms('original')
+
         self.add_available_step('gray', make_gray)
         self.add_available_step('clahe', make_clahe)
         self.add_synonyms('clahe, clahed')
@@ -880,7 +897,7 @@ class StepControl():
         self.add_synonyms('sobv, sobelv, sobel vertical')
 
 
-        self.add_available_step('pause', lambda d: make_pause(d, seconds=5))
+        self.add_available_step('pause', lambda d: make_pause(d, seconds=2))
         self.add_synonyms('pause, pause 5')
 
         self.add_available_step('laplacian', make_laplacian)
@@ -896,8 +913,18 @@ class StepControl():
         self.add_available_step('blender', make_blender_cube)
         self.add_synonyms('blender, blend, blender cube')
 
-        self.add_available_step('detect red', make_detect_red)
+        # self.add_available_step('detect red', make_detect_color)
+        self.add_available_step('detect red', lambda d: make_detect_color(d, color_name='red'))
+        self.add_available_step('detect orange', lambda d: make_detect_color(d, color_name='orange'))
+        self.add_available_step('detect blue', lambda d: make_detect_color(d, color_name='blue'))
+        self.add_available_step('detect green', lambda d: make_detect_color(d, color_name='green'))
 
+        self.add_available_step('source', make_source_image)
+        self.add_available_step('source1', lambda d: make_source_image(d, source_id=1))
+        self.add_available_step('source2', lambda d: make_source_image(d, source_id=2))
+        self.add_available_step('source3', lambda d: make_source_image(d, source_id=3))
+        self.add_available_step('source4', lambda d: make_source_image(d, source_id=4))
+        self.add_synonyms('source, set source, source0')
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         self.add_available_step('clear border', make_clear_border)

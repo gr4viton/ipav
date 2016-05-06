@@ -160,6 +160,16 @@ class Multicopter(GridLayout):
         # new_chain_string = 'original'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5'
 
+        hulling = ', resize, detect green, mega gauss, otsu, cnt, hull,'
+        rng = range(3)
+        rng = [0,2,3]
+        # rng = [0,2,3,4]
+        chain_list = ['source{}'.format(i) + hulling for i in rng]
+        # new_chain_string = 'source0' + hulling + 'source1' + hulling
+        last = ['source4, resize' + hulling]
+        last = ['source4, resize, resize, detect green, mega gauss, mega gauss, otsu, cnt, hull']
+        new_chain_string = ''.join(chain_list + last)
+        # new_chain_string = 'original, resize, detect green'
 
         available_steps_dict = self.chain_control.get_available_steps()
 

@@ -196,8 +196,14 @@ class ChainControl():
 
     def do_chain(self):
         start = time.time()
-        self._step_control.step_all(self.capture_control.image_stream_control.frame,
-                                    self.resolution_multiplier )
+        data = StepData()
+        data[dd.captured] = [stream.frame for stream in self.capture_control.streams]
+        # data[dd.im] = self.capture_control.image_stream_control.frame
+        data[dd.im] = data[dd.captured][0]
+        data[dd.resolution_multiplier] = self.resolution_multiplier
+
+        self._step_control.step_all(data)
+
         end = time.time()
         self.add_exec_times(end-start)
 

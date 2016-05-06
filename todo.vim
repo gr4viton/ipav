@@ -15,6 +15,18 @@ x] resolution
 [x] change string from popup !
 [x] on_text does not update ChangeChainWidget stringProperty!
 
+[] . before step name = narrow / hide
+
+[] camera settings - camera info based - not from index of connection = nondeterministic
+[] camera profiles - saved config = resolution, multiplyer, COLOR CONFIG, STATIC BACKGROUND IMAGE 
+- taken once when clicked in gui on the start
+
+[] INFO SHOW ONLY ONE PER STEP
+[] source step automaticly on new line
+
+[] thread step - in individual threads - multiple color background
+
+
 [] narrow wide - reversed!!! !!!!!!!!!!!!!!!!!!!!!!!!
 
 [] Hide/show on all images not functional

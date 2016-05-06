@@ -123,6 +123,8 @@ class RealCamera():
             print('%'*42, rcam_pos)
             rcam_rot = self.rot
             rcam_sca = self.size
+            rcam_sca = (640,480,5)
+            rcam_sca = (320,240,5)
 
             # rcam_rot = np.deg2rad(rcam_rot)
 
@@ -192,10 +194,12 @@ class RealCamera():
 
 
                 proj = self.get_contour_projection_object()
-                proj_original = self.duplicate(proj, 'hull')
-                self.proj = proj
+                name = name = 'prj_hull_' + self.rcam.name[-4:]
+                proj_original = self.duplicate(proj, name)
+                # self.proj = proj
+                self.proj = proj_original
 
-            self.proj.name = 'prj' + self.rcam.name[-4:]
+            # self.proj.name = 'prj' + self.rcam.name[-4:]
             #    rcam_d.location += Vector((1,1,1))
             #    rcam_d.rotation_euler = Vector((pi,0,0))
 

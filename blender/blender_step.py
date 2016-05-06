@@ -134,7 +134,7 @@ class blender_module():
 
     def init_room(self):
         self.send_data_dict({'load_blend': self.blend_path})
-        time.sleep(1)
+        time.sleep(2)
         self.send_data_dict({'init_real_cam_set':True})
         self.rooming = True
 

@@ -96,37 +96,7 @@ class BlenderServer():
     def create_projections(self):
         if len(self.real_cam_set) < 1:
             return
-        # self.real_cam_set[0].hull = self.projections
 
-        #
-        # hull_orig = [[[30, 31]],
-        #              [[28, 33]],
-        #              [[25, 34]],
-        #              [[15, 34]],
-        #              [[ 8, 31]],
-        #              [[ 6, 30]],
-        #              [[ 3, 27]],
-        #              [[ 1, 24]],
-        #              [[ 1, 20]],
-        #              [[ 2, 18]],
-        #              [[11,  9]],
-        #              [[13,  8]],
-        #              [[27,  8]],
-        #              [[29, 10]],
-        #              [[30, 16]]]
-
-        # if self.projections:
-        # #     print('\n'*5)
-        # #     print(hull_orig)
-        # #     print('%'*50)
-        #     hull_orig = self.projections[0]
-        #     # print(hull_orig)
-        #     # print('\n'*5)
-        # else:
-        #     return
-        #
-        # hull = [x[0] for x in hull_orig]
-        # print(hull)
         if self.projections:
             hull_orig = self.projections
         else:
