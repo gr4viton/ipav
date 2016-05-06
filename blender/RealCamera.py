@@ -86,7 +86,8 @@ class RealCamera():
     # #    scene.objects.link(rcam_d)
     #     scene.update()
 
-
+        if object == None:
+            return
         scene = bpy.context.scene
         # [print(obj) for obj in scene.objects]
         # if object in scene.objects:
@@ -183,10 +184,9 @@ class RealCamera():
             if self.proj:
                 self.delete_projection()
 
-
             if self.hull == None:
                 self.proj = self.rcam.copy()
-                self.proj.scale = Vector((1, 1, 5))
+                self.proj.scale = Vector((1, 1, 3))
 
             else:
 

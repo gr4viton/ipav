@@ -880,7 +880,7 @@ class StepControl():
         self.add_synonyms('sobv, sobelv, sobel vertical')
 
 
-        self.add_available_step('pause', lambda d: make_pause(d, seconds=1))
+        self.add_available_step('pause', lambda d: make_pause(d, seconds=5))
         self.add_synonyms('pause, pause 5')
 
         self.add_available_step('laplacian', make_laplacian)

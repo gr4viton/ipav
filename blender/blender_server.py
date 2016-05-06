@@ -41,6 +41,7 @@ class BlenderServer():
     def __init__(self):
         # path = 'D:/DEV/PYTHON/pyCV/kivyCV_start/blender/real_cam_set.ini'
         # self.init_real_cam_set_from_conf(path)
+        self.projections = None
         pass
 
     def init_real_cam_set(self):
@@ -97,33 +98,45 @@ class BlenderServer():
             return
         # self.real_cam_set[0].hull = self.projections
 
+        #
+        # hull_orig = [[[30, 31]],
+        #              [[28, 33]],
+        #              [[25, 34]],
+        #              [[15, 34]],
+        #              [[ 8, 31]],
+        #              [[ 6, 30]],
+        #              [[ 3, 27]],
+        #              [[ 1, 24]],
+        #              [[ 1, 20]],
+        #              [[ 2, 18]],
+        #              [[11,  9]],
+        #              [[13,  8]],
+        #              [[27,  8]],
+        #              [[29, 10]],
+        #              [[30, 16]]]
 
-        hull_orig = [[[30, 31]],
-                     [[28, 33]],
-                     [[25, 34]],
-                     [[15, 34]],
-                     [[ 8, 31]],
-                     [[ 6, 30]],
-                     [[ 3, 27]],
-                     [[ 1, 24]],
-                     [[ 1, 20]],
-                     [[ 2, 18]],
-                     [[11,  9]],
-                     [[13,  8]],
-                     [[27,  8]],
-                     [[29, 10]],
-                     [[30, 16]]]
-        if self.projections:
-            print('\n'*5)
-            print(hull_orig)
-            print('%'*50)
-            hull_orig = self.projections[0]
-            print(hull_orig)
-            print('\n'*5)
-
-        hull = [x[0] for x in hull_orig]
+        # if self.projections:
+        # #     print('\n'*5)
+        # #     print(hull_orig)
+        # #     print('%'*50)
+        #     hull_orig = self.projections[0]
+        #     # print(hull_orig)
+        #     # print('\n'*5)
+        # else:
+        #     return
+        #
+        # hull = [x[0] for x in hull_orig]
         # print(hull)
+        if self.projections:
+            hull_orig = self.projections
+        else:
+            return
 
+
+        pixel_len = 2
+        hull = [hull_orig[i:i+pixel_len] for i in range(0, len(hull_orig), pixel_len)]
+        # map (lambda x: hull_orig[pixel_len*x:(x+1)*pixel_len], range (pixel_len))
+        # hull = hull_orig
 
         self.real_cam_set[0].hull = hull
         for rcam in self.real_cam_set:
@@ -132,6 +145,8 @@ class BlenderServer():
         for cam in self.real_cam_set:
             print('creating projection')
             cam.create_projection()
+
+        return
 
 
     def duplicate(self, template, name):
@@ -184,6 +199,9 @@ class BlenderServer():
         # [print(rcam.proj) for rcam in self.real_cam_set]
         for rcam in self.real_cam_set:
              rcam.delete_projection()
+
+        scene = bpy.context.scene
+        [print(obj) for obj in scene.objects]
 
 
 
@@ -324,7 +342,11 @@ class BlenderServer():
                 if loaded_pickle:
                     loaded_pickle += pickle.STOP
                     print('<<< loaded_pickle =', loaded_pickle)
-                    data_dict = pickle.loads(loaded_pickle)
+                    try:
+                        data_dict = pickle.loads(loaded_pickle)
+                    except:
+                        print('pickle loads failed')
+                        continue
                     print('data_dict =', data_dict )
                     try:
 

@@ -16,6 +16,8 @@ import socket
 
 import pickle
 
+import itertools
+
 #TODO
 # socket communication with script running in blender (scipt running in blender would be the blender_server)
 # multiple blender servers - at the same time (synchro would be difficult)
@@ -139,7 +141,14 @@ class blender_module():
     def photogrammetry_object(self, projections):
         start = time.time()
 
-        self.send_data_dict({'projections': projections})
+        print('%'*105)
+        print(projections)
+        projections = [[x,y] for x,y in [inside[0] for inside in projections[0]]]
+        projections_xy = list(itertools.chain(*projections))
+        print(projections_xy)
+        print('%'*105)
+
+        self.send_data_dict({'projections': projections_xy})
 
         self.send_data_dict({'create_cam_projections': True})
         self.send_data_dict({'photogrammetry_object': True})
