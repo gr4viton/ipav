@@ -148,6 +148,18 @@ class BlenderServer():
         else:
             pass
 
+    def set_stream_info(self, stream_info):
+        self.stream_info = stream_info
+        source_name = self.stream_info[0]
+        for rcam in self.real_cam_set:
+            if rcam.source_name == source_name:
+                # [name] + [id] + resol + focal
+                rcam.id = self.stream_info[1]
+                rcam.resolution = [self.stream_info[2], self.stream_info[3]]
+                rcam.focal = self.stream_info[-1]
+
+                print('Setting rcam[{}] stream_info to [{}]'.format( source_name, self.stream_info))
+                # print(rcam.resolution)
 
 
     def photogrammetry_object(self):
@@ -367,7 +379,8 @@ class BlenderServer():
                                 self.create_projections()
 
                             stream_info = data_dict.get('stream_info', None)
-                            if stream_info: self.stream_info = stream_info
+                            if stream_info:
+                                self.set_stream_info(stream_info)
 
                             projections = data_dict.get('prjs', None)
                             if projections:

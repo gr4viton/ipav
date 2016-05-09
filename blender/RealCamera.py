@@ -42,6 +42,10 @@ class RealCamera():
     hull = None
 
     source_name_delimiter = '~'
+    focal = 400
+    id = 0
+    resolution = [320,240]
+
     def __init__(self, name, pos, rot, eul, size):
         self.name = name
         self.pos = Vector(pos)
@@ -159,9 +163,10 @@ class RealCamera():
             rcam_pos = self.pos
             print('%'*42, rcam_pos)
             rcam_rot = self.rot
+
             rcam_sca = self.size
-            rcam_sca = (640,480,5)
-            rcam_sca = (320,240,5)
+            # rcam_sca = (640,480,5)
+            # rcam_sca = (320,240, self.focal)
 
             # rcam_rot = np.deg2rad(rcam_rot)
 
@@ -170,9 +175,13 @@ class RealCamera():
             # x = 200
             # h, v = (640/x, 480/x)
             # focal = 300/x
-            h, v, focal = rcam_sca
+            # h, v, focal = rcam_sca
+            # eye_center = [(h/2, v/2, focal*80)]
+            h, v = self.resolution
+            focal = self.focal
+            eye_center = [(h/2, v/2, focal)]
 
-            eye_center = [(h/2, v/2, focal*80)]
+            print(eye_center)
             # eye_center = [(1,1,3)]
 
             hull = self.hull

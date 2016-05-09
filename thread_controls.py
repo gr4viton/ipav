@@ -285,7 +285,7 @@ class ImageStreamControl():
 
         self.sleepTime = 0.0
 
-        self.focal = 5
+        self.focal = 400
 
 
         self.name = 'unitialized' + str(ImageStreamControl.count )
@@ -471,6 +471,9 @@ class ImageStreamControl():
 
         ImageStreamControl.already_selected.append(name)
 
+
+        if name == rnd:
+            self.focal *= 1
         # prop = CAP_PROP_
         # self.capture.get()
 
