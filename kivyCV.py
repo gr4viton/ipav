@@ -173,8 +173,10 @@ class Multicopter(GridLayout):
         new_chain_string = ''.join(chain_list + last)
         # new_chain_string = 'original, resize, detect green'
 
+        new_chain_string = 'original' + hulling
+        new_chain_string += ',blend, pause'
 
-        # new_chain_string = 'original, .resize, detect red'
+        new_chain_string = 'original, .resize, detect red'
 
 
         # Load the chain
@@ -306,7 +308,7 @@ class multicopterApp(App):
         self.root.img_webcam.texture = convert_to_texture(preview )
 
         # print('redraw')
-        # frame = self.capture_control.image_stream_control.frame
+        # frame = self.capture_control.stream.frame
         # self.root.lb_webcam_resolution = str(frame.shape)
         #
         # if frame is not None:

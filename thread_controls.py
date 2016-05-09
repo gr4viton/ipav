@@ -11,6 +11,8 @@ import findHomeography as fh
 
 from StepControl import *
 
+import CaptureControl as cc
+
 class LockedValue(object):
     """
     Thread safe numpy array
@@ -202,7 +204,7 @@ class ChainControl():
 
         data[dd.capture_control] = self.capture_control
 
-        # data[dd.im] = self.capture_control.image_stream_control.frame
+        # data[dd.im] = self.capture_control.stream.frame
 
         # source_id = 0
         # stream = data[dd.capture_control].get_stream(source_id)
@@ -247,6 +249,7 @@ class ChainControl():
 #         self.source_id =
 
 
+
 class ImageStreamControl():
     """
     Shared class to control source capture execution
@@ -254,10 +257,19 @@ class ImageStreamControl():
 
     # frame = np.ones( (32,24,3,), np.uint8 ) * 128
     # frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
+    count = 0
+    invalid_values = [-1, 2009211520]
+
 
     def __init__(self, source_id=0):
         # self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
         self.frame = np.ones( (32,24,3,), np.uint8 ) * 128
+
+        self.dir_cv2_cap_prop = cc.CaptureControl.dir_cv2_cap_prop
+        self.cv2_dict_name = {}
+        for cv2_name in self.dir_cv2_cap_prop:
+            self.cv2_dict_name[getattr(cv2, cv2_name)] = cv2_name
+            # print(word, '=', getattr(cv2, word))
 
         self.capturing = LockedValue(False)
 
@@ -270,7 +282,77 @@ class ImageStreamControl():
 
         self.sleepTime = 0.0
 
+        self.focal = 5
 
+
+        self.source_name = 'unitialized' + str(ImageStreamControl.count )
+        ImageStreamControl.count += 1
+
+    def print_all_properties(self):
+        # width = 640
+        # height = 480
+        # width, height = [640, 480]
+        # width, height = [800, 600]
+        width, height = [1024, 768]
+
+        # stream.capture.set(3, width)
+        # stream.capture.set(4, height)
+        print('Source [{}] Printing all properties:'.format(self.source_id))
+
+        for prop_name in self.dir_cv2_cap_prop:
+            # super(cv2,prop_name)
+            # print(globals())
+            # print('loc')
+            # print(locals())
+            # cv2_prop = locals()[prop_name]
+            cv2_prop = getattr(cv2, prop_name)
+            # print(cv2_prop)
+            prop_val = self.capture.get(cv2_prop)
+            # cv2
+            if prop_val not in self.invalid_values:
+                print(prop_name, ' = ', prop_val)
+
+        # print(prop)
+
+    def set_properties(self):
+        # width = 640
+        # height = 480
+        # width, height = [640, 480]
+        # width, height = [800, 600]
+        # width, height = [1024, 768]
+        prop_list = []
+
+        def add_set_prop(prop_key, value):
+            prop_list.append([self.cv2_dict_name[prop_key], prop_key, value])
+
+        # for q in range(8,1,-1):
+        #     add_set_prop(cv2.CAP_PROP_GAMMA, q)
+        # # add_set_prop(cv2.CAP_PROP_GAMMA, 5)
+        # add_set_prop(cv2.CAP_PROP_GAMMA, 0.01)
+        # add_set_prop(cv2.CAP_PROP_GAMMA, 42)
+        # add_set_prop(cv2.CAP_PROP_GAMMA, 4)
+        # print(prop_list)
+
+        for prop_cv2_name, prop_key, prop_value in [prop for prop in prop_list]:
+            self.capture_lock.acquire()
+
+            last_val = self.capture.get(prop_key)
+            self.capture.set(prop_key, prop_value)
+            read_val = self.capture.get(prop_key)
+
+            self.capture_lock.release()
+
+            if last_val != read_val:
+                print('Source [{}] Property set: {} = {} (before = {})'.format
+                  (self.source_id, prop_cv2_name, prop_value, last_val))
+            else:
+                print('Source [{}] Property could not be set! {} = {} (wanted= {})'.format
+                      (self.source_id, prop_cv2_name, read_val, prop_value))
+        # for stream in self.streams:
+            # stream.capture.set(3, width)
+            # stream.capture.set(4, height)
+
+            # stream.capture.get(cv2.CAP_PROP_APERTURE)
 
     def init_capture(self):
         self.capture_lock.acquire()
@@ -283,13 +365,25 @@ class ImageStreamControl():
         self.capture_lock.release()
         self.open_source_id()
 
+    def get_source_info(self):
+        # name = self.source_name
+        # self.capture_lock.acquire()
+        # # prop = CAP_PROP_
+        # # self.capture.get()
+        # self.capture_lock.release()
+        # self.source_name = name
+        pass
+
     def open_capture(self):
         self.capture_lock.acquire()
         self.capture.open(self.source_id)
         if self.capture.isOpened() != True:
             print('Source[', self.source_id, '] Cannot open capture.')
             return False
-        print('Source[', self.source_id, '] Opened capture.')
+        print('Source[{}] Opened capture.'.format(self.source_id))
+        self.get_source_info()
+        print('Source[{}] Renamed to {}.'.format(self.source_id, self.source_name))
+                # print('Source[', self.source_id, '] renamed to {}.')
         self.capture_lock.release()
         return True
 

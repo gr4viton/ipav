@@ -93,22 +93,33 @@ class BlenderServer():
             print(obj)
         printl()
 
+
+    def remap_list_plain2leveled(self, hull_xy):
+
+        # remap from this:  [ x1, y1, x2, y2 ... ]
+        # to this: [ [x1,y1], [x2,y2], ... ]
+        pixel_len = 2
+        hull = [hull_xy[i:i+pixel_len] for i in range(0, len(hull_xy), pixel_len)]
+        # map (lambda x: hull_orig[pixel_len*x:(x+1)*pixel_len], range (pixel_len))
+
+        return hull
+
     def create_projections(self):
         if len(self.real_cam_set) < 1:
             return
 
+        # for rcam in self.real_cam_set:
+
         if self.projections:
-            hull_orig = self.projections
+            hull_xy = self.projections
         else:
             return
 
+        hull = self.remap_list_plain2leveled(hull_xy)
 
-        pixel_len = 2
-        hull = [hull_orig[i:i+pixel_len] for i in range(0, len(hull_orig), pixel_len)]
-        # map (lambda x: hull_orig[pixel_len*x:(x+1)*pixel_len], range (pixel_len))
         # hull = hull_orig
 
-        self.real_cam_set[0].hull = hull
+        # self.real_cam_set[0].hull = hull
         for rcam in self.real_cam_set:
             rcam.hull = hull
 
@@ -126,6 +137,11 @@ class BlenderServer():
         scene.objects.link(copy)
         scene.update()
         return copy
+
+    def set_projections(self, projections):
+        id = self.stream_info[0]
+
+        self.projection[id] = projections
 
     def photogrammetry_object(self):
         print('photogrammetrying object')
@@ -343,9 +359,12 @@ class BlenderServer():
                             if data_dict.get('create_cam_projections', None) == True:
                                 self.create_projections()
 
+                            stream_info = data_dict.get('stream_info ', None)
+                            if stream_info: self.stream_info = stream_info
+
                             projections = data_dict.get('projections', None)
                             if projections:
-                                self.projections = projections
+                                self.set_projections(projections)
 
                             if data_dict.get('photogrammetry_object', None) == True:
                                 self.photogrammetry_object()

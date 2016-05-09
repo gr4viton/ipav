@@ -9,6 +9,8 @@ import os
 import shutil
 from subprocess import Popen, PIPE, STDOUT
 
+from StepEnum import DataDictParameterNames as dd
+
 # import blender_client
 import sys
 import socket
@@ -138,17 +140,40 @@ class blender_module():
         self.send_data_dict({'init_real_cam_set':True})
         self.rooming = True
 
-    def photogrammetry_object(self, projections):
-        start = time.time()
+    def create_projection_xy_list(self, projections):
+        # print('%'*105)
+        # print(projections)
 
-        print('%'*105)
-        print(projections)
         projections = [[x,y] for x,y in [inside[0] for inside in projections[0]]]
         projections_xy = list(itertools.chain(*projections))
-        print(projections_xy)
-        print('%'*105)
+        # print(projections_xy)
+        # print('%'*105)
 
-        self.send_data_dict({'projections': projections_xy})
+        return projections_xy
+
+    def photogrammetry_object(self, data):
+        start = time.time()
+
+        hulls = data[dd.hulls]
+        # hulls_xy = [self.create_projection_xy_list(hull) for hull in hulls]
+
+        # focal = data[dd.stream].focal
+        # resol = data[dd.im].shape
+        # print(resol, focal)
+
+        for stream in data[dd.capture_control].streams:
+            id = stream.source_id
+            name = stream.source_name
+            hull = hulls[name]
+            hull_xy = self.create_projection_xy_list(hull)
+
+            resol = list(stream.frame.shape)
+            focal = [stream.focal]
+            stream_info = [name] + [id] + resol + focal
+
+            print(stream_info)
+            self.send_data_dict({'stream_info': stream_info})
+            # self.send_data_dict({'projections': hull_xy})
 
         self.send_data_dict({'create_cam_projections': True})
         self.send_data_dict({'photogrammetry_object': True})

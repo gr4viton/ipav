@@ -658,8 +658,9 @@ class StepControl():
                 self.bm.init_room()
                 time.sleep(1.5)
 
-            projections = data[dd.hull]
-            imdir = self.bm.photogrammetry_object(projections)
+            # projections = data[dd.hull]
+            # projections = data[dd.hulls]
+            imdir = self.bm.photogrammetry_object(data)
 
             # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
             dir_files = os.listdir(imdir)
