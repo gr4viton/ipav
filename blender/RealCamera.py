@@ -58,7 +58,7 @@ class RealCamera():
 
     def init_rot(self, real_point, pixel):
         """
-        initializes rotation from real space point projection to camera plane
+        initializes rotation from real space point prjs to camera plane
         """
     def create_iso(self):
         cubeobject = bpy.ops.mesh.primitive_ico_sphere_add

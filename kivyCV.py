@@ -165,20 +165,24 @@ class Multicopter(GridLayout):
         hulling = ', .resize, .detect green, .mega gauss, .otsu, .cnt, hull,'
         rng = range(3)
         rng = [0,2,3]
+        rng = [0,1,2,3]
         # rng = [0,2,3,4]
         chain_list = ['source{}'.format(i) + hulling for i in rng]
-        # new_chain_string = 'source0' + hulling + 'source1' + hulling
-        last = ['source4, .resize' + hulling]
-        last = ['source4, .resize, .resize, .detect green, .mega gauss, .mega gauss, .otsu, .cnt, hull']
-        new_chain_string = ''.join(chain_list + last)
+        new_chain_string = ''.join(chain_list)
+
+        # last = ['source4, .resize' + hulling]
+        # last = ['source4, .resize, .resize, .detect green, .mega gauss, .mega gauss, .otsu, .cnt, hull']
+        # new_chain_string = ''.join(chain_list + last)
+
         # new_chain_string = 'original, resize, detect green'
 
-        new_chain_string = 'original' + hulling
+        # new_chain_string = 'source0' + hulling + 'source1' + hulling
+        # new_chain_string = 'original' + hulling
         new_chain_string += ',blend, pause'
 
-        new_chain_string = 'original, .resize, detect red'
-        # new_chain_string = 'original, source1, source2, source3'
-        new_chain_string = 'original, source1'
+        # new_chain_string = 'original, .resize, detect red'
+        # # new_chain_string = 'original, source1, source2, source3'
+        # new_chain_string = 'original, source1, source2'
 
 
         # Load the chain

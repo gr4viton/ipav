@@ -301,11 +301,11 @@ class StepWidgetControl():
         if diff > 0: # create widgets
             for num in range(0, np.abs(diff)):
                 self.layout_steps.add_widget(StepWidget())
-                print('added widget')
+                # print('added widget')
         else:
             for num in range(0, np.abs(diff)):
                 self.layout_steps.remove_widget( self.layout_steps.children[-1])
-                print('removed widget')
+                # print('removed widget')
 
         ziplist = list(zip(self.layout_steps.children, step_control.steps))
 

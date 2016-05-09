@@ -208,9 +208,41 @@ class StepControl():
         def make_nothing(data):
             # data[dd.resolution] = data[dd.im].shape
             stream = data[dd.stream]
-            txt = 'name[{}],id[{}]\n'.format(stream.name, stream.source_id)
+            txt = '|S[{}]={}|'.format(stream.source_id, stream.name)
             info_text(data,txt)
             return data
+
+
+        def make_set_source(data, source_id=0):
+            # if source_id < len(data[dd.captured]):
+                # data[dd.im] = data[dd.captured][source_id]
+            stream = data[dd.capture_control].get_stream(source_id)
+            if stream is None:
+                print('ImageStreamControl with id=[{}] is nonexistent', source_id)
+            else:
+                data[dd.stream] = stream
+                # print(stream.source_id)
+                data[dd.im] = stream.frame
+                txt = '|S[{}]={}|'.format(stream.source_id, stream.name)
+                info_text(data,txt)
+
+            return data
+
+        def make_set_next_source(data):
+            source_id = data[dd.capture_control].get_next_stream().source_id
+            return self.make_set_source(data, source_id)
+            # data[dd.stream] = stream
+            # data[dd.im] = stream.frame
+
+
+            # if stream is None:
+            #     print('ImageStreamControl with id=[{}] is nonexistent', source_id)
+            # else:
+            #     data[dd.stream] = stream
+            #     print(stream.source_id)
+            #     data[dd.im] = stream.frame
+
+            # return data
 
 
         def make_gauss(data, kernel=(5,5), sigma=(1,1)):
@@ -652,7 +684,7 @@ class StepControl():
 
 # predavat dictionary - multiple possible images, text overlay
         def make_blender_cube(data):
-            # projections = 'contours of moving objects'
+            # prjs = 'contours of moving objects'
             if not self.bm.running:
                 self.bm.start_server()
                 time.sleep(1.5)
@@ -661,8 +693,9 @@ class StepControl():
                 self.bm.init_room()
                 time.sleep(1.5)
 
-            # projections = data[dd.hull]
-            # projections = data[dd.hulls]
+
+            # print('%'*42,'data[dd.hulls] = ', data[dd.hulls])
+
             imdir = self.bm.photogrammetry_object(data)
 
             # imdir = os.path.abspath('D:\\DEV\\PYTHON\\pyCV\\kivyCV_start\\blender\\pic\\')
@@ -806,14 +839,20 @@ class StepControl():
 
             # print(len(cnt))
             hull = cv2.convexHull(cnt)
-            data[dd.hull] = [hull]
-            id = data[dd.stream].source_id
+            this_hull = [hull]
+            data[dd.hull] = this_hull
+            name = data[dd.stream].name
+
+            # print(name)
 
             # if data.get(dd.hulls,] == None:
             if data.get(dd.hulls, None) is None:
-                data[dd.hulls] = [None]*id
+                data[dd.hulls] = {name: this_hull}
+            else:
+                data[dd.hulls][name] = this_hull
 
-            data[dd.hulls].insert(id, [hull])
+            # print(name,data[dd.hulls][name])
+            # data[dd.hulls].insert(id, [hull])
             # data[dd.hulls][id] = [hull]
 
             # print(len(hull))
@@ -882,37 +921,6 @@ class StepControl():
             print('mask', np.min(mask), np.max(mask))
             im = mask * 1
             return im
-
-        def make_set_source(data, source_id=0):
-            # if source_id < len(data[dd.captured]):
-                # data[dd.im] = data[dd.captured][source_id]
-            stream = data[dd.capture_control].get_stream(source_id)
-            if stream is None:
-                print('ImageStreamControl with id=[{}] is nonexistent', source_id)
-            else:
-                data[dd.stream] = stream
-                # print(stream.source_id)
-                data[dd.im] = stream.frame
-                txt = 'name[{}],id[{}]'.format(stream.name, stream.source_id)
-                info_text(data,txt)
-
-            return data
-
-        def make_set_next_source(data):
-            source_id = data[dd.capture_control].get_next_stream().source_id
-            return self.make_set_source(data, source_id)
-            # data[dd.stream] = stream
-            # data[dd.im] = stream.frame
-
-
-            # if stream is None:
-            #     print('ImageStreamControl with id=[{}] is nonexistent', source_id)
-            # else:
-            #     data[dd.stream] = stream
-            #     print(stream.source_id)
-            #     data[dd.im] = stream.frame
-
-            # return data
 
         self.add_available_step('original', make_nothing)
         self.add_synonyms('original')

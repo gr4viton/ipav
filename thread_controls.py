@@ -262,7 +262,7 @@ class ImageStreamControl():
     invalid_values = [-1, 2009211520]
     # invalid_values = [-1]
     # invalid_values = [2009211520]
-    invalid_values = []
+    # invalid_values = []
 
     def __init__(self, source_id=0):
         # self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
@@ -403,22 +403,24 @@ class ImageStreamControl():
         rnd = 'round'
         blu = 'blue'
 
-        blk = 'black'
-        gra = 'gray'
-        cli = 'clips'
-        con_blk = 129
-        con_gra = 128
-        con_cli = 127
-        # indistinguishable = [
-        #         ['black', 129],
-        #         ['gray', 128],
-        #         ['cli', 127]
-        #         ]
+        # blk = 'black'
+        # gra = 'gray'
+        # cli = 'clips'
+        # con_blk = 129
+        # con_gra = 128
+        # con_cli = 127
+        indistinguishable = [
+                ['cli', 129],
+                ['gray', 128],
+                ['black', 127]
+                ]
+        con_val = [cam[1] for cam in indistinguishable]
+
         def set_contrast(contrast_val):
             self.set_property(cv2.CAP_PROP_CONTRAST, contrast_val)
 
         def is_defined(name):
-            return any(blk in w for w in already)
+            return any(name in w for w in already)
         # print(fourcc, white, contrast)
         if fourcc == 844715353.0:
             # round, clips, gray, black
@@ -427,29 +429,41 @@ class ImageStreamControl():
                 # round -> potlaèit blikani 50Hz
             else:
                 # clips, gray, black
-                if contrast == contrast_def:
-                    # for in indistinguishable
-                    if not is_defined(blk):
-                        name = blk
-                        set_contrast(con_blk)
-                    elif not is_defined(gra):
-                        name = gra
-                        set_contrast(con_gra)
-                    elif not is_defined(cli):
-                        name = cli
-                        set_contrast(con_cli)
+                for cam in indistinguishable:
+                    if contrast == contrast_def or contrast not in con_val:
+                        if not is_defined(cam[0]):
+                            name = cam[0]
+                            set_contrast(cam[1])
+                            break
                     else:
-                        # unknown camera
-                        name = self.name
-                        pass
+                        if contrast == cam[1]:
+                            name = cam[0]
 
-                else:
-                    if contrast == con_blk:
-                        name = blk
-                    elif contrast == con_gra:
-                        name = gra
-                    elif contrast == con_cli:
-                        name = cli
+                #
+                # if contrast == contrast_def:
+                #
+                #     # if not is_defined(blk):
+                #     #     name = blk
+                #     #     set_contrast(con_blk)
+                #     # elif not is_defined(gra):
+                #     #     name = gra
+                #     #     set_contrast(con_gra)
+                #     # elif not is_defined(cli):
+                #     #     name = cli
+                #     #     set_contrast(con_cli)
+                #     # else:
+                #     #     # unknown camera
+                #     #     name = self.name
+                #     #     pass
+                #
+                # else:
+                #     # for in indistinguishable
+                #     if contrast == con_blk:
+                #         name = blk
+                #     elif contrast == con_gra:
+                #         name = gra
+                #     elif contrast == con_cli:
+                #         name = cli
 
         elif fourcc == -466162819:
             # blue

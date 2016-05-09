@@ -142,7 +142,7 @@ class blender_module():
 
     def create_projection_xy_list(self, projections):
         # print('%'*105)
-        # print(projections)
+        # print(prjs)
 
         projections = [[x,y] for x,y in [inside[0] for inside in projections[0]]]
         projections_xy = list(itertools.chain(*projections))
@@ -163,17 +163,23 @@ class blender_module():
 
         for stream in data[dd.capture_control].streams:
             id = stream.source_id
-            name = stream.source_name
-            hull = hulls[name]
-            hull_xy = self.create_projection_xy_list(hull)
+            name = stream.name
+            if hulls.get(name, None):
+                print('Creating stream [{}] prjs data'.format(stream.name))
+                hull = hulls[name]
 
-            resol = list(stream.frame.shape)
-            focal = [stream.focal]
-            stream_info = [name] + [id] + resol + focal
+                hull_xy = self.create_projection_xy_list(hull)
 
-            print(stream_info)
-            self.send_data_dict({'stream_info': stream_info})
-            # self.send_data_dict({'projections': hull_xy})
+                resol = list(stream.frame.shape)
+                focal = [stream.focal]
+                stream_info = [name] + [id] + resol + focal
+
+                print(stream_info)
+                self.send_data_dict({'stream_info': stream_info})
+                self.send_data_dict({'prjs': hull_xy})
+
+            else:
+                print('No contour created for stream[', name,'] !')
 
         self.send_data_dict({'create_cam_projections': True})
         self.send_data_dict({'photogrammetry_object': True})

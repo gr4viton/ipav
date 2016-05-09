@@ -41,7 +41,8 @@ class BlenderServer():
     def __init__(self):
         # path = 'D:/DEV/PYTHON/pyCV/kivyCV_start/blender/real_cam_set.ini'
         # self.init_real_cam_set_from_conf(path)
-        self.projections = None
+        self.prjs = None
+        self.stream_info = None
         pass
 
     def init_real_cam_set(self):
@@ -110,10 +111,15 @@ class BlenderServer():
 
         # for rcam in self.real_cam_set:
 
-        if self.projections:
-            hull_xy = self.projections
+        if self.prjs:
+            hull_xy = self.prjs
         else:
             return
+
+        hull_xy = next (iter (hull_xy.values()))
+
+        print('%'*123)
+        print(hull_xy)
 
         hull = self.remap_list_plain2leveled(hull_xy)
 
@@ -124,7 +130,7 @@ class BlenderServer():
             rcam.hull = hull
 
         for cam in self.real_cam_set:
-            print('creating projection')
+            print('creating prjs')
             cam.create_projection()
 
         return
@@ -139,9 +145,18 @@ class BlenderServer():
         return copy
 
     def set_projections(self, projections):
-        id = self.stream_info[0]
+        # id = self.stream_info[0]
+        stream_info = self.stream_info
+        if stream_info is not None:
+            name = stream_info [0]
+            if self.prjs:
+                self.prjs[name] = projections
+            else:
+                self.prjs = {name: projections}
+        else:
+            pass
 
-        self.projection[id] = projections
+
 
     def photogrammetry_object(self):
         print('photogrammetrying object')
@@ -156,8 +171,8 @@ class BlenderServer():
         for rcam in self.real_cam_set:
             if rcam.proj:
                 if self.pobj is None:
-                    # first projection
-                    print('first projection')
+                    # first prjs
+                    print('first prjs')
                     self.pobj = self.duplicate(rcam.proj, 'pobj')
                     # self.pobj = rcam.proj
                 else:
@@ -359,10 +374,10 @@ class BlenderServer():
                             if data_dict.get('create_cam_projections', None) == True:
                                 self.create_projections()
 
-                            stream_info = data_dict.get('stream_info ', None)
+                            stream_info = data_dict.get('stream_info', None)
                             if stream_info: self.stream_info = stream_info
 
-                            projections = data_dict.get('projections', None)
+                            projections = data_dict.get('prjs', None)
                             if projections:
                                 self.set_projections(projections)
 
