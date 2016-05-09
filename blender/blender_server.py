@@ -107,33 +107,25 @@ class BlenderServer():
 
     def create_projections(self):
         if len(self.real_cam_set) < 1:
+            print('No Rcams to make projections')
             return
 
-        # for rcam in self.real_cam_set:
-
-        if self.prjs:
-            hull_xy = self.prjs
-        else:
+        if not self.prjs:
+            print('There are no projection data!')
             return
 
-        hull_xy = next (iter (hull_xy.values()))
-
-        print('%'*123)
-        print(hull_xy)
-
-        hull = self.remap_list_plain2leveled(hull_xy)
-
-        # hull = hull_orig
-
-        # self.real_cam_set[0].hull = hull
         for rcam in self.real_cam_set:
-            rcam.hull = hull
+            source_name = rcam.source_name
+            hull_xy = self.prjs.get(source_name, None)
+            if hull_xy:
+                hull = self.remap_list_plain2leveled(hull_xy)
+                rcam.hull = hull
 
-        for cam in self.real_cam_set:
-            print('creating prjs')
-            cam.create_projection()
+                print('Rcam[{}] Creating projection mesh.'.format(source_name))
+                rcam.create_projection()
+            else:
+                print('For Rcam[{}] there is no projection data!'.format(source_name))
 
-        return
 
 
     def duplicate(self, template, name):

@@ -181,7 +181,7 @@ class Multicopter(GridLayout):
         new_chain_string += ',blend, pause'
 
         # new_chain_string = 'original, .resize, detect red'
-        # # new_chain_string = 'original, source1, source2, source3'
+        # new_chain_string = 'original, source1, source2, source3'
         # new_chain_string = 'original, source1, source2'
 
 

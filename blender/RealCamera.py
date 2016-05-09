@@ -41,12 +41,15 @@ class RealCamera():
     rcam = None
     hull = None
 
+    source_name_delimiter = '~'
     def __init__(self, name, pos, rot, eul, size):
         self.name = name
         self.pos = Vector(pos)
         self.rot = Vector(rot)
         self.eul = Vector(eul)
         self.size = Vector(size)
+
+        self.init_source_name()
 
     def __init__(self, name, pos, rot, eul, size, rcam_obj):
         self.name = name
@@ -55,6 +58,12 @@ class RealCamera():
         self.eul = eul
         self.size = Vector(size)
         self.rcam = rcam_obj
+
+        self.init_source_name()
+
+    def init_source_name(self):
+        self.source_name = self.name.split(self.source_name_delimiter )[1]
+        print(self.source_name)
 
     def init_rot(self, real_point, pixel):
         """
@@ -87,6 +96,7 @@ class RealCamera():
     #     scene.update()
 
         if object == None:
+            print('Object could not be deleted')
             return
         scene = bpy.context.scene
         # [print(obj) for obj in scene.objects]
@@ -106,10 +116,37 @@ class RealCamera():
         self.proj = None
 
 
-    def duplicate(self, obj, duplicate_name):
+    def setMaterial(ob, mat):
+        me = ob.data
+
+        me.materials.append(mat)
+
+    def makeMaterial(name, diffuse, specular, alpha):
+        mat = bpy.data.materials.new(name)
+        mat.diffuse_color = diffuse
+        mat.diffuse_shader = 'LAMBERT'
+        mat.diffuse_intensity = 1.0
+        mat.specular_color = specular
+        mat.specular_shader = 'COOKTORR'
+        mat.specular_intensity = 0.5
+        mat.alpha = alpha
+        mat.ambient = 1
+        mat.use_transparency = True
+        return mat
+
+
+    def duplicate(self, obj, duplicate_name, alpha=1):
 
         obj_duplicate = obj.copy()
         obj_duplicate.name = duplicate_name
+        if alpha < 1:
+
+            if self.blue_mat is None:
+                self.blue_mat = self.makeMaterial('BlueSemi', (0,0,1), (0.5,0.5,0), 0.5)
+                print('Created material blue')
+            # set transparency
+            self.setMaterial(obj, self.blue_mat)
+            pass
 
         scene = bpy.context.scene
         scene.objects.link(obj_duplicate)
@@ -184,20 +221,28 @@ class RealCamera():
     def create_projection(self):
         if self.rcam:
             if self.proj:
+                print('Deleting old projection object')
                 self.delete_projection()
 
             if self.hull == None:
+                # if no projection data -> use scaled camera pyramid
                 self.proj = self.rcam.copy()
                 self.proj.scale = Vector((1, 1, 3))
-
             else:
-
-
+                print('Going to [get_contour_projection_object]')
                 proj = self.get_contour_projection_object()
-                name = name = 'prj_hull_' + self.rcam.name[-4:]
-                proj_original = self.duplicate(proj, name)
-                # self.proj = proj
-                self.proj = proj_original
+
+                name = 'prj_hull_' + self.rcam.name[-4:]
+
+                self.proj = proj
+
+                # # keep the projections visible
+                keep_prjs = True
+                if keep_prjs == True:
+                    alpha = 0.5
+                    alpha = 1
+                    proj_original = self.duplicate(proj, name, alpha)
+                    self.proj = proj_original
 
             # self.proj.name = 'prj' + self.rcam.name[-4:]
             #    rcam_d.location += Vector((1,1,1))

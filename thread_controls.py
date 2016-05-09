@@ -410,7 +410,7 @@ class ImageStreamControl():
         # con_gra = 128
         # con_cli = 127
         indistinguishable = [
-                ['cli', 129],
+                ['clips', 129],
                 ['gray', 128],
                 ['black', 127]
                 ]
