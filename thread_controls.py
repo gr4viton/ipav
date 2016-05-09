@@ -139,6 +139,8 @@ class ChainControl():
         self.execution_time = []
         self.resolution_multiplier = 0.5
 
+        # self.streams = None
+
         self._step_control = StepControl(self.resolution_multiplier, self.current_chain)
 
     def reset_step_control(self):
@@ -197,9 +199,22 @@ class ChainControl():
     def do_chain(self):
         start = time.time()
         data = StepData()
-        data[dd.captured] = [stream.frame for stream in self.capture_control.streams]
+
+        data[dd.capture_control] = self.capture_control
+
         # data[dd.im] = self.capture_control.image_stream_control.frame
-        data[dd.im] = data[dd.captured][0]
+
+        # source_id = 0
+        # stream = data[dd.capture_control].get_stream(source_id)
+
+        index = 0
+        stream = data[dd.capture_control].streams[index]
+        data[dd.stream] = stream
+        data[dd.im] = stream.frame
+
+        # data[dd.captured] = [stream.frame for stream in self.capture_control.streams]
+        # data[dd.im] = data[dd.captured][index]
+
         data[dd.resolution_multiplier] = self.resolution_multiplier
 
         self._step_control.step_all(data)
@@ -225,6 +240,11 @@ class ChainControl():
         self.resolution_multiplier = resolution_multiplier
 
 
+# class StreamInfo():
+#     def __init__(self, stream):
+#         self.stream = stream
+#         self.resolution = stream.frame.shape
+#         self.source_id =
 
 
 class ImageStreamControl():
@@ -249,6 +269,8 @@ class ImageStreamControl():
         self.source_id = source_id
 
         self.sleepTime = 0.0
+
+
 
     def init_capture(self):
         self.capture_lock.acquire()

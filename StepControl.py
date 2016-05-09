@@ -127,8 +127,16 @@ class StepControl():
 
         # [self.steps.append(self.available_steps[step_name].copy()) for step_name in self.chain.step_names]
         # [self.steps.append(Step(step_name, self.available_step_fcn[step_name])) for step_name in self.chain.step_names]
-        [self.steps.append(Step(step_name, self.available_steps[step_name].function))
-         for step_name in self.chain.step_names]
+
+        hide_char = '.'
+        for step_name in self.chain.step_names:
+            narrowed = False
+            # print(step_name)
+            if step_name[0] == hide_char:
+                step_name = step_name[1:]
+                narrowed = True
+            self.steps.append(Step(step_name, self.available_steps[step_name].function, narrowed))
+            # print(self.steps[-1].narrow)
 
 
     def __init__(self, resolution_multiplier, current_chain):
@@ -776,16 +784,33 @@ class StepControl():
                 # calc cnts
                 data = make_find_contours(data)
 
-
             data[dd.info_text] += 'Convex hull'
             cnts = data[dd.cnts]
             if len(cnts) < 1:
                 return data
             # print(len(cnts))
-            cnt = cnts[0]
+
+            # get biggest cnt
+            len_max = 0
+            for cnt in cnts:
+                if len(cnt) > len_max:
+                    len_max=len(cnt)
+                    cnt_huge = cnt
+
+            # cnt = cnts[0]
+            cnt = cnt_huge
+
             # print(len(cnt))
             hull = cv2.convexHull(cnt)
             data[dd.hull] = [hull]
+            id = data[dd.stream].source_id
+
+            # if data.get(dd.hulls,] == None:
+            if data.get(dd.hulls, None) is None:
+                data[dd.hulls] = [None]*id
+
+            data[dd.hulls].insert(id, [hull])
+            # data[dd.hulls][id] = [hull]
 
             # print(len(hull))
             data[dd.im] = draw_cnts(data, dd.hull, 0)
@@ -854,10 +879,34 @@ class StepControl():
             im = mask * 1
             return im
 
-        def make_source_image(data, source_id=0):
-            if source_id < len(data[dd.captured]):
-                data[dd.im] = data[dd.captured][source_id]
+        def make_set_source(data, source_id=0):
+            # if source_id < len(data[dd.captured]):
+                # data[dd.im] = data[dd.captured][source_id]
+            stream = data[dd.capture_control].get_stream(source_id)
+            if stream is None:
+                print('ImageStreamControl with id=[{}] is nonexistent', source_id)
+            else:
+                data[dd.stream] = stream
+                # print(stream.source_id)
+                data[dd.im] = stream.frame
+
             return data
+
+        def make_set_next_source(data):
+            source_id = data[dd.capture_control].get_next_stream().source_id
+            return self.make_set_source(data, source_id)
+            # data[dd.stream] = stream
+            # data[dd.im] = stream.frame
+
+
+            # if stream is None:
+            #     print('ImageStreamControl with id=[{}] is nonexistent', source_id)
+            # else:
+            #     data[dd.stream] = stream
+            #     print(stream.source_id)
+            #     data[dd.im] = stream.frame
+
+            # return data
 
         self.add_available_step('original', make_nothing)
         self.add_synonyms('original')
@@ -919,12 +968,15 @@ class StepControl():
         self.add_available_step('detect blue', lambda d: make_detect_color(d, color_name='blue'))
         self.add_available_step('detect green', lambda d: make_detect_color(d, color_name='green'))
 
-        self.add_available_step('source', make_source_image)
-        self.add_available_step('source1', lambda d: make_source_image(d, source_id=1))
-        self.add_available_step('source2', lambda d: make_source_image(d, source_id=2))
-        self.add_available_step('source3', lambda d: make_source_image(d, source_id=3))
-        self.add_available_step('source4', lambda d: make_source_image(d, source_id=4))
+        self.add_available_step('source', make_set_source)
+        self.add_available_step('source1', lambda d: make_set_source(d, source_id=1))
+        self.add_available_step('source2', lambda d: make_set_source(d, source_id=2))
+        self.add_available_step('source3', lambda d: make_set_source(d, source_id=3))
+        self.add_available_step('source4', lambda d: make_set_source(d, source_id=4))
         self.add_synonyms('source, set source, source0')
+
+        self.add_available_step('next source', make_set_next_source)
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         self.add_available_step('clear border', make_clear_border)

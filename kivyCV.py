@@ -124,6 +124,8 @@ class Multicopter(GridLayout):
         self.change_chain_widget.chain_string_input.text = new_chain_string
         self.change_chain_widget.chain_string_input.multiline = False
 
+
+        # START THE CHAIN COMPUTING !
         step_names = self.chain_control.load_chain(new_chain_string)
         self.change_chain_widget.dismiss()
 
@@ -160,17 +162,22 @@ class Multicopter(GridLayout):
         # new_chain_string = 'original'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5'
 
-        hulling = ', resize, detect green, mega gauss, otsu, cnt, hull,'
+        hulling = ', .resize, .detect green, .mega gauss, .otsu, .cnt, hull,'
         rng = range(3)
         rng = [0,2,3]
         # rng = [0,2,3,4]
         chain_list = ['source{}'.format(i) + hulling for i in rng]
         # new_chain_string = 'source0' + hulling + 'source1' + hulling
-        last = ['source4, resize' + hulling]
-        last = ['source4, resize, resize, detect green, mega gauss, mega gauss, otsu, cnt, hull']
+        last = ['source4, .resize' + hulling]
+        last = ['source4, .resize, .resize, .detect green, .mega gauss, .mega gauss, .otsu, .cnt, hull']
         new_chain_string = ''.join(chain_list + last)
         # new_chain_string = 'original, resize, detect green'
 
+
+        # new_chain_string = 'original, .resize, detect red'
+
+
+        # Load the chain
         available_steps_dict = self.chain_control.get_available_steps()
 
         self.change_chain_widget = ChangeChainWidget(new_chain_string,
@@ -229,6 +236,7 @@ class multicopterApp(App):
         Chain.chain_names = ['2L', '3L', 'c2', 'standard']
         Chain.tag_names = ['2L', '3L', 'c2']
         Chain.load_data_chain_names = Chain.tag_names
+
         current_chain = Chain(selected_chain_name, start_chain = False)
 
 

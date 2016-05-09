@@ -7,7 +7,7 @@ class Step():
 
     steps_count = 0
 
-    def __init__(self, name, function):
+    def __init__(self, name, function, narrowed=False):
         self.name = name
         self.function = function
         self.execution_time_len = 23
@@ -20,6 +20,7 @@ class Step():
         self.data_prev = None
         self.data_post = None
 
+        self.narrowed = narrowed
 
         self.id = Step.steps_count
         Step.steps_count +=1

@@ -84,15 +84,20 @@ class StepWidget(GridLayout):
             size=(cv_image.shape[1], cv_image.shape[0]), colorfmt='bgr')
         self.update_texture(cv_image)
 
-    def recreate_widget(self, cv_image, name, info_position='b'):
+    def recreate_widget(self, cv_image, name, narrowed=False, info_position='b'):
         self.recreate_texture(cv_image)
         self.recreate_info_label()
         self.name = name
+        print('setting narrowed for {} to {}'.format(name, narrowed))
+        self.set_narrowed(narrowed)
+
         self.info_label_position = info_position
-        print('Recreated widget:', cv_image.shape, '[px] name: [', name,'] info_pos:', info_position)
+        print('Recreated widget:', cv_image.shape, '[px] name: [', name,
+              '] info_pos:', info_position)
 
     def update_widget(self, step):
         if not self.narrowed:
+            # print(step.name,'.narrowed = ', self.narrowed)
             self.time_label.text = step.str_mean_execution_time('')
             if step.data_post == None:
                 return
@@ -173,15 +178,18 @@ class StepWidget(GridLayout):
         self.informing = value
 
 
-    def set_narrow(self, value):
-        self.narrowed = not value
-        if value == True:
-            self.tbt_narrow.state = 'normal'
+    def set_narrowed(self, narrowed, from_gui=False):
+        # self.narrowed = not value
+        self.narrowed = narrowed
+        if narrowed == True:
+            if from_gui==False:
+                self.tbt_narrow.state = 'normal'
             # self.size_hint_x = 0.33
             # self.width = 282
             self.width = 282/3
-        if value == False:
-            self.tbt_narrow.state = 'down'
+        if narrowed == False:
+            if from_gui==False:
+                self.tbt_narrow.state = 'down'
             # self.size_hint_x = 0.33/9
             self.width = 282/3
             self.width *= 3
@@ -282,7 +290,7 @@ class StepWidgetControl():
         self.do_all_steps(StepWidget.show_img, subset)
 
     def narrow(self, subset):
-        self.do_all_steps(StepWidget.set_narrow, subset)
+        self.do_all_steps(StepWidget.set_narrowed, subset)
 
     def info(self, subset):
         self.do_all_steps(StepWidget.show_info, subset)
@@ -305,7 +313,7 @@ class StepWidgetControl():
         # print(ziplist)
         # print(ziplist[::-1])
 
-        [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name)
+        [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name, narrowed=step.narrowed)
          for (widget, step) in ziplist if step.data_post is not None]
 
     def update_layout_steps(self, step_control):

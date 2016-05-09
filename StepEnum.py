@@ -49,9 +49,12 @@ class DataDictParameterNames(AutoNumber):
     colors = ()
     # make_convex_hull
     hull = ()
+    hulls = ()
     # wait
     seconds = ()
     # captured source image
     captured = ()
+    capture_control = ()
+    stream = ()
     # res multiplier gui
     resolution_multiplier = ()

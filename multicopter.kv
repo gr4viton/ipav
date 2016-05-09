@@ -509,7 +509,7 @@
             text: root.name
             size_hint_x: 0.9
             state: 'down'
-            on_state: root.set_narrow(self.state != 'down')
+            on_state: root.set_narrowed(narrowed=(self.state != 'down'), from_gui=True)
 
         GridLayout:
             cols: 2
