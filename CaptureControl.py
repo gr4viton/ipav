@@ -21,11 +21,16 @@ class CaptureControl():
         # ids = [0] # latest connection
         ids = [0]
         # 0 hd evolve
-        # 1 webcam black
+        # 1 webcam black5
         # 2 webcam clips
         # 3 usbcam blue
 
+        # FPS:
+        # RED-round = 2000
+
+
         # ids = [0,1,2,3,4]
+        ids = [0,1]
 
         [self.streams.append(ImageStreamControl(id)) for id in ids]
 
@@ -64,10 +69,6 @@ class CaptureControl():
         return self.streams[self.cur_index]
         # next_stream = [stream for stream in self.streams if stream.source_id == id]
         # print(type(stream_w_id[0]))
-
-
-
-
 
 
     def start_all_capturing(self):

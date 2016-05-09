@@ -206,7 +206,10 @@ class StepControl():
 
 
         def make_nothing(data):
-            data[dd.resolution] = data[dd.im].shape
+            # data[dd.resolution] = data[dd.im].shape
+            stream = data[dd.stream]
+            txt = 'name[{}],id[{}]\n'.format(stream.name, stream.source_id)
+            info_text(data,txt)
             return data
 
 
@@ -890,6 +893,8 @@ class StepControl():
                 data[dd.stream] = stream
                 # print(stream.source_id)
                 data[dd.im] = stream.frame
+                txt = 'name[{}],id[{}]'.format(stream.name, stream.source_id)
+                info_text(data,txt)
 
             return data
 

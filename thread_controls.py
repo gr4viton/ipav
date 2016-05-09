@@ -257,9 +257,12 @@ class ImageStreamControl():
 
     # frame = np.ones( (32,24,3,), np.uint8 ) * 128
     # frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
+    already_selected = []
     count = 0
     invalid_values = [-1, 2009211520]
-
+    # invalid_values = [-1]
+    # invalid_values = [2009211520]
+    invalid_values = []
 
     def __init__(self, source_id=0):
         # self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
@@ -285,7 +288,7 @@ class ImageStreamControl():
         self.focal = 5
 
 
-        self.source_name = 'unitialized' + str(ImageStreamControl.count )
+        self.name = 'unitialized' + str(ImageStreamControl.count )
         ImageStreamControl.count += 1
 
     def print_all_properties(self):
@@ -313,17 +316,25 @@ class ImageStreamControl():
                 print(prop_name, ' = ', prop_val)
 
         # print(prop)
+    def add_set_prop(self, prop_key, value, prop_list=[]):
+        prop_list.append([self.cv2_dict_name[prop_key], prop_key, value])
+        return prop_list
 
-    def set_properties(self):
+    def set_property(self, prop_key, value):
+        prop_list = self.add_set_prop(prop_key, value)
+        # print(prop_list)
+        self.set_properties(prop_list)
+
+    def set_properties(self, prop_list=[]):
         # width = 640
         # height = 480
         # width, height = [640, 480]
         # width, height = [800, 600]
         # width, height = [1024, 768]
-        prop_list = []
 
+        # prop_list
         def add_set_prop(prop_key, value):
-            prop_list.append([self.cv2_dict_name[prop_key], prop_key, value])
+            self.add_set_prop(prop_key, value, prop_list)
 
         # for q in range(8,1,-1):
         #     add_set_prop(cv2.CAP_PROP_GAMMA, q)
@@ -331,23 +342,36 @@ class ImageStreamControl():
         # add_set_prop(cv2.CAP_PROP_GAMMA, 0.01)
         # add_set_prop(cv2.CAP_PROP_GAMMA, 42)
         # add_set_prop(cv2.CAP_PROP_GAMMA, 4)
+        # add_set_prop(cv2.CAP_PROP_FPS, 2001)
+        # add_set_prop(cv2.CAP_PROP_SETTINGS, 0)
+        # add_set_prop(cv2.CAP_PROP_CONTRAST, 120)
+
+        # try to write all props which value is zero
+        # for prop_key in self.cv2_dict_name:
+        #
+        #     val = self.capture.get(prop_key)
+        #     # if val == -1:
+        #     if val == 2009211520:
+        #         add_set_prop(prop_key, 1.2)
         # print(prop_list)
 
-        for prop_cv2_name, prop_key, prop_value in [prop for prop in prop_list]:
-            self.capture_lock.acquire()
+        # OPENNI_REGISTRATION = ok
+
+        for prop_cv2_name, prop_key, prop_val in [prop for prop in prop_list]:
+            # self.capture_lock.acquire()
 
             last_val = self.capture.get(prop_key)
-            self.capture.set(prop_key, prop_value)
+            self.capture.set(prop_key, prop_val)
             read_val = self.capture.get(prop_key)
 
-            self.capture_lock.release()
+            # self.capture_lock.release()
 
             if last_val != read_val:
-                print('Source [{}] Property set: {} = {} (before = {})'.format
-                  (self.source_id, prop_cv2_name, prop_value, last_val))
+                print('Source[{}] Property set: {} = {} (before = {})'.format
+                  (self.source_id, prop_cv2_name, prop_val, last_val))
             else:
-                print('Source [{}] Property could not be set! {} = {} (wanted= {})'.format
-                      (self.source_id, prop_cv2_name, read_val, prop_value))
+                print('Source[{}] Property could not be set! {} = {} (wanted= {})'.format
+                      (self.source_id, prop_cv2_name, read_val, prop_val))
         # for stream in self.streams:
             # stream.capture.set(3, width)
             # stream.capture.set(4, height)
@@ -366,12 +390,77 @@ class ImageStreamControl():
         self.open_source_id()
 
     def get_source_info(self):
-        # name = self.source_name
-        # self.capture_lock.acquire()
-        # # prop = CAP_PROP_
-        # # self.capture.get()
-        # self.capture_lock.release()
-        # self.source_name = name
+
+        name = self.name
+
+        fourcc = self.capture.get(cv2.CAP_PROP_FOURCC)
+        white = self.capture.get(cv2.CAP_PROP_WHITE_BALANCE_BLUE_U)
+        contrast = self.capture.get(cv2.CAP_PROP_CONTRAST)
+        contrast_def = 130
+        already = ImageStreamControl.already_selected
+        print(already)
+
+        rnd = 'round'
+        blu = 'blue'
+
+        blk = 'black'
+        gra = 'gray'
+        cli = 'clips'
+        con_blk = 129
+        con_gra = 128
+        con_cli = 127
+        # indistinguishable = [
+        #         ['black', 129],
+        #         ['gray', 128],
+        #         ['cli', 127]
+        #         ]
+        def set_contrast(contrast_val):
+            self.set_property(cv2.CAP_PROP_CONTRAST, contrast_val)
+
+        def is_defined(name):
+            return any(blk in w for w in already)
+        # print(fourcc, white, contrast)
+        if fourcc == 844715353.0:
+            # round, clips, gray, black
+            if white != 2009211520.0:
+                name = rnd
+                # round -> potlaèit blikani 50Hz
+            else:
+                # clips, gray, black
+                if contrast == contrast_def:
+                    # for in indistinguishable
+                    if not is_defined(blk):
+                        name = blk
+                        set_contrast(con_blk)
+                    elif not is_defined(gra):
+                        name = gra
+                        set_contrast(con_gra)
+                    elif not is_defined(cli):
+                        name = cli
+                        set_contrast(con_cli)
+                    else:
+                        # unknown camera
+                        name = self.name
+                        pass
+
+                else:
+                    if contrast == con_blk:
+                        name = blk
+                    elif contrast == con_gra:
+                        name = gra
+                    elif contrast == con_cli:
+                        name = cli
+
+        elif fourcc == -466162819:
+            # blue
+            name = blu
+
+        ImageStreamControl.already_selected.append(name)
+
+        # prop = CAP_PROP_
+        # self.capture.get()
+
+        self.name = name
         pass
 
     def open_capture(self):
@@ -382,7 +471,7 @@ class ImageStreamControl():
             return False
         print('Source[{}] Opened capture.'.format(self.source_id))
         self.get_source_info()
-        print('Source[{}] Renamed to {}.'.format(self.source_id, self.source_name))
+        print('Source[{}] Renamed to {}.'.format(self.source_id, self.name))
                 # print('Source[', self.source_id, '] renamed to {}.')
         self.capture_lock.release()
         return True
