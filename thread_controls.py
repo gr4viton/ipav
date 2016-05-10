@@ -302,6 +302,7 @@ class ImageStreamControl():
         # stream.capture.set(4, height)
         print('Source [{}] Printing all properties:'.format(self.source_id))
 
+        txt = ''
         for prop_name in self.dir_cv2_cap_prop:
             # super(cv2,prop_name)
             # print(globals())
@@ -312,8 +313,11 @@ class ImageStreamControl():
             # print(cv2_prop)
             prop_val = self.capture.get(cv2_prop)
             # cv2
+
             if prop_val not in self.invalid_values:
-                print(prop_name, ' = ', prop_val)
+                length = len('CAP_PROP_')
+                txt += '{}={} | '.format(prop_name[length:], prop_val)
+        print(txt)
 
         # print(prop)
     def add_set_prop(self, prop_key, value, prop_list=[]):

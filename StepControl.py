@@ -736,6 +736,9 @@ class StepControl():
         def make_detect_color(data, color_name='red'):
             im = data[dd.im]
             # Convert BGR to HSV
+            if len(im.shape) == 2:
+                print('Cannot detect color on grayscale image!')
+                return data
             hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
 
             # define range of blue color in HSV

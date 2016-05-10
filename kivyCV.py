@@ -162,28 +162,44 @@ class Multicopter(GridLayout):
         # new_chain_string = 'original'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5'
 
-        hulling = ', .resize, .detect green, .mega gauss, .otsu, .cnt, hull,'
-        rng = range(3)
-        rng = [0,2,3]
-        rng = [0,1,2,3]
-        # rng = [0,2,3,4]
-        chain_list = ['source{}'.format(i) + hulling for i in rng]
-        new_chain_string = ''.join(chain_list)
 
-        # last = ['source4, .resize' + hulling]
-        # last = ['source4, .resize, .resize, .detect green, .mega gauss, .mega gauss, .otsu, .cnt, hull']
-        # new_chain_string = ''.join(chain_list + last)
+        def try_detect_green():
+            a = ''
+            a += 'source1, .resize, .mega gauss, detect green, .otsu, .cnt, hull,'
+            a += 'source1, .resize, detect green, .mega gauss, .otsu, .cnt, hull'
+            return a
 
-        # new_chain_string = 'original, resize, detect green'
+        def all_sources_hulls():
+            hulling = ', .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull,'
+            rng = range(3)
+            rng = [0,2,3]
+            rng = [0,1,2,3]
+            # rng = [0,2,3,4]
+            chain_list = ['source{}'.format(i) + hulling for i in rng]
+            new_chain_string = ''.join(chain_list)
 
-        # new_chain_string = 'source0' + hulling + 'source1' + hulling
-        # new_chain_string = 'original' + hulling
-        new_chain_string += ',blend, pause'
+            # last = ['source4, .resize' + hulling]
+            # last = ['source4, .resize, .resize, .detect green, .mega gauss, .mega gauss, .otsu, .cnt, hull']
+            # new_chain_string = ''.join(chain_list + last)
+            return new_chain_string
+
+        def blender_cube():
+            return all_sources_hulls() + ',blend, pause'
+
+
+        def detect_green():
+            return 'original, resize, detect green'
+
+
+        #
 
         # new_chain_string = 'original, .resize, detect red'
         # new_chain_string = 'original, source1, source2, source3'
         # new_chain_string = 'original, source1, source2'
 
+        new_chain_string = all_sources_hulls()
+        new_chain_string = blender_cube()
+        # new_chain_string = detect_green()
 
         # Load the chain
         available_steps_dict = self.chain_control.get_available_steps()

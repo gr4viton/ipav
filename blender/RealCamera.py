@@ -161,7 +161,7 @@ class RealCamera():
     def get_contour_projection_object(self):
             rcam_eul = self.eul
             rcam_pos = self.pos
-            print('%'*42, rcam_pos)
+            # print('%'*42, rcam_pos)
             rcam_rot = self.rot
 
             rcam_sca = self.size
@@ -182,16 +182,17 @@ class RealCamera():
             eye_center = [(h/2, v/2, focal)]
 
             print(eye_center)
-            # eye_center = [(1,1,3)]
 
             hull = self.hull
-            print(hull)
 
+            # map to 3d coordinates
             hull_xyz = [(x,y,0) for (x,y) in hull]
 
+            # shift origin to eye_center
             verts = eye_center + hull_xyz
         #    print('verts=\n', '\n'.join([str(v) for v in verts]) )
 
+            # generate faces from vertexes
             start_index = 1
             hull_max_index = len(hull_xyz) + start_index -1
 
@@ -204,6 +205,7 @@ class RealCamera():
 
             faces = faces_eye + faces_canvas
 
+            # create mesh object from faces and vertices
             mesh_data = bpy.data.meshes.new("hull_mesh")
             mesh_data.from_pydata(verts, [], faces)
             mesh_data.update()
