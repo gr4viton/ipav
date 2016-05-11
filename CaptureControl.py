@@ -20,7 +20,7 @@ class CaptureControl():
 
         # self.init_cap_prop()
 
-        # ids = [0] # latest connection
+        # opened_ids = [0] # latest connection
         ids = [0]
         # 0 hd evolve
         # 1 webcam black5
@@ -31,9 +31,9 @@ class CaptureControl():
         # RED-round = 2000
 
 
-        # ids = [0,1,2,3,4]
-        ids = [0,1,2,3]
-        # ids = [0,1]
+        # opened_ids = [0,1,2,3,4]
+        # opened_ids = [0,1,2,3]
+        ids = [0,1]
 
         [self.streams.append(ImageStreamControl(id)) for id in ids]
 

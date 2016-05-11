@@ -69,7 +69,7 @@ class ChangeChainWidget(Popup):
     def create_available_step_widgets(self, available_steps_dict, whatever=None):
         available_steps_list = [key for key in available_steps_dict.keys()]
 
-        # sort the list by ids
+        # sort the list by opened_ids
 
         sorted_available_steps_list = \
             sorted(available_steps_list,

@@ -2,26 +2,31 @@ import cv2
 import win32com.client
 import findHomeography as fh
 
+import os
+import datetime as dt
+import time
 
-try_ids = [0,1,2,3]
-caps = []
-ids = []
+captures = []
+opened_ids = []
 
-def open_all():
-    for id in try_ids :
-        cap = cv2.VideoCapture()
-        cap.open(id)
-        if cap.isOpened():
-            print('Source[{}] Opened'.format(id))
-            caps.append(cap)
-            ids.append(id)
+def open_all(try_ids):
+    for id in try_ids:
+        if id not in opened_ids:
+            cap = cv2.VideoCapture()
+            cap.open(id)
+            if cap.isOpened():
+                print('Source[{}] Opened'.format(id))
+                captures.append(cap)
+                opened_ids.append(id)
+            else:
+                print('Source[{}] Cannot open'.format(id))
+                cap.release()
         else:
-            print('Source[{}] Cannot open'.format(id))
-            cap.release()
+            print('Source[{}] Already opened'.format(id))
 
 def image_all():
     whole = None
-    for cap in caps:
+    for cap in captures:
         ret, im = cap.read()
         cv2.imshow('im', im)
         if whole is None:
@@ -31,8 +36,10 @@ def image_all():
     cv2.imshow('whole image', whole)
 
 
-def close_all():
-    for (cap, id) in zip(caps, ids):
+def close_all(only_this=[]):
+    if only_this == []:
+        only_this = opened_ids
+    for (cap, id) in zip(captures, only_this):
         cap.release()
         print('Source[{}] Released'.format(id))
 
@@ -65,7 +72,7 @@ def print_usb_info():
 
 
     wmi = win32com.client.GetObject("winmgmts:")
-    print('_'*42,'device ids:')
+    print('_'*42,'device opened_ids:')
 
     for usb in wmi.InstancesOf("Win32_USBHub"):
         # print(usb.DeviceID)
@@ -92,13 +99,80 @@ def print_usb_info():
     #
     #     print('Manufacturer: ' + str(usb.Manufacturer))
 
+def cap_show(cap):
+    ret, im = cap.read()
+
+    txt = 'Source[{}] image'.format(id)
+    cv2.imshow(txt, im)
+    return im
+
+def save_image(im):
+
+    format_str = "%Y-%m-%d %H_%M_%S"
+    i = dt.datetime.now().strftime(format_str)
+    path = os.path.abspath(''.join([r'D:\DEV\PYTHON\pyCV\calibration\_pics\\', str(i), ' image.png']))
+    print('path =', path)
+    cv2.imwrite(path,im)
 
 if __name__ == '__main__':
     print_usb_info()
 
-    # open_all()
+    try_ids = [0,1,2,3]
+    try_ids = [1]
+    open_all(try_ids)
     # image_all()
-    # close_all()
+    id = try_ids[0]
+    # captures = []
+    # cams = [id for id in try_ids]
+
+    while(True):
+        # print(captures)
+        index = opened_ids.index(id)
+        cap = captures[index]
+        if cap is not None:
+            im = cap_show(cap)
+        key = cv2.waitKey(1) & 0xFF
+
+        if int(key) == 255:
+            # print(key)
+            continue
+        if key == ord('q'):
+            break
+        elif key == ord('b'):
+            print('it')
+        else:
+            key_int = int(key) - 48
+            print(opened_ids, key_int)
+            if key_int in opened_ids:
+                print('Selecting source[{}] '.format(key_int))
+                id = key_int
+            else:
+                open_all([key_int])
+                # if 0 < key_int and key_int < len(captures) :
+                if key_int in captures:
+                    cap = captures[captures.index(key_int)]
+                    ret, im = cap.read()
+                    print(im.shape)
+                    close_all([cap])
+                    if im is not None:
+                        print('Choosing source[{}] '.format(key_int))
+                        id = key_int
+                    else:
+                        print('Source[{}] not opened'.format(key_int))
+            # if key in function_keys
+            if key == ord('s'):
+                save_image(im)
+            if key == ord('a'):
+                for q in range(4,0,-1):
+                    print('Taking 20 screenshots in {}'.format(q))
+                    time.sleep(1)
+                for q in range(20):
+                    key = cv2.waitKey(1)
+                    im = cap_show(cap)
+                    save_image(im)
+                    time.sleep(1)
+
+    close_all()
     # while(True):
     #     if cv2.waitKey(1) & 0xFF == ord('q'):
     #         break
