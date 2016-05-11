@@ -1,6 +1,8 @@
 from thread_controls import ImageStreamControl #, ChainControl, Chain
 import cv2
 
+from camera_distinguish import print_usb_info
+
 def init_cap_prop():
     prefix = 'CAP_PROP_'
     length = len(prefix)
@@ -80,6 +82,8 @@ class CaptureControl():
                 stream.print_all_properties()
                 stream.set_properties()
                 # stream.print_all_properties()
+
+        print_usb_info()
 
 
     def on_stop(self):

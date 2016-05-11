@@ -1,5 +1,7 @@
 import cv2
-import usb.core
+import win32com.client
+import findHomeography as fh
+
 
 try_ids = [0,1,2,3]
 caps = []
@@ -17,8 +19,16 @@ def open_all():
             print('Source[{}] Cannot open'.format(id))
             cap.release()
 
-
-
+def image_all():
+    whole = None
+    for cap in caps:
+        ret, im = cap.read()
+        cv2.imshow('im', im)
+        if whole is None:
+            whole = im
+        else:
+            fh.joinIm([whole, im],vertically=0)
+    cv2.imshow('whole image', whole)
 
 
 def close_all():
@@ -26,27 +36,7 @@ def close_all():
         cap.release()
         print('Source[{}] Released'.format(id))
 
-
-if __name__ == '__main__':
-
-    # all_devs = list(usb.core.find(find_all=True))
-    # # print(all_devs)
-    # [print(dev) for dev in all_devs]
-
-    usb.core.show_devices(verbose=True)
-
-    # find our device
-    # dev = usb.core.find(idVendor=0xfffe, idProduct=0x0001)
-    #
-    # # was it found?
-    # if dev is None:
-    #     raise ValueError('Device not found')
-
-    import win32com.client
-
-    wmi = win32com.client.GetObject("winmgmts:")
-    print('_'*42,'device ids:')
-
+def print_usb_info():
     hub = 'USB\ROOT_HUB'
     viahub = 'USB\VIA_ROOT_HUB'
     keyb = r'USB\VID_04D9&PID_1702\5&270230AB&0&2'
@@ -54,36 +44,48 @@ if __name__ == '__main__':
     prefixes = (hub, viahub, keyb, virtual_pointer)
 
     ports = {}
-    ports[r'\5&104B4E52&0&2'] = 'B1'
-    ports[r'\5&104B4E52&0&1'] = 'B2'
-    ports[r'\5&1E58346&0&4'] = 'B3'
-    ports[r'\5&1E58346&0&3'] = 'B4'
-    ports[r'\7&250AC7DE&0&1'] = 'B5'
-    ports[r'\7&250AC7DE&0&2'] = 'B6'
+    # generic cam ports ==
+    ports[r'\5&104B4E52&0&2'] = 'B1 generic'
+    ports[r'\5&104B4E52&0&1'] = 'B2 generic'
+    ports[r'\5&1E58346&0&4'] = 'B3 generic'
+    ports[r'\5&1E58346&0&3'] = 'B4 generic'
+    ports[r'\7&250AC7DE&0&1'] = 'B5 generic'
+    ports[r'\7&250AC7DE&0&2'] = 'B6 generic'
 
-    ports[r'\5&104B4E52&0&5'] = 'F1'
-    ports[r'\5&106F75EA&0&1'] = 'F2'
+    ports[r'\5&104B4E52&0&5'] = 'F1 generic'
+    ports[r'\5&106F75EA&0&1'] = 'F2 generic'
+    # round cam ports ==
+    ports[r'\B91FC2E2'] = 'F1 round'
 
-    cam = r'USB\VID_1908&PID_2311'
-    cams = [cam]
+    cam = r'USB\VID_1908&PID_2311' # generic camera = clips, black, gray
+    round = r'USB\VID_046D&PID_0992'
+    cams = [cam, round]
     lencam = len(cam)
+
+
+
+    wmi = win32com.client.GetObject("winmgmts:")
+    print('_'*42,'device ids:')
 
     for usb in wmi.InstancesOf("Win32_USBHub"):
         # print(usb.DeviceID)
         id = str(usb.DeviceID)
-
+        # print(type(usb))
+        # product = str(usb.DeviceID)
+        # usb.
+        # print('DeviceID: {}  Product: {}'.format(id,product) )
         # if any(ext in url_string for ext in extensionsToCheck):
         if not id.startswith(prefixes):
             if id.startswith(tuple(cams)):
                 port = id[lencam:]
                 if port in ports.keys():
 
-                    print('Cam found on {} '.format(ports[port]))
+                    print('>>> {} '.format(ports[port]))
 
                 else:
-                    print('Cam found elsewhere = {} '.format(port)  )
+                    print('>>> Cam found elsewhere = {} '.format(port)  )
             else:
-                print('DeviceID: ' + id)
+                print('>>> DeviceID: ' + id)
 
     # print('_'*42,'manufacturer:')
     # for usb in wmi.InstancesOf ("Win32_UsbController"):
@@ -91,10 +93,148 @@ if __name__ == '__main__':
     #     print('Manufacturer: ' + str(usb.Manufacturer))
 
 
-ports = {}
-port = 'USB\ROOT_HUB\4&DAD28DC&0'
+if __name__ == '__main__':
+    print_usb_info()
+
+    # open_all()
+    # image_all()
+    # close_all()
+    # while(True):
+    #     if cv2.waitKey(1) & 0xFF == ord('q'):
+    #         break
+round_ports = '''
+USB\VID_046D&PID_0992\B91FC2E2 = F1
+USB\VID_046D&PID_0992\B91FC2E2 = F2
+
+on B5:
+DeviceID: USB\VIA_ROOT_HUB\5&2564895&0
+DeviceID: USB\VID_046D&PID_0992\B91FC2E2
+
+on B6:
+DeviceID: USB\VIA_ROOT_HUB\5&2564895&0
+DeviceID: USB\VID_046D&PID_0992\B91FC2E2
+'''
+
+order = '''
+>>> B5 generic
+>>> B6 generic
+>>> F1 generic
+
+>>> B4 generic
+>>> B5 generic
+>>> B2 generic
+
+>>> B4 generic
+>>> B1 generic
+>>> B3 generic
 
 
+____________________________________________________
+>>> B1 generic
+>>> B3 generic
+>>> B2 generic
+
+>>> B4 generic
+>>> B3 generic
+>>> B2 generic
+
+>>> B4 generic
+>>> B1 generic
+>>> B2 generic
+____________________________________________________
+>>> B4 generic
+>>> B3 generic
+>>> B6 generic
+
+>>> B3 generic
+>>> B5 generic
+>>> B6 generic
+
+>>> B3 generic
+>>> B5 generic
+>>> B2 generic
+
+>>> B5 generic
+>>> B6 generic
+>>> B2 generic
+____________________________________________________
+>>> F2 generic
+>>> B4 generic
+>>> B2 generic
+
+>>> B4 generic
+>>> B2 generic
+>>> F1 generic
+
+>>> B1 generic
+>>> B3 generic
+>>> F1 generic
+
+>>> F2 generic
+>>> B1 generic
+>>> B3 generic
+
+>>> B5 generic
+>>> B6 generic
+>>> F1 generic
+____________________________________________________
+
+THIS IS IT!
+>>> F2 generic
+>>> B4 generic
+>>> B1 generic
+>>> B3 generic
+>>> B5 generic
+>>> B6 generic
+>>> B2 generic
+>>> F1 generic
+'''
+
+correlation_CVindex_portOrder = '''
+Black Gray Clips  Round
+Top Bottom Left
+A = F1
+B = F2
+1 = B1 ...
+____________________________________________________
+413 = CGB
+134 = GBC
+012 = BCG
+
+
+413 = GCB
+134 = CBG
+012 = BGC
+
+reconnect B
+413 = GCB
+134 = CBG
+012 = BGC
+
+not closed
+reconnect G
+413 = GCB
+134 = CBG
+012 = BGC
+
+not closed
+reconnect C
+413 = GCB
+134 = CBG
+012 = BGC
+
+closed
+reconnect C
+413 = GCB
+134 = CBG
+012 = BGC
+
+
+USE THIS
+B413 = RGCB
+134 = CBG
+0123 = RBGC
+'''
 
 black_data = '''
 bcdUSB:             0x0200
