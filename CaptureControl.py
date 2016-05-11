@@ -31,6 +31,7 @@ class CaptureControl():
 
         # ids = [0,1,2,3,4]
         ids = [0,1,2,3]
+        # ids = [0,1]
 
         [self.streams.append(ImageStreamControl(id)) for id in ids]
 

@@ -1,0 +1,61 @@
+
+clips add 1
+black add 2
+1) VIA USB eXtensible Host Controller
+USB#VIA_ROOT_HUB#5&2564895&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+VUSB#VID_2109&PID_3431#6&2df641f&0&1#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+B5 = [Loc111]
+B6 = [Loc112]
+
+3) Standartní rozšíøený hostitelský øadiè z PCI na USB
+USB#ROOT_HUB20#4&1a43899b&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+B1 = [Loc32]
+B2 = [Loc31]
+F1 = [Loc35]
+
+6) Standartní rozšíøený hostitelský øadiè z PCI na USB
+USB#ROOT_HUB20#4&1622ff0&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+F2 = [Loc51]
+
+7) Standartní rozšíøený hostitelský øadiè USB OpenHCD
+Root Hub: USB#ROOT_HUB#4&53fba88&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+B7 = [Loc71]
+B8 = [Loc72]
+
+8) Standartní rozšíøený hostitelský øadiè z PCI na USB
+USB#ROOT_HUB20#4&5ac72ff&0#{f18a0e88-c30c-11d0-8815-00a0c906bed8}
+B3 = [Loc84]
+B4 = [Loc83]
+
+
+
+
+
+
+all _connected
+DeviceID: USB\ROOT_HUB\4&DAD28DC&0
+DeviceID: USB\VID_1908&PID_2311\5&106F75EA&0&1
+DeviceID: USB\ROOT_HUB20\4&1622FF0&0
+DeviceID: USB\VID_04D9&PID_1702\5&270230AB&0&2
+DeviceID: USB\ROOT_HUB20\4&1A43899B&0
+DeviceID: USB\ROOT_HUB20\4&5AC72FF&0
+DeviceID: USB\VID_1908&PID_2311\5&104B4E52&0&2
+DeviceID: USB\VIA_ROOT_HUB\5&2564895&0
+DeviceID: USB\VID_1908&PID_2311\7&250AC7DE&0&1
+DeviceID: USB\VID_046D&PID_0992\B91FC2E2
+DeviceID: USB\ROOT_HUB\4&20EA87F5&0
+DeviceID: USB\ROOT_HUB\4&221CE9B1&0
+DeviceID: VUSB\VID_2109&PID_3431\6&2DF641F&0&1
+DeviceID: USB\ROOT_HUB\4&53FBA88&0
+
+clips connected
+DeviceID: USB\VID_04D9&PID_1702\5&270230AB&0&2
+DeviceID: USB\VIA_ROOT_HUB\5&2564895&0
+DeviceID: USB\VID_1908&PID_2311\5&1E58346&0&4
+DeviceID: VUSB\VID_2109&PID_3431\6&2DF641F&0&1
+
+
+none connected
+DeviceID: USB\VID_04D9&PID_1702\5&270230AB&0&2
+DeviceID: USB\VIA_ROOT_HUB\5&2564895&0
+DeviceID: VUSB\VID_2109&PID_3431\6&2DF641F&0&1
