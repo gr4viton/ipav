@@ -399,8 +399,9 @@ class ImageStreamControl():
 
         fourcc = self.capture.get(cv2.CAP_PROP_FOURCC)
         white = self.capture.get(cv2.CAP_PROP_WHITE_BALANCE_BLUE_U)
-        contrast = self.capture.get(cv2.CAP_PROP_CONTRAST)
-        contrast_def = 130
+        # contrast = self.capture.get(cv2.CAP_PROP_CONTRAST)
+        # contrast_def = 130
+
         already = ImageStreamControl.already_selected
         print(already)
 
@@ -426,12 +427,14 @@ class ImageStreamControl():
         # def is_defined(name):
         #     return any(name in w for w in already)
         # # print(fourcc, white, contrast)
-        if fourcc == 844715353.0:
-            # round, clips, gray, black
+        # print(white, fourcc)
+        if fourcc in [1196444237, 844715353.0]:
             if white != 2009211520.0:
                 name = rnd
                 # round -> potlacit blikani 50Hz
-            else:
+        if fourcc == 844715353.0:
+            # round, clips, gray, black
+            if white == 2009211520.0:
                 # clips, gray, black
                 if self.source_id == 1:
                     name = blk
@@ -439,7 +442,6 @@ class ImageStreamControl():
                     name = gra
                 elif self.source_id == 3:
                     name = cli
-
 
         elif fourcc == -466162819:
             # blue
@@ -454,6 +456,29 @@ class ImageStreamControl():
         # self.capture.get()
 
         self.name = name
+
+        folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
+
+        def load_matrix(folder,file):
+            path = os.path.join(folder, name, file)
+            try:
+                mat = np.loadtxt(path)
+            except:
+                mat = None
+            return np.array(mat)
+
+        mtx = load_matrix(folder, 'Intrinsic.txt')
+        dist = load_matrix(folder, 'Distortion.txt')
+        # print('Intrinsic: {}\nDistortion: {}'.format(mtx,dist))
+
+        self.intrinsic = mtx
+        self.distortion = dist
+
+        h0 = self.capture.get(cv2.CAP_PROP_FRAME_HEIGHT)
+        w0 = self.capture.get(cv2.CAP_PROP_FRAME_WIDTH)
+        self.original_resolution = (h0, w0)
+        # self.focal = (self.intrinsic[0][0] + self.intrinsic[1][1]) / 2
+        # print(self.focal)
         pass
 
     def open_capture(self):

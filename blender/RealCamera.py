@@ -63,11 +63,33 @@ class RealCamera():
         self.size = Vector(size)
         self.rcam = rcam_obj
 
-        self.init_source_name()
+        self.init_source_cam()
 
-    def init_source_name(self):
+    def init_source_cam(self):
         self.source_name = self.name.split(self.source_name_delimiter )[1]
         print(self.source_name)
+        name = self.source_name
+        folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
+
+        def load_matrix(folder,file):
+            path = os.path.join(folder, name, file)
+            mat = np.loadtxt(path)
+            return np.array(mat)
+
+        mtx = load_matrix(folder, 'Intrinsic.txt')
+        dist = load_matrix(folder, 'Distortion.txt')
+
+        self.intrinsic = mtx
+        self.distortion = dist
+
+        self.alpha = self.intrinsic[0][0]
+        self.beta = self.intrinsic[1][1]
+        self.focal = (self.alpha + self.beta) / 2
+        self.u0 = self.intrinsic[0][2]
+        self.v0 = self.intrinsic[1][2]
+
+        self.h0 = self.w0 = None
+
 
     def init_rot(self, real_point, pixel):
         """
@@ -177,14 +199,30 @@ class RealCamera():
             # focal = 300/x
             # h, v, focal = rcam_sca
             # eye_center = [(h/2, v/2, focal*80)]
-            h, v = self.resolution
-            focal = self.focal
-            eye_center = [(h/2, v/2, focal)]
 
-            print(eye_center)
+
+            # h, v = self.resolution
+            # focal = self.focal
+            # eye_center = [(h/2, v/2, focal)]
+
+            # self.u0, self.v0
+
+            h1 = self.resolution[0]
+            w1 = self.resolution[1]
+
+            h0 = self.h0
+            w0 = self.w0
+            u0 = self.u0
+            v0 = self.v0
+            u1 = h1/h0 * u0
+            v1 = w1/w1 * v0
+
+            eye_center = [(u1, v1, self.focal)]
+
+            print('eye_center', eye_center)
 
             hull = self.hull
-
+            print('%%'*42, self.hull)
             # map to 3d coordinates
             hull_xyz = [(x,y,0) for (x,y) in hull]
 
@@ -196,14 +234,14 @@ class RealCamera():
             start_index = 1
             hull_max_index = len(hull_xyz) + start_index -1
 
-            faces_eye = [ (x, x+1, 0) for x in range(start_index, hull_max_index)]
-            faces_eye += [(hull_max_index, start_index, 0)]
+            faces_lateral = [ (x, x+1, 0) for x in range(start_index, hull_max_index)]
+            faces_lateral += [(hull_max_index, start_index, 0)]
 
-            faces_canvas = [ (x+1, x, start_index) for x in range(start_index+1, hull_max_index)]
+            faces_canvas = [ (start_index, x, x+1) for x in range(start_index+1, hull_max_index)]
         #    print('faces_eye[',len(faces_eye),']=',faces_eye)
         #    print('faces_canvas[',len(faces_canvas),']=',faces_canvas)
 
-            faces = faces_eye + faces_canvas
+            faces = faces_lateral + faces_canvas
 
             # create mesh object from faces and vertices
             mesh_data = bpy.data.meshes.new("hull_mesh")
@@ -212,6 +250,7 @@ class RealCamera():
 
             hull_name = "hull_" + self.name
             hull = bpy.data.objects.new(hull_name, mesh_data)
+            # hull.scale([5,5,5])
 
             scene = bpy.context.scene
             scene.objects.link(hull)

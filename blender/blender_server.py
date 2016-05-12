@@ -156,7 +156,8 @@ class BlenderServer():
                 # [name] + [id] + resol + focal
                 rcam.id = self.stream_info[1]
                 rcam.resolution = [self.stream_info[2], self.stream_info[3]]
-                rcam.focal = self.stream_info[-1]
+                rcam.w0 = self.stream_info[-1]
+                rcam.h0 = self.stream_info[-2]
 
                 print('Setting rcam[{}] stream_info to [{}]'.format( source_name, self.stream_info))
                 # print(rcam.resolution)

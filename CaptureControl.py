@@ -1,7 +1,7 @@
 from thread_controls import ImageStreamControl #, ChainControl, Chain
 import cv2
 
-from camera_distinguish import print_usb_info
+from camera_distinguish import Distinguish
 
 def init_cap_prop():
     prefix = 'CAP_PROP_'
@@ -32,8 +32,8 @@ class CaptureControl():
 
 
         # opened_ids = [0,1,2,3,4]
-        # opened_ids = [0,1,2,3]
-        ids = [0,1]
+        ids = [0,1,2,3]
+        # ids = [0,1]
 
         [self.streams.append(ImageStreamControl(id)) for id in ids]
 
@@ -83,7 +83,7 @@ class CaptureControl():
                 stream.set_properties()
                 # stream.print_all_properties()
 
-        print_usb_info()
+        # Distinguish.print_usb_info()
 
 
     def on_stop(self):

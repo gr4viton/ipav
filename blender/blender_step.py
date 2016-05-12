@@ -171,8 +171,9 @@ class blender_module():
                 hull_xy = self.create_projection_xy_list(hull)
 
                 resol = list(stream.frame.shape)
-                focal = [stream.focal]
-                stream_info = [name] + [id] + resol + focal
+                # focal = [stream.focal]
+                h0, w0 = stream.original_resolution
+                stream_info = [name] + [id] + resol + [h0] + [w0]
 
                 print(stream_info)
                 self.send_data_dict({'stream_info': stream_info})
