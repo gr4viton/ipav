@@ -106,7 +106,8 @@ class Distinguish():
 
 
     def im_show(self, im):
-        txt = 'Source[{}] = {} = image'.format(self.id, self.names[self.id])
+        # txt = 'Source[{}] = {} = image'.format(self.id, self.names[self.id])
+        txt = ''
         cv2.imshow(txt, im)
         return im
 

@@ -247,7 +247,8 @@ class RealCamera():
             faces_lateral = [ (x, x+1, 0) for x in range(start_index, hull_max_index)]
             faces_lateral += [(hull_max_index, start_index, 0)]
 
-            faces_canvas = [ (start_index, x, x+1) for x in range(start_index+1, hull_max_index)]
+            # faces_canvas = [ (start_index, x, x+1) for x in range(start_index+1, hull_max_index)]
+            faces_canvas = [ (x+1,x,start_index ) for x in range(start_index+1, hull_max_index)]
         #    print('faces_eye[',len(faces_eye),']=',faces_eye)
         #    print('faces_canvas[',len(faces_canvas),']=',faces_canvas)
 
