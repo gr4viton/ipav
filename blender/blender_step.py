@@ -33,7 +33,12 @@ class blender_module():
     # PORT = 8082
     # PORT = 8083
     # PORT = 8089
-    PORT = 8081
+    # PORT = 8081
+
+    _, num = divmod(int(time.time()/3), 1000)
+    print(num)
+    PORT = 8081 + num
+
     HOST = "localhost"
     param_dict = {}
     param_exit = 'exit()'

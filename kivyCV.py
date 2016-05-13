@@ -199,8 +199,8 @@ class Multicopter(GridLayout):
 
         new_chain_string = all_sources_hulls()
         new_chain_string = blender_cube()
-        new_chain_string = source_ids([0,1,2,3])
-        new_chain_string = 'source0, .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull, blender, pause'
+        # new_chain_string = source_ids([0,1,2,3])
+        # new_chain_string = 'source0, .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull, blender, pause'
 
         # new_chain_string = detect_green()
 

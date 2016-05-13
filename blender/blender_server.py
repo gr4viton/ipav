@@ -9,7 +9,9 @@ import pickle
 import bpy
 import os
 import datetime as dt
+import time
 
+import numpy as np
 
 
 sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
@@ -488,7 +490,12 @@ if __name__ == "__main__":
     # message = lambda x: print(x, flush=True, end="")
     # message('I am flushing out now...')
 
-    PORT = 8083
+    _, num = divmod(int(time.time()/3), 1000)
+    print(num)
+    # rnd = np.random.random() * num
+    # print(rnd)
+
+    PORT = 8081 + num
     HOST = 'localhost'
 
     delimiter = '--'
