@@ -160,6 +160,7 @@ class blender_module():
         start = time.time()
 
         hulls = data[dd.hulls]
+        print('hulls.keys =', [key for key in hulls.keys()])
         # hulls_xy = [self.create_projection_xy_list(hull) for hull in hulls]
 
         # focal = data[dd.stream].focal
@@ -170,17 +171,19 @@ class blender_module():
             id = stream.source_id
             name = stream.name
             if hulls.get(name, None):
-                print('Creating stream [{}] prjs data'.format(stream.name))
+                print('Creating stream [{}] prjs data'.format(name))
                 hull = hulls[name]
 
                 hull_xy = self.create_projection_xy_list(hull)
 
-                resol = list(stream.frame.shape)
+                # resol = list(stream.frame.shape)
+                resol = list(data[dd.im].shape)
                 # focal = [stream.focal]
                 h0, w0 = stream.original_resolution
                 stream_info = [name] + [id] + resol + [h0] + [w0]
 
-                print(stream_info)
+                print('Stream[{}] stream_info = {}'.format(name, stream_info))
+                print('Stream[{}] len(hull_xy)/2 = {}'.format(name, len(hull_xy)/2))
                 self.send_data_dict({'stream_info': stream_info})
                 self.send_data_dict({'prjs': hull_xy})
 

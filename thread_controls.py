@@ -456,6 +456,9 @@ class ImageStreamControl():
         # self.capture.get()
 
         self.name = name
+        if name == rnd:
+
+            self.set_property(cv2.CAP_PROP_SETTINGS, 1)
 
         folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
 

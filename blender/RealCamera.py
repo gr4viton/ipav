@@ -69,26 +69,35 @@ class RealCamera():
         self.source_name = self.name.split(self.source_name_delimiter )[1]
         print(self.source_name)
         name = self.source_name
-        folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
+        # folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
+        folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics\_all'
 
         def load_matrix(folder,file):
-            path = os.path.join(folder, name, file)
+            # path = os.path.join(folder, name, file)
+            path = os.path.join(folder, file)
+            print(path)
             mat = np.loadtxt(path)
             return np.array(mat)
 
-        mtx = load_matrix(folder, 'Intrinsic.txt')
-        dist = load_matrix(folder, 'Distortion.txt')
+        mtx = load_matrix(folder, name+'_Intrinsic.txt')
+        dist = load_matrix(folder, name+'_Distortion.txt')
+
 
         self.intrinsic = mtx
         self.distortion = dist
 
         self.alpha = self.intrinsic[0][0]
         self.beta = self.intrinsic[1][1]
-        self.focal = (self.alpha + self.beta) / 2
+        self.focal = (self.alpha + self.beta) / 2 /2
+
         self.u0 = self.intrinsic[0][2]
         self.v0 = self.intrinsic[1][2]
 
         self.h0 = self.w0 = None
+
+        #
+        # self.u0 = 640/2
+        # self.v0 = 480/2
 
 
     def init_rot(self, real_point, pixel):
@@ -212,14 +221,15 @@ class RealCamera():
 
             h0 = self.h0
             w0 = self.w0
+
             u0 = self.u0
             v0 = self.v0
             u1 = h1/h0 * u0
-            v1 = w1/w1 * v0
+            v1 = w1/w0 * v0
 
             eye_center = [(u1, v1, self.focal)]
 
-            print('eye_center', eye_center)
+            print('Rcam[{}].eye_center={}'.format(self.source_name, eye_center))
 
             hull = self.hull
             print('%%'*42, self.hull)
