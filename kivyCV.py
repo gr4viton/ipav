@@ -170,10 +170,12 @@ class Multicopter(GridLayout):
             return a
 
         def all_sources_hulls():
-            hulling = ', .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull,'
+            # hulling = ', .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull,' # gauss on color is useless
+            hulling = ', .resize, .detect green, .mega gauss, .otsu, .cnt, hull,'
             rng = range(3)
             rng = [0,2,3]
             rng = [0,1,2,3]
+            rng = [0,1,2,3,4,5]
             # rng = [0,2,3,4]
             chain_list = ['source{}'.format(i) + hulling for i in rng]
             new_chain_string = ''.join(chain_list)
@@ -198,7 +200,8 @@ class Multicopter(GridLayout):
             return ','.join(['source{}'.format(id) for id in ids])
 
         new_chain_string = all_sources_hulls()
-        new_chain_string = blender_cube()
+        # new_chain_string = 'source5'
+        # new_chain_string = blender_cube()
         # new_chain_string = source_ids([0,1,2,3])
         # new_chain_string = 'source0, .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull, blender, pause'
 

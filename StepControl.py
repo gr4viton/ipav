@@ -990,6 +990,7 @@ class StepControl():
         self.add_available_step('source2', lambda d: make_set_source(d, source_id=2))
         self.add_available_step('source3', lambda d: make_set_source(d, source_id=3))
         self.add_available_step('source4', lambda d: make_set_source(d, source_id=4))
+        self.add_available_step('source5', lambda d: make_set_source(d, source_id=5))
         self.add_synonyms('source, set source, source0')
 
         self.add_available_step('next source', make_set_next_source)
