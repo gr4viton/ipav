@@ -130,13 +130,19 @@ class StepControl():
         # [self.steps.append(Step(step_name, self.available_step_fcn[step_name])) for step_name in self.chain.step_names]
 
         hide_char = '.'
+        info_char = 'i'
         for step_name in self.chain.step_names:
             narrowed = False
             # print(step_name)
             if step_name[0] == hide_char:
                 step_name = step_name[1:]
                 narrowed = True
-            self.steps.append(Step(step_name, self.available_steps[step_name].function, narrowed))
+
+            available_step = self.available_steps.get(step_name, None)
+            if not available_step:
+                break
+            new_step = Step(step_name, available_step .function, narrowed)
+            self.steps.append(new_step)
             # print(self.steps[-1].narrow)
 
 

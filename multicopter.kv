@@ -353,20 +353,77 @@
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #<ChainStringTextInput>:
 
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#GridLayoutFramed:
+<LabelLeft@Label>:
+    halign: 'left'
+    text_size: self.size
+
+
+<HistoryTextInput@TextInput>:
+    halign: 'left'
+    readonly: 'True'
+    multiline: 'False'
+    height: self.minimum_height - 0
+    size_hint_y: None
+#    height: font_size
+
+<ChainHistory>:
+    history_item: history_item
+    cols:2
+#    height: self.HistoryTextInput.minimum_height - 0
+    size_hint_y: None
+    height: history_item.height
+    HistoryTextInput
+        id: history_item
+        text: root.text
+
+    Button
+#        size_hint: None,None
+        size_hint_x: 0.05
+#        width: self.height
+        text: '>'
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <ChangeChainWidget>:
     layout_available_steps: layout_available_steps
     chain_string_input: chain_string_input
+    chain_history_layout: chain_history_layout
 
     title: 'Change chain steps'
 #    auto_dismiss: 'False'
-    size_hint: (1, 0.7)
+#    size_hint: (1, 1)
     GridLayout:
         cols: 1
-        Label:
+        GridLayout
+            cols:1
+            size_hint_y: 5
+            GridLayout:
+                cols:2
+                size_hint_y: 0.2
+                LabelLeft
+                    text: 'Chain history'
+                Button
+                    size_hint_x: 0.1
+                    text: 'Save history'
+                    on_press: root.save_chain_history()
+            ScrollView
+#                StackLayout:
+#
+#                    orientation: 'lr-tb'
+                StackLayout
+
+#                    size_hint_y: None
+                    orientation: 'lr-tb'
+#                    orientation: 'vertical'
+                    id: chain_history_layout
+        LabelLeft
+            size_hint_y: 1
             text: 'Insert chain step names separated by commas'
-            halign: 'left'
+
         TextInput:
+            size_hint_y: 5
             id: chain_string_input
 #            text: 'original, gray'
             text: root.chain_string

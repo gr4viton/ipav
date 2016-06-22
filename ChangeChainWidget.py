@@ -19,9 +19,9 @@ from kivy.uix.togglebutton import ToggleButton
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
-
+from kivy.uix.boxlayout import BoxLayout
 # from kivy.modules import inspector
-
+import os.path
 from StepData import *
 
 class ChangeChainWidget(Popup):
@@ -29,8 +29,12 @@ class ChangeChainWidget(Popup):
     chain_string = StringProperty('')
     chain_string_input = ObjectProperty()
     layout_available_steps = ObjectProperty()
+    chain_history_layout = ObjectProperty()
 
     chain_delimiter = ','
+    history_file_path = 'chain_history.txt'
+    default_chain_history = 'original'
+    chain_history = None
     def __init__(self, new_chain_string, update_chain_string_from_popup,
                  available_steps_dict,  **kwargs):
 
@@ -41,6 +45,8 @@ class ChangeChainWidget(Popup):
 
         self.create_available_step_widgets(available_steps_dict)
         self.where = 'end'
+
+        self.load_chain_history()
 
     # def on_dismiss(self, **kwargs):
     #     print('dismissing')
@@ -89,8 +95,49 @@ class ChangeChainWidget(Popup):
     def update_chain_string(self, whatever=None):
         print(whatever)
         self.update_chain_string_from_popup()
+        self.update_chain_history(self.chain_string_input.text)
 
     def on_text_change(self, instance, value):
         # print('The widget', instance, 'have:', value)
         pass
 
+    def load_chain_history(self):
+        if os.path.isfile(self.history_file_path):
+            with open(self.history_file_path, 'r') as f:
+                self.chain_history_text = f.read()
+            self.chain_history = self.chain_history_text.split('\n')
+            for chain_string in self.chain_history:
+                self.chain_history_layout.add_widget(ChainHistory(text=chain_string))
+        else:
+            with open(self.history_file_path, 'w+') as f:
+                f.write(self.default_chain_history)
+
+
+# save history!!
+# after click load of chain!
+
+    def save_chain_history(self):
+        if os.path.isfile(self.history_file_path):
+            with open(self.history_file_path, 'w+') as f:
+                f.write(self.chain_history_text)
+        # else:
+        #     with open(self.history_file_path, 'w+') as f:
+        #         f.write(self.default_chain_history)
+        #         f.write(self.chain_history_text)
+
+    def update_chain_history(self, chain_string, force_add=False):
+        print('Chain history = ', self.chain_history)
+        print('last = ', self.chain_history[-1])
+        if chain_string is not self.chain_history[-1]:
+            self.chain_history.append(chain_string)
+            self.chain_history_layout.add_widget(ChainHistory(text=chain_string))
+
+
+
+class ChainHistory(GridLayout):
+    text = StringProperty()
+    def __init__(self, text, **kwargs):
+        self.text = text
+        super(ChainHistory, self).__init__(**kwargs)
+
+    pass
