@@ -74,8 +74,6 @@ class Distinguish():
         cams = [cam, round]
         lencam = len(cam)
 
-
-
         wmi = win32com.client.GetObject("winmgmts:")
         print('_'*42,'device opened_ids:')
 
@@ -116,8 +114,6 @@ class Distinguish():
         ret, im  = cap.read()
         self.im_show(im)
         return im
-
-
 
     def save_image(self, im):
 
@@ -246,6 +242,7 @@ class Distinguish():
 
                 elif key == ord('u'):
                     self.undistort = False
+
                 elif key == ord('a'):
                     for q in range(4,0,-1):
                         print('Taking 20 screenshots in {}'.format(q))
@@ -270,6 +267,7 @@ class Distinguish():
 
 if __name__ == '__main__':
     d = Distinguish()
+
 round_ports = '''
 USB\VID_046D&PID_0992\B91FC2E2 = F1
 USB\VID_046D&PID_0992\B91FC2E2 = F2

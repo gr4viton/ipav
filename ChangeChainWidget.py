@@ -86,7 +86,6 @@ class ChangeChainWidget(Popup):
         # popup = Popup(title='Available step names', content=text_input)
         # popup.open()
 
-
     def update_chain_string(self, whatever=None):
         print(whatever)
         self.update_chain_string_from_popup()

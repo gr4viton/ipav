@@ -29,6 +29,7 @@ class Step():
     def run(self, data_prev):
         self.data_prev = data_prev.copy()
 
+
         self.user_input = False # e.g. from snippet or gui
         if self.user_input == True:
             self.data_prev[dd.kernel] = (42,42) # from user
@@ -37,7 +38,9 @@ class Step():
             self.data_prev[dd.take_all_def] = True
 
         start = time.time()
+        self.data_prev[dd.info_text] = ''
         self.data_post = self.function(self.data_prev)
+
         end = time.time()
         self.add_exec_times(end-start)
 
@@ -54,7 +57,7 @@ class Step():
             info += str(im.shape) + 'px'
             info += ', ' + str(im.dtype)
             if im.dtype == np.float:
-                info += ' (red=negative, green=positive)'
+                info += ' (R=negative, G=positive)'
 
         if data[dd.info] == True:
             info += '\n' + data[dd.info_text]

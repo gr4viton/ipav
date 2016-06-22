@@ -456,9 +456,8 @@ class ImageStreamControl():
         # self.capture.get()
 
         self.name = name
-        if name == rnd:
-
-            self.set_property(cv2.CAP_PROP_SETTINGS, 1)
+        # if name == rnd:
+        #     self.set_property(cv2.CAP_PROP_SETTINGS, 1) # open settings on rnd cam
 
         folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
 
@@ -490,6 +489,7 @@ class ImageStreamControl():
         if self.capture.isOpened() != True:
             print('Source[', self.source_id, '] Cannot open capture.')
             return False
+
         print('Source[{}] Opened capture.'.format(self.source_id))
         self.get_source_info()
         print('Source[{}] Renamed to {}.'.format(self.source_id, self.name))

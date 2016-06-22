@@ -111,6 +111,7 @@ class StepControl():
     def select_steps(self, current_chain):
         self.chain = current_chain
 
+        # legacy from findtag search in image
         if current_chain.tag_search == True:
             def make_find_tags(im):
                 markuped_scene, seen_tags = findTagsInScene(im.copy(), self.chain)
@@ -209,7 +210,7 @@ class StepControl():
             # data[dd.resolution] = data[dd.im].shape
             stream = data[dd.stream]
             txt = '|S[{}]={}|'.format(stream.source_id, stream.name)
-            info_text(data,txt)
+            info_text(data, txt)
             return data
 
 
@@ -755,6 +756,8 @@ class StepControl():
 
             im_out = mask
             data[dd.im] = im_out
+            txt = color_name + ' HSV<' + str(color)  + '>'
+            info_text(data,txt)
             return data
 
         def get_spaced_colors(n):
