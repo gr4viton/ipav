@@ -58,3 +58,5 @@ class DataDictParameterNames(AutoNumber):
     stream = ()
     # res multiplier gui
     resolution_multiplier = ()
+    # change name
+    new_name = ()

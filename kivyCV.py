@@ -444,3 +444,10 @@ if __name__ == '__main__':
     # comment
 
 
+#todo create binding connection between stepwidget (gui) and step object (processing)
+    # stepwidget.py
+    # - to allow step function parameter modifications from gui (sliders)
+    #   -- need to do it.. how the slider works now?
+    # - and the other way around - step function changing widget name label
+    #   -- no need = periodic updating functions of gui - textinput info, exec time - add name
+    #   ==update_layout_steps

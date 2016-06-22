@@ -209,8 +209,9 @@ class StepControl():
         def make_nothing(data):
             # data[dd.resolution] = data[dd.im].shape
             stream = data[dd.stream]
-            txt = '|S[{}]={}|'.format(stream.source_id, stream.name)
-            info_text(data, txt)
+            txt = 'S[{}]={}'.format(stream.source_id, stream.name)
+            data[dd.new_name] = txt
+            # info_text(data, txt)
             return data
 
 
@@ -756,8 +757,10 @@ class StepControl():
 
             im_out = mask
             data[dd.im] = im_out
-            txt = color_name + ' HSV<' + str(color)  + '>'
-            info_text(data,txt)
+
+            data[dd.new_name] = 'detect ' + color_name
+            txt = 'HSV <' + str(color)  + '>'
+            info_text(data, txt)
             return data
 
         def get_spaced_colors(n):

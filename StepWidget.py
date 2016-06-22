@@ -103,6 +103,8 @@ class StepWidget(GridLayout):
                 return
             if self.informing:
                 self.update_info_label(step)
+            if step.new_name:
+                self.name = step.new_name
             if self.drawing: # called only if intended to draw
                 # do I need a copy?
                 im = step.data_post[dd.im].copy()
@@ -315,6 +317,10 @@ class StepWidgetControl():
 
         [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name, narrowed=step.narrowed)
          for (widget, step) in ziplist if step.data_post is not None]
+
+
+
+
 
     def update_layout_steps(self, step_control):
 

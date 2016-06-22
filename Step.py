@@ -9,6 +9,7 @@ class Step():
 
     def __init__(self, name, function, narrowed=False):
         self.name = name
+        self.new_name = '' # if changed in rename_stepwidget_label it changes stepwidget label
         self.function = function
         self.execution_time_len = 23
         self.execution_time = 0
@@ -25,6 +26,18 @@ class Step():
         self.id = Step.steps_count
         Step.steps_count +=1
 
+        self.last_widget_name_label = name
+
+    def rename_stepwidget_label(self, new_name):
+        if self.last_widget_name_label is not new_name:
+            self.name = new_name
+            self.new_name = new_name
+
+    def check_renaming(self):
+        new_name = self.data_post.get(dd.new_name, '')
+        if new_name:
+            self.rename_stepwidget_label(new_name)
+        self.data_post[dd.new_name] = ''
 
     def run(self, data_prev):
         self.data_prev = data_prev.copy()
@@ -37,11 +50,17 @@ class Step():
         else:
             self.data_prev[dd.take_all_def] = True
 
-        start = time.time()
         self.data_prev[dd.info_text] = ''
+        start = time.time()
         self.data_post = self.function(self.data_prev)
-
         end = time.time()
+
+        self.check_renaming()
+        # new_name = self.data_post.get(dd.new_name,'')
+        # if new_name:
+        #     self.rename_stepwidget_label(new_name)
+
+
         self.add_exec_times(end-start)
 
         return self.data_post
