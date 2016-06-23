@@ -151,23 +151,15 @@ class ChangeChainWidget(Popup):
             self.chain_history_layout.add_widget(
                 ChainHistory(text=chain_string, use_chain=self.use_chain))
 
-
-
 class UnicodeButton(Button, Fonter):
-    unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
-
-class ChainHistory(GridLayout, Fonter):
-    text = StringProperty()
     unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
     # unifont = str(Fonter.fonts_path) + 'Carlito-Bold'
     # unifont = str(Fonter.fonts_path) + 'DejaVuSans'
+
+class ChainHistory(GridLayout, Fonter):
+    text = StringProperty()
 
     def __init__(self, text, use_chain, **kwargs):
         self.text = text
         super(ChainHistory, self).__init__(**kwargs)
         self.use_chain = use_chain
-        # self.
-        print(self.unifont )
-            # = CoreLabel.get_system_fonts_dir()
-
-    # def use_chain(self):
