@@ -1,5 +1,5 @@
 #:kivy 1.9
-
+#from kivy.core.text import Label as CoreLabel
 
 <Multicopter>:
     cols: 2
@@ -356,34 +356,58 @@
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #GridLayoutFramed:
+<ButtonLeft>:
+    halign: 'left'
+#    size: self.text_size
+    text_size: self.size
+    padding: (5,5)
+    size_hint: (None,None)
+    height: 25
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <LabelLeft@Label>:
     halign: 'left'
     text_size: self.size
 
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<UnicodeButton>
+    font_name: root.unifont
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <HistoryTextInput@TextInput>:
     halign: 'left'
     readonly: 'True'
     multiline: 'False'
     height: self.minimum_height - 0
     size_hint_y: None
+    background_color: [0.5,0.5,0.5, 1]
 #    height: font_size
-
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <ChainHistory>:
     history_item: history_item
-    cols:2
+    cols:3
 #    height: self.HistoryTextInput.minimum_height - 0
     size_hint_y: None
     height: history_item.height
+
     HistoryTextInput
         id: history_item
         text: root.text
 
-    Button
+    UnicodeButton
 #        size_hint: None,None
-        size_hint_x: 0.05
+        size_hint_x: 0.025
+        text: '\u25B2' # black triangle pointing up
+        on_press: root.use_chain(root.text, use=False)
+
+    UnicodeButton
+#        size_hint: None,None
+        size_hint_x: 0.025
 #        width: self.height
-        text: '>'
+#        text: unichr(2764)
+
+#        text: '>'
+#        text: '\u22BC' # >>>
+        text: '\u2713\u25B6' # check
+        on_press: root.use_chain(root.text, use=True)
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <ChangeChainWidget>:
@@ -396,67 +420,9 @@
 #    size_hint: (1, 1)
     GridLayout:
         cols: 1
-        GridLayout
+        GridLayout:
             cols:1
             size_hint_y: 5
-            GridLayout:
-                cols:2
-                size_hint_y: 0.2
-                LabelLeft
-                    text: 'Chain history'
-                Button
-                    size_hint_x: 0.1
-                    text: 'Save history'
-                    on_press: root.save_chain_history()
-            ScrollView
-#                StackLayout:
-#
-#                    orientation: 'lr-tb'
-                StackLayout
-
-#                    size_hint_y: None
-                    orientation: 'lr-tb'
-#                    orientation: 'vertical'
-                    id: chain_history_layout
-        LabelLeft
-            size_hint_y: 1
-            text: 'Insert chain step names separated by commas'
-
-        TextInput:
-            size_hint_y: 5
-            id: chain_string_input
-#            text: 'original, gray'
-            text: root.chain_string
-#            on_enter: root.when_on_enter()
-            on_text_validate: root.update_chain_string()
-            on_text: root.on_text_change(self, self.text)
-            padding: 2,0,2,0
-            multiline: 'False'
-#            on_text: print(self.text)
-#            on_text: print(root.chain_string_text)
-
-#            valign: 'middle'
-#            text_size: self.si`ze
-
-
-        GridLayout:
-            cols:2
-            size_hint_y: 5
-            GridLayout:
-#            StackLayout:
-                cols: 1
-                size_hint_x: 0.3
-#                orientation: 'tb-lr'
-                Button:
-                    text: 'Dismiss'
-                    on_press: root.dismiss()
-#                Button:
-#                    text: 'Show available step names'
-#                    on_press: root.show_step_names()
-                Button:
-                    text: 'Use'
-                    on_press: root.update_chain_string()
-
 #                GridLayout:
 #                    cols: 1
 #                    Label:
@@ -487,8 +453,75 @@
 #                    cols: 3
 #                    id: layout_available_steps
                 StackLayout:
-                    orientation: 'lr-tb'
+#                    orientation: 'lr-tb'
+                    orientation: 'tb-lr'
                     id: layout_available_steps
+
+        LabelLeft
+            size_hint_y: 1
+            text: 'Insert chain step names separated by commas'
+
+        GridLayout:
+            cols:2
+            TextInput:
+                size_hint_y: 5
+                id: chain_string_input
+    #            text: 'original, gray'
+                text: root.chain_string
+    #            on_enter: root.when_on_enter()
+                on_text_validate: root.update_chain_string()
+                on_text: root.on_text_change(self, self.text)
+                padding: 2,0,2,0
+                multiline: 'False'
+
+            GridLayout:
+#            StackLayout:
+                cols: 1
+                size_hint_x: 0.025
+#                orientation: 'tb-lr'
+                UnicodeButton:
+                    text: '\u00D7'
+                    on_press: root.dismiss()
+#                Button:
+#                    text: 'Show available step names'
+#                    on_press: root.show_step_names()
+                UnicodeButton:
+                    text: '\u2713'
+                    on_press: root.update_chain_string()
+                UnicodeButton:
+                    text: '\u2713\u25B6'
+                    on_press: root.update_chain_string()
+
+#            on_text: print(self.text)
+#            on_text: print(root.chain_string_text)
+
+#            valign: 'middle'
+#            text_size: self.si`ze
+
+        GridLayout
+            cols:1
+            size_hint_y: 5
+            GridLayout:
+                cols:2
+                size_hint_y: 0.2
+                LabelLeft
+                    text: 'Chain history'
+                Button
+                    size_hint_x: 0.1
+                    text: 'Save history'
+                    on_press: root.save_chain_history()
+            ScrollView
+#                StackLayout:
+#
+#                    orientation: 'lr-tb'
+                StackLayout
+
+#                    size_hint_y: None
+                    orientation: 'lr-tb'
+                    orientation: 'tb-lr'
+#                    orientation: 'lr-bt'
+#                    orientation: 'vertical'
+                    id: chain_history_layout
 
 
 

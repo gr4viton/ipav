@@ -24,6 +24,18 @@ from kivy.uix.boxlayout import BoxLayout
 import os.path
 from StepData import *
 
+# from kivy.uix.unichr
+
+from kivy.core.text import Label as CoreLabel
+
+class Fonter():
+    fonts_paths = CoreLabel.get_system_fonts_dir()
+    # fonts_path = fonts_paths[1] + '\\'
+    fonts_path = fonts_paths[0] + '\\'
+
+class ButtonLeft(Button):
+    pass
+
 class ChangeChainWidget(Popup):
 
     chain_string = StringProperty('')
@@ -39,6 +51,8 @@ class ChangeChainWidget(Popup):
                  available_steps_dict,  **kwargs):
 
         super(ChangeChainWidget, self).__init__(**kwargs)
+        # a = unichr()
+
 
         self.chain_string = new_chain_string
         self.update_chain_string_from_popup = update_chain_string_from_popup
@@ -64,13 +78,11 @@ class ChangeChainWidget(Popup):
             # self.add_step_string(str(step_name))
             self.chain_string_input.text += self.chain_delimiter + ' ' + str(step_name)
 
-    def add_step_widget(self, step_name):
+    def add_step_button(self, step_name):
         self.layout_available_steps.add_widget(
-            Button(text=step_name,
-                   size_hint=(None,None),
-                   width=15*len(step_name),
-                   height= 25,
-                   on_press=lambda step_name: self.add_step(step_name=step_name.text)))
+            ButtonLeft(text = step_name,
+                       width = 12*len(step_name),
+                       on_press = lambda step_name: self.add_step(step_name=step_name.text)))
 
     def create_available_step_widgets(self, available_steps_dict, whatever=None):
         available_steps_list = [key for key in available_steps_dict.keys()]
@@ -81,7 +93,7 @@ class ChangeChainWidget(Popup):
             sorted(available_steps_list,
                    key=lambda step: available_steps_dict[step].id)
 
-        [self.add_step_widget( step_name
+        [self.add_step_button( step_name
             # '='.join([step_name, str(available_steps_dict[step_name].id)])
         ) for step_name in sorted_available_steps_list
          if available_steps_dict[step_name].origin == None]
@@ -97,6 +109,11 @@ class ChangeChainWidget(Popup):
         self.update_chain_string_from_popup()
         self.update_chain_history(self.chain_string_input.text)
 
+    def use_chain(self, new_chain, use=True):
+        self.chain_string_input.text = new_chain
+        if use:
+            self.update_chain_string()
+
     def on_text_change(self, instance, value):
         # print('The widget', instance, 'have:', value)
         pass
@@ -107,7 +124,8 @@ class ChangeChainWidget(Popup):
                 self.chain_history_text = f.read()
             self.chain_history = self.chain_history_text.split('\n')
             for chain_string in self.chain_history:
-                self.chain_history_layout.add_widget(ChainHistory(text=chain_string))
+                self.chain_history_layout.add_widget(
+                    ChainHistory(text=chain_string, use_chain=self.use_chain))
         else:
             with open(self.history_file_path, 'w+') as f:
                 f.write(self.default_chain_history)
@@ -118,8 +136,8 @@ class ChangeChainWidget(Popup):
 
     def save_chain_history(self):
         if os.path.isfile(self.history_file_path):
-            with open(self.history_file_path, 'w+') as f:
-                f.write(self.chain_history_text)
+            with open(self.history_file_path, 'w') as f:
+                f.write('\n'.join(self.chain_history))
         # else:
         #     with open(self.history_file_path, 'w+') as f:
         #         f.write(self.default_chain_history)
@@ -130,14 +148,26 @@ class ChangeChainWidget(Popup):
         print('last = ', self.chain_history[-1])
         if chain_string is not self.chain_history[-1]:
             self.chain_history.append(chain_string)
-            self.chain_history_layout.add_widget(ChainHistory(text=chain_string))
+            self.chain_history_layout.add_widget(
+                ChainHistory(text=chain_string, use_chain=self.use_chain))
 
 
 
-class ChainHistory(GridLayout):
+class UnicodeButton(Button, Fonter):
+    unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
+
+class ChainHistory(GridLayout, Fonter):
     text = StringProperty()
-    def __init__(self, text, **kwargs):
+    unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
+    # unifont = str(Fonter.fonts_path) + 'Carlito-Bold'
+    # unifont = str(Fonter.fonts_path) + 'DejaVuSans'
+
+    def __init__(self, text, use_chain, **kwargs):
         self.text = text
         super(ChainHistory, self).__init__(**kwargs)
+        self.use_chain = use_chain
+        # self.
+        print(self.unifont )
+            # = CoreLabel.get_system_fonts_dir()
 
-    pass
+    # def use_chain(self):
