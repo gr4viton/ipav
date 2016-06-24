@@ -7,7 +7,7 @@ class Step():
 
     steps_count = 0
 
-    def __init__(self, name, function, narrowed=False):
+    def __init__(self, name, function, narrowed=False, controls=None):
         self.name = name
         self.new_name = '' # if changed in rename_stepwidget_label it changes stepwidget label
         self.function = function
@@ -28,6 +28,8 @@ class Step():
 
         self.last_widget_name_label = name
 
+        self.controls = controls
+
     def rename_stepwidget_label(self, new_name):
         if self.last_widget_name_label is not new_name:
             self.name = new_name
@@ -44,6 +46,7 @@ class Step():
 
 
         self.user_input = False # e.g. from snippet or gui
+
         if self.user_input == True:
             self.data_prev[dd.kernel] = (42,42) # from user
             self.data_prev[dd.take_all_def] = False

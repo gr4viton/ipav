@@ -16,12 +16,22 @@ from StepData import StepData
 from FcnAditional import *
 from Step import Step
 
+from kivy.uix.slider import Slider
+from kivy.uix.gridlayout import GridLayout
+
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # global variables
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # function definitions
 
+
+
+class ResolutionControls(GridLayout):
+    slider_value = NumericProperty()
+    pass
 
 class StepControl():
 
@@ -56,8 +66,20 @@ class StepControl():
             self.recreate_buffer(im)
         return self.buffer
 
-    def add_available_step(self, name, function, origin=None):
-        self.available_steps[name] = Step(name, function)
+
+    def get_controls(self, name):
+        if name == 'resize':
+            print('returned controls !!!!!!!!!!!!!!!!!!!!!!')
+            return ResolutionControls()
+            # return None
+        else:
+            return None
+
+
+    def add_available_step(self, name, function, origin=None, controls=None):
+        if not controls:
+            controls = self.get_controls(name)
+        self.available_steps[name] = Step(name, function, controls)
         # self.available_step_fcn[name] = function
         step = self.available_steps[name]
         if origin is not None:
@@ -139,9 +161,10 @@ class StepControl():
                 narrowed = True
 
             available_step = self.available_steps.get(step_name, None)
-            if not available_step:
+            if not available_step: # not known step name
                 break
-            new_step = Step(step_name, available_step .function, narrowed)
+
+            new_step = Step(step_name, available_step.function, narrowed, available_step.controls)
             self.steps.append(new_step)
             # print(self.steps[-1].narrow)
 
@@ -936,6 +959,9 @@ class StepControl():
             print('mask', np.min(mask), np.max(mask))
             im = mask * 1
             return im
+
+
+
 
         self.add_available_step('original', make_nothing)
         self.add_synonyms('original')

@@ -349,7 +349,22 @@
 #
 #    GridLayout:
 #        ctx.GridLayout
-#
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<ResolutionControls>
+#    slider_value: slider_value
+    cols:1
+    Label:
+        text: 'Resolution multiplier'
+    Label:
+        text: str(root.slider_value)
+    Slider:
+#        id: slider_resolution_div
+        sla_steps: 42
+        value: 0.5
+        min: 0.05
+        max: 2
+#        on_value: root.chain_control.set_resolution_div(self.value);
+        value: root.slider_value
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #<ChainStringTextInput>:
 
@@ -565,6 +580,8 @@
 
 #    info_label_bottom: info_label_bottom
     info_label_layout: info_label_layout
+    control_layout: control_layout
+
 #    info_label_right: info_label_right
     time_label: time_label
 
@@ -665,6 +682,10 @@
             id: info_label_layout
             size_hint_y: 0
 
+        GridLayout:
+            cols: 1
+            id: control_layout
+            size_hint_y: 0.2
 
 #
 #<InfoLabelWidget@TextInput>:

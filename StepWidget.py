@@ -33,6 +33,8 @@ class StepWidget(GridLayout):
 
     # info_label_bottom = ObjectProperty()
     info_label_layout = ObjectProperty()
+    control_layout = ObjectProperty()
+
     # info_label_right = ObjectProperty()
     time_label = ObjectProperty()
 
@@ -41,6 +43,7 @@ class StepWidget(GridLayout):
     tbt_informing = ObjectProperty()
     tbt_show_img = ObjectProperty()
     tbt_draw = ObjectProperty()
+
 
     # layout_steps_height = NumericProperty(1600)
 
@@ -84,7 +87,17 @@ class StepWidget(GridLayout):
             size=(cv_image.shape[1], cv_image.shape[0]), colorfmt='bgr')
         self.update_texture(cv_image)
 
-    def recreate_widget(self, cv_image, name, narrowed=False, info_position='b'):
+    def recreate_widget(self, step):
+        # cv_image, name, narrowed=False, info_position='b'
+        self.step = step
+
+        cv_image = np.uint8(step.data_post[dd.im])
+        cv_image = cv_image
+        # print(len(cv_image[0]))
+        name = step.name
+        narrowed = step.narrowed
+        info_position = 'b'
+
         self.recreate_texture(cv_image)
         self.recreate_info_label()
         self.name = name
@@ -94,6 +107,15 @@ class StepWidget(GridLayout):
         self.info_label_position = info_position
         print('Recreated widget:', cv_image.shape, '[px] name: [', name,
               '] info_pos:', info_position)
+
+        # recreate control widgets
+        self.control_layout.clear_widgets()
+        controls = self.step.controls
+        if controls:
+            self.control_layout.add_widget(controls)
+
+
+
 
     def update_widget(self, step):
         if not self.narrowed:
@@ -240,11 +262,11 @@ class StepWidget(GridLayout):
             self.info_label_layout.remove_widget(children[0])
             self.info_label_layout.size_hint_y = 0
             self.info_label_bottom = None
-        #
-        # self.info_label_bottom.y = self.elsewhere
-        # self.info_label_bottom.size_hint_y = None
-        # # self.info_label_bottom.min_height = 0
-        # self.info_label_bottom.height = 1000
+            #
+            # self.info_label_bottom.y = self.elsewhere
+            # self.info_label_bottom.size_hint_y = None
+            # # self.info_label_bottom.min_height = 0
+            # self.info_label_bottom.height = 1000
 
     def show_info(self, value):
         self.info_showed = value
@@ -315,8 +337,14 @@ class StepWidgetControl():
         # print(ziplist)
         # print(ziplist[::-1])
 
-        [widget.recreate_widget(np.uint8(step.data_post[dd.im]), step.name, narrowed=step.narrowed)
-         for (widget, step) in ziplist if step.data_post is not None]
+        [widget.recreate_widget(step) for (widget, step) in ziplist
+         if step.data_post is not None]
+
+        # [widget.recreate_widget(
+        #     np.uint8(step.data_post[dd.im]),
+        #     step.name,
+        #     narrowed=step.narrowed)
+        #     for (widget, step) in ziplist if step.data_post is not None]
 
 
 
