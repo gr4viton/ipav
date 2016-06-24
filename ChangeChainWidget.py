@@ -152,7 +152,8 @@ class ChangeChainWidget(Popup):
                 ChainHistory(text=chain_string, use_chain=self.use_chain))
 
 class UnicodeButton(Button, Fonter):
-    unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
+    # unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
+    unifont = str(Fonter.fonts_path) + 'calibrib'
     # unifont = str(Fonter.fonts_path) + 'Carlito-Bold'
     # unifont = str(Fonter.fonts_path) + 'DejaVuSans'
 

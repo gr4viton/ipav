@@ -32,7 +32,7 @@ class CaptureControl():
 
 
         # opened_ids = [0,1,2,3,4]
-        ids = [0,1,2,3]
+        # ids = [0,1,2,3]
         # ids = [0,1,2,3,4,5]
         # ids = [0,1]
 

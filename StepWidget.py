@@ -34,6 +34,7 @@ class StepWidget(GridLayout):
     # info_label_bottom = ObjectProperty()
     info_label_layout = ObjectProperty()
     control_layout = ObjectProperty()
+    bottom_layout = ObjectProperty()
 
     # info_label_right = ObjectProperty()
     time_label = ObjectProperty()
@@ -62,6 +63,7 @@ class StepWidget(GridLayout):
 
         self.narrowed = False
 
+        self.controls = None
 
         self.informing = True
         self.info_showed = False
@@ -101,18 +103,26 @@ class StepWidget(GridLayout):
         self.recreate_texture(cv_image)
         self.recreate_info_label()
         self.name = name
-        print('setting narrowed for {} to {}'.format(name, narrowed))
+        print('Setting [{}].narrowed = {}'.format(name, narrowed))
         self.set_narrowed(narrowed)
 
         self.info_label_position = info_position
-        print('Recreated widget:', cv_image.shape, '[px] name: [', name,
-              '] info_pos:', info_position)
 
         # recreate control widgets
-        self.control_layout.clear_widgets()
-        controls = self.step.controls
-        if controls:
-            self.control_layout.add_widget(controls)
+        # self.control_layout.clear_widgets()
+        if self.controls:
+            self.bottom_layout.clear_widgets(self.controls)
+            print('Deleted old controls widgets')
+
+
+        self.controls = self.step.controls
+        if self.controls:
+            self.control_layout.add_widget(self.controls)
+            print('Created new controls widgets')
+
+
+        print('Recreated widget:', cv_image.shape, '[px] name: [', name,
+              '] info_pos:', info_position)
 
 
 

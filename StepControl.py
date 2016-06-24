@@ -19,7 +19,7 @@ from Step import Step
 from kivy.uix.slider import Slider
 from kivy.uix.gridlayout import GridLayout
 
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty, BoundedNumericProperty
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # global variables
@@ -30,7 +30,7 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty
 
 
 class ResolutionControls(GridLayout):
-    slider_value = NumericProperty()
+    slider_value = BoundedNumericProperty(0.5, min=00.05, max=2)
     pass
 
 class StepControl():
@@ -68,8 +68,9 @@ class StepControl():
 
 
     def get_controls(self, name):
+        # print('Checking controls for step [{}]'.format(name))
         if name == 'resize':
-            print('returned controls !!!!!!!!!!!!!!!!!!!!!!')
+            # print('returned controls !!!!!!!!!!!!!!!!!!!!!!')
             return ResolutionControls()
             # return None
         else:
@@ -79,7 +80,13 @@ class StepControl():
     def add_available_step(self, name, function, origin=None, controls=None):
         if not controls:
             controls = self.get_controls(name)
-        self.available_steps[name] = Step(name, function, controls)
+
+
+        if controls:
+            print('Got controls for step [{}]'.format(name))
+            print(controls)
+
+        self.available_steps[name] = Step(name, function, controls=controls)
         # self.available_step_fcn[name] = function
         step = self.available_steps[name]
         if origin is not None:

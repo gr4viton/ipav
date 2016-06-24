@@ -352,13 +352,14 @@
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <ResolutionControls>
 #    slider_value: slider_value
+    slider: slider
     cols:1
     Label:
         text: 'Resolution multiplier'
     Label:
-        text: str(root.slider_value)
+        text: str(round(slider.value,2))
     Slider:
-#        id: slider_resolution_div
+        id: slider
         sla_steps: 42
         value: 0.5
         min: 0.05
@@ -581,6 +582,7 @@
 #    info_label_bottom: info_label_bottom
     info_label_layout: info_label_layout
     control_layout: control_layout
+    bottom_layout: bottom_layout
 
 #    info_label_right: info_label_right
     time_label: time_label
@@ -656,7 +658,7 @@
     GridLayout:
         cols:1
         size_hint_y: 0.85
-
+        id: bottom_layout
         GridLayout:
             cols: 1
 #            size_hint_y: 0.8
@@ -665,7 +667,7 @@
 #                cols:1
             Image:
                 id: kivy_image
-                size_hint_y: 1.1
+#                size_hint_y: 1.1
     #                size_hint_x: 1
     #                background_normal: 'True'
 #
@@ -685,9 +687,10 @@
         GridLayout:
             cols: 1
             id: control_layout
-            size_hint_y: 0.2
+#            size_hint_y: 0.2
 
 #
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #<InfoLabelWidget@TextInput>:
 <InfoLabelWidget>:
 

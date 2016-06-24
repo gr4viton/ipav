@@ -30,6 +30,10 @@ class Step():
 
         self.controls = controls
 
+        if controls:
+            print('Got controls for step [{}]'.format(self.name))
+            print(self.controls)
+
     def rename_stepwidget_label(self, new_name):
         if self.last_widget_name_label is not new_name:
             self.name = new_name
