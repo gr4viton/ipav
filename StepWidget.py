@@ -13,6 +13,11 @@ from kivy.uix.textinput import TextInput
 
 from kivy.graphics import Color, Rectangle
 from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.stacklayout import StackLayout
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.anchorlayout import AnchorLayout
+
+
 from kivy.uix.button import Button
 # from kivy.uix.checkbox import CheckBox
 from kivy.uix.togglebutton import ToggleButton
@@ -25,7 +30,9 @@ import numpy as np
 from StepData import *
 import findHomeography as fh
 
-class StepWidget(GridLayout):
+# class StepWidget(BoxLayout):
+# class StepWidget(StackLayout):
+class StepWidget(AnchorLayout):
 
     name = StringProperty()
     drawing = ObjectProperty('down')

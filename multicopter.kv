@@ -595,15 +595,18 @@
 
 #    layout_steps_height: 1500
 #    size_hint_y: 0.4
-    size_hint_y: None
+#    size_hint_y: None
 #    size_hint_x: 1/3
-    size_hint_x: None
-    width: 282
+#    size_hint_x: None
+#    width: 282
 #    height: self.minimum_height * 4
-    height: 250
+#    height: 250
 #    size_hint_y: layout_steps_height / 400
 
-    cols: 1
+#    cols: 1
+    orientation: 'tb-rl'
+#    orientation: 'vertical'
+
     padding: (4,4,4,4)
     spacing: (4,4)
     margin: 1
@@ -615,9 +618,18 @@
             pos: self.x + self.margin, self.y + self.margin + 1
             size: self.width - 2 * self.margin , self.height - 2 * self.margin
 #            self.thickness
+
+
+    id: bottom_layout
+    Button:
+        text: 'text'
+    Button:
+        text: 'text'
     GridLayout:
         cols: 2
-        size_hint_y: 0.15
+#        size_hint_y: 0.15
+#        size_hint_y: None
+#        height: 0.15 * 250
 
         ToggleButton:
             id: tbt_narrow
@@ -661,23 +673,21 @@
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')
 
-#    BoxLayout:
-    GridLayout
-        cols:1
-#        orientation: 'vertical'
-        size_hint_y: 0.85
-        id: bottom_layout
-        GridLayout:
-            cols: 1
-#            size_hint_y: 0.8
-            size_hint_y: 0.8
-#            GridLayout:
+#    GridLayout
+#        cols:1
+#        size_hint_y: 0.85
+#    GridLayout:
+#        cols: 1
+##        size_hint_y: 0.8
+##            GridLayout:
 #                cols:1
-            Image:
-                id: kivy_image
+    Image:
+        id: kivy_image
+#        size_hint_y: None
+#        height: 0.8*250
 #                size_hint_y: 1.1
-    #                size_hint_x: 1
-    #                background_normal: 'True'
+#                size_hint_x: 1
+#                background_normal: 'True'
 #
 #            TextInput:
 #                id: info_label_right
@@ -687,10 +697,11 @@
 ##                readonly: 'True'
 ##                do_scroll: 'True'
 
-        GridLayout:
-            cols: 1
-            id: info_label_layout
-            size_hint_y: 0
+
+    GridLayout:
+        cols: 1
+        id: info_label_layout
+#        size_hint_y: None
 
 #        GridLayout:
 #            cols: 1

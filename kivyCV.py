@@ -216,7 +216,7 @@ class Multicopter(GridLayout):
         # # new_chain_string += ', blender, pause'
 
         new_chain_string = detect_green()
-
+        new_chain_string = 'original'
         # Load the chain
         available_steps_dict = self.chain_control.get_available_steps()
 
