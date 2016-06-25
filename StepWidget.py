@@ -117,7 +117,7 @@ class StepWidget(GridLayout):
 
         self.controls = self.step.controls
         if self.controls:
-            self.control_layout.add_widget(self.controls)
+            self.bottom_layout.add_widget(self.controls)
             print('Created new controls widgets')
 
 
