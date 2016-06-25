@@ -302,6 +302,12 @@
                 ScrollView: # step scrolling
                     id: scroll_steps
 
+                    min_move: 5
+                #    scroll_distance: self.width * 0.05 # good moving - cannot zoom
+                    scroll_distance: min(self.width, self.height) * 0.8
+#                    scroll_timeout: 50
+                    do_scroll_x: 0
+
                     StackLayout:
                         height: self.minimum_height - 0
                         size_hint_y: None
@@ -655,8 +661,10 @@
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')
 
-    GridLayout:
+#    BoxLayout:
+    GridLayout
         cols:1
+#        orientation: 'vertical'
         size_hint_y: 0.85
         id: bottom_layout
         GridLayout:
