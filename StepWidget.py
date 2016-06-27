@@ -31,6 +31,9 @@ from StepData import *
 import findHomeography as fh
 
 
+class StepWidgetImage(Image):
+
+    pass
 
 class StepWidgetInfoLabel(TextInput):
     update_height = None
@@ -39,11 +42,44 @@ class StepWidgetInfoLabel(TextInput):
         if len(self._lines) != self.last_lines:
             self.last_lines = len(self._lines)
             self.height = (len(self._lines)+1) * self.line_height
-            self.update_height()
+            self.parent.update_height()
 
 
-class HidableWidget(Widget):
-    pass
+class HideableWidget():
+
+    def __init__(self, name, widget_class, toggle_button, parent):
+        self.name = name
+        self.widget = None
+        self.widget_class = widget_class
+        self.tbt_show_widget = toggle_button
+        self.parent = parent
+
+    def widget_show(self):
+        if self.widget is None:
+            self.widget = self.widget_class()
+            # self.widget = StepWidgetInfoLabel()
+            # self.widget = super(widget_class, (
+            # # new(widget_class)
+            # # super(StepWidget, self).__init__(**kwargs)
+            self.parent.add_widget(self.widget)
+
+    def widget_hide(self):
+        if self.widget is not None:
+            self.parent.clear_widgets(self.widget)
+            self.widget = None
+
+    def show(self, value=True):
+        self.widget_showed = value
+        if value == True:
+            self.tbt_show_widget.state = 'down'
+            self.widget_show()
+        if value == False:
+            self.tbt_show_widget.state = 'normal'
+            self.widget_hide()
+
+    def hide(self):
+        self.show(False)
+
 
 # class StepWidget(BoxLayout):
 # class StepWidget(StackLayout):
@@ -97,35 +133,36 @@ class StepWidget(GridLayout):
         super(StepWidget, self).__init__(**kwargs)
         # self.layout_steps = kwargs['parent']
         self.name = ''
-        self.drawing = True
         init_shape = (0, 0)
+
         self.texture = Texture.create(size = init_shape, colorfmt='bgr')
         self.texture_shape = init_shape
+
+
         self.name = 'default name'
 
+        self.drawing = True
         self.narrowed = False
 
         self.controls = None
 
-        self.informing = True
-        self.info_showed = False
         self.padding_y = 4
 
+        self.info = HideableWidget('info',
+                                   widget_class=StepWidgetInfoLabel,
+                                   toggle_button=self.tbt_show_info,
+                                   parent=self)
 
-        self.kivy_image_y_normal = self.kivy_image.y + self.padding_y
-        self.kivy_image_y_info = self.padding_y + 40
+        self.image = HideableWidget('image',
+                                   widget_class=StepWidgetImage,
+                                   toggle_button=self.tbt_show_img,
+                                   parent=self)
 
+        self.informing = True
+        # self.info_showed = False
 
-        # self.info_label_bottom_y = self.info_label_bottom.y
-        self.info_label_bottom = None
-        self.info_label_hide()
-
-
-        # self.kivy_image = ImageButton(self.toggle_drawing)
-        # self.kivy_image = ImageButton()
-        # self.add_widget(self.kivy_image)
-
-        self.update_height()
+        self.info.hide()
+        self.image.show()
 
     def recreate_texture(self, cv_image):
         self.texture_shape = cv_image.shape
@@ -161,7 +198,7 @@ class StepWidget(GridLayout):
 
         self.controls = self.step.controls
         if self.controls:
-            self.bottom_layout.add_widget(self.controls)
+            self.add_widget(self.controls)
             print('Created new controls widgets')
 
 
@@ -229,8 +266,8 @@ class StepWidget(GridLayout):
 
 
     def update_info_label(self, step):
-        if self.info_label_bottom is not None:
-            self.info_label_bottom.text = step.get_info_string()
+        if self.info.widget :
+            self.info.widget.text = step.get_info_string()
             step.data_post[dd.info] = False
 
     def update_texture(self, im):
@@ -241,7 +278,10 @@ class StepWidget(GridLayout):
         buf = buf1.tostring()
         self.texture.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
         # print(im_rgb.shape)
-        self.kivy_image.texture = self.texture
+        # self.kivy_image.texture = self.texture
+        if self.image.widget:
+            self.image.widget.texture = self.texture
+
 
 
     def colorify(self, im):
@@ -249,6 +289,8 @@ class StepWidget(GridLayout):
             return cv2.cvtColor(im, cv2.COLOR_GRAY2RGB)
         else:
             return im.copy()
+
+
 
 
 
@@ -296,26 +338,31 @@ class StepWidget(GridLayout):
             self.show_img(True)
 
     def recreate_info_label(self):
-        self.info_label_hide()
+        self.info.hide()
+        # self.info_label_hide()
 
-    def info_label_show(self):
-        if self.info_label_widget is None:
-            self.info_label_widget = StepWidgetInfoLabel()
-            self.add_widget(self.info_label_widget)
 
-    def info_label_hide(self):
-        if self.info_label_widget is not None:
-            self.clear_widgets(self.info_label_widget)
-            self.info_label_widget = None
 
-    def show_info(self, value):
-        self.info_showed = value
-        if value == True:
-            self.tbt_show_info.state = 'down'
-            self.info_label_show()
-        if value == False:
-            self.tbt_show_info.state = 'normal'
-            self.info_label_hide()
+    #
+    # def info_label_show(self):
+    #     if self.info_label_widget is None:
+    #         self.info_label_widget = StepWidgetInfoLabel()
+    #         self.add_widget(self.info_label_widget)
+    #
+    # def info_label_hide(self):
+    #     if self.info_label_widget is not None:
+    #         self.clear_widgets(self.info_label_widget)
+    #         self.info_label_widget = None
+    #
+    # def show_info(self, value):
+    #     self.info_showed = value
+    #     if value == True:
+    #         self.tbt_show_info.state = 'down'
+    #         self.info_label_show()
+    #     if value == False:
+    #         self.tbt_show_info.state = 'normal'
+    #         self.info_label_hide()
+
 
     def set_drawing(self, value):
         self.drawing = value

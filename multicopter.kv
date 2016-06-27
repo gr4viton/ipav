@@ -583,7 +583,7 @@
     tbt_show_img: tbt_show_img
     tbt_narrow: tbt_narrow
 
-    kivy_image: kivy_image
+#    kivy_image: kivy_image
 
 #    bottom_layout: bottom_layout
 
@@ -651,7 +651,7 @@
                     id: tbt_show_info
                     text: 'info'
 #                    state: 'down'
-                    on_state: root.show_info(self.state == 'down')
+                    on_state: root.info.show(self.state == 'down')
 
                 ToggleButton:
                     id: tbt_informing
@@ -663,7 +663,7 @@
                     id: tbt_show_img
                     text: 'img'
                     state: 'down'
-                    on_state: root.show_img(self.state == 'down')
+                    on_state: root.image.show(self.state == 'down')
 
                 ToggleButton:
                     id: tbt_draw
@@ -671,8 +671,8 @@
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')
 
-    Image:
-        id: kivy_image
+#    Image:
+#        id: kivy_image
 #        size_hint_y: None
 #        height: 0.8*250
 #                size_hint_y: 1.1
@@ -691,30 +691,39 @@
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <StepWidgetInfoLabel>
     multiline: 'True'
-    text: '2\n3'
+    font_size: 12
+    valign: 'top'
+    scroll_y: 0.0
+
     size_hint: 1, None
     height: (len(self._lines)+1) * self.line_height
     on_text: self.update_parent()
-#    on_enter: self.update_parent()
     on_focus: self.update_parent()
+#    on_enter: self.update_parent()
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#<InfoLabelWidget@TextInput>:
-<InfoLabelWidget>:
+<StepWidgetImage>
+    size_hint: 1, None
+#    height: texture.height
+#    height: texture_size[0]
+    height: 205
 
-#    id: parent
-    font_size: 12
-#    GridLayout:
-#        cols:1
-#        Label:
-    text: self.text
-#    text: 'asd'
-    valign: 'top'
-#            font_size: 6
-#            font_size: 12
-#    readonly: 'True'
-    scroll_y: 0.0
-#    do_scroll: 'True'
-#    size_hint_y: 0.2
-#    wid
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+##<InfoLabelWidget@TextInput>:
+#<InfoLabelWidget>:
+#
+##    id: parent
+##    GridLayout:
+##        cols:1
+##        Label:
+#    text: self.text
+##    text: 'asd'
+##            font_size: 6
+##            font_size: 12
+##    readonly: 'True'
+##    do_scroll: 'True'
+##    size_hint_y: 0.2
+##    wid
 
