@@ -15,6 +15,7 @@ from StepEnum import DataDictParameterNames as dd
 from StepData import StepData
 from FcnAditional import *
 from Step import Step
+from StepEnum import DataDictParameterNames as dd
 
 from kivy.uix.slider import Slider
 from kivy.uix.gridlayout import GridLayout
@@ -28,10 +29,28 @@ from kivy.properties import ObjectProperty, StringProperty, NumericProperty, Bou
 # function definitions
 
 
+class DetectColorControls(GridLayout):
+    # selected_color = StringProperty('green')
+    selected_color = 'green'
+
+    def select_color(self, selected_color):
+        self.selected_color = selected_color
+
+    def get_control_values(self, data):
+        data[dd.color_name] = self.selected_color
+        print('selected_color= ', self.selected_color)
+        return data
 
 class ResolutionControls(GridLayout):
-    slider_value = BoundedNumericProperty(0.5, min=00.05, max=2)
-    pass
+    slider_value = BoundedNumericProperty(0.5, min=0.05, max=2)
+    slider = ObjectProperty()
+
+    def get_control_values(self, data):
+        # val = self.slider_value
+        val = self.slider.value
+        data[dd.fxfy] = [val, val]
+        # print('getting data = ', val)
+        return data
 
 class StepControl():
 
@@ -73,6 +92,8 @@ class StepControl():
             # print('returned controls !!!!!!!!!!!!!!!!!!!!!!')
             return ResolutionControls()
             # return None
+        elif name == 'detect green':
+            return DetectColorControls()
         else:
             return None
 
@@ -224,7 +245,7 @@ class StepControl():
         self.ret = data
 
     def step_all(self, data):
-        self.resolution_multiplier = data[dd.resolution_multiplier]
+        # self.resolution_multiplier = data[dd.resolution_multiplier]
         self.run_all(data)
 
 
@@ -292,8 +313,9 @@ class StepControl():
         # def make_gauss(im, a=5, sigma=1):
         #     return cv2.GaussianBlur(im.copy(), (a, a), sigmaX=sigma)
 
-        def make_resize(data):
-            fxfy = add_default(data, dd.fxfy, [self.resolution_multiplier, self.resolution_multiplier])
+        def make_resize(data, fx=0.5, fy=0.5):
+            # resolution_multiplier = add_default(data,dd.resolution_multiplier, resolution_multiplier)
+            fxfy = add_default(data, dd.fxfy, [fx, fy])
             data[dd.im] = cv2.resize(data[dd.im], (0, 0), fx=fxfy[0], fy=fxfy[1])
             return data
 
@@ -777,6 +799,9 @@ class StepControl():
             if len(im.shape) == 2:
                 print('Cannot detect color on grayscale image!')
                 return data
+
+            color_name = add_default(data, dd.color_name, color_name)
+
             hsv = cv2.cvtColor(im, cv2.COLOR_BGR2HSV)
 
             # define range of blue color in HSV

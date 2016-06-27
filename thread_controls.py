@@ -217,7 +217,7 @@ class ChainControl():
         # data[dd.captured] = [stream.frame for stream in self.capture_control.streams]
         # data[dd.im] = data[dd.captured][index]
 
-        data[dd.resolution_multiplier] = self.resolution_multiplier
+        # data[dd.resolution_multiplier] = self.resolution_multiplier
 
         self._step_control.step_all(data)
 

@@ -49,10 +49,12 @@ class Step():
         self.data_prev = data_prev.copy()
 
 
-        self.user_input = False # e.g. from snippet or gui
+        # self.user_input = False # e.g. from snippet or gui
+        self.user_input = self.controls is not None
 
         if self.user_input == True:
-            self.data_prev[dd.kernel] = (42,42) # from user
+            # self.data_prev[dd.kernel] = (42,42) # from user
+            self.data_prev = self.controls.get_control_values(data_prev)
             self.data_prev[dd.take_all_def] = False
         else:
             self.data_prev[dd.take_all_def] = True

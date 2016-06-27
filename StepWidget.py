@@ -32,7 +32,6 @@ import findHomeography as fh
 
 
 class StepWidgetImage(Image):
-
     pass
 
 class StepWidgetInfoLabel(TextInput):
@@ -43,7 +42,6 @@ class StepWidgetInfoLabel(TextInput):
             self.last_lines = len(self._lines)
             self.height = (len(self._lines)+1) * self.line_height
             self.parent.update_height()
-
 
 class HideableWidget():
 
@@ -377,9 +375,6 @@ class StepWidget(GridLayout):
         else:
             self.set_drawing(True)
 
-
-class InfoLabelWidget(TextInput):
-    pass
 
 class StepWidgetControl():
 

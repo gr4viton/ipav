@@ -60,3 +60,4 @@ class DataDictParameterNames(AutoNumber):
     resolution_multiplier = ()
     # change name
     new_name = ()
+    color_name = ()

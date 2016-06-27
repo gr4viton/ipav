@@ -7,47 +7,11 @@
 #    gl_middle: gl_middle
 #    gl_right: gl_right
     img_webcam: img_webcam
-#    img_tags: img_tags
-#    txt_numFound: txt_numFound
-#    sla_tags: sla_tags
     layout_steps: layout_steps
-#    img_steps: img_steps # temporal
-#    label_mean_exec_time: label_mean_exec_time
-#    grid_img_tags: grid_img_tags
-    # lb_webcam_resolution: lb_webcam_resolution
-
-    #label_chain_string_text: label_chain_string_text
-
-#    ScrollView:
-#        Label:
-#            text: str('looooooong text '*1000)
-#            font_size: 12
-#            text_size: self.width, None
-#            size_hint_y: None
-#            height: self.texture_size[1]
-#    GridLayout:
-#        cols: 2
-#        size_hint_y: 0.9
-#
-#        TextInput:
-#            text: 'ah'
-#            size_hint_y: 0.1
-#        TextInput:
-#            text: 'ah'
-#            size_hint_y: 0.1
 
     GridLayout:
-#        size_hint_x: 1
         cols:1
         id: gl_left
-#        padding: 10
-#        canvas.before:
-#            Color:
-#                rgba: 0, 1, 0, 1
-#            Rectangle:
-#                # self here refers to the widget i.e FloatLayout
-#                pos: self.pos
-#                size: self.size
 
         Button:
 #            text: 'Switch cameras'
@@ -165,18 +129,18 @@
                 Rectangle:
                     pos: self.x + self.margin, self.y + self.margin + 1
                     size: self.width - 2 * self.margin , self.height - 2 * self.margin
-
-            Label:
-                text: 'Resolution multiplier'
-            Label:
-                text: str(slider_resolution_div.value)
-            Slider:
-                id: slider_resolution_div
-                sla_steps: 42
-                value: 0.5
-                min: 0.05
-                max: 2
-                on_value: root.chain_control.set_resolution_div(self.value);
+#
+#            Label:
+#                text: 'Resolution multiplier'
+#            Label:
+#                text: str(slider_resolution_div.value)
+#            Slider:
+#                id: slider_resolution_div
+#                sla_steps: 42
+#                value: 0.5
+#                min: 0.05
+#                max: 2
+#                on_value: root.chain_control.set_resolution_div(self.value);
 
 
         GridLayout: # Info tab
@@ -193,20 +157,6 @@
                     pos: self.x + self.margin, self.y + self.margin + 1
                     size: self.width - 2 * self.margin , self.height - 2 * self.margin
 
-#            row_force_default: 'true'
-#            row_default_height: 15
-
-#            Label:
-#                size_hint_x: 2
-#                text: "Found tags"
-#                halign: "right"
-#                valign: "middle"
-#                text_size: self.size
-##                pos_hint_x: 10
-#            Label:
-##                size_hint_x: None
-#                id: txt_numFound
-
             Label:
                 text: "Chain last [ms]"
                 halign: 'right'
@@ -221,36 +171,6 @@
                 text_size: self.size
             Label:
                 text: root.label_mean_exec_time
-#                size_hint_y: 0.2
-    #            text: root.chain_control.mean_exec_time
-#        Label:
-#            text:
-#                'splitter.width: {}\nparent.width: {}\nmax_size: {}'\
-#                .format(spl.width, root.width, spl.max_size)
-
-#            GridLayout: # img tags
-#                id: grid_img_tags
-#                cols: 1
-#                size_hint_x: 0
-#                margin: 1
-#                color: 0.08, 0.16 , 0.24
-#                canvas.before:
-#                    Color:
-#                        rgb: self.color
-#                    Rectangle:
-#                        pos: self.x + self.margin, self.y + self.margin + 1
-#                        size: self.width - 2 * self.margin , self.height - 2 * self.margin
-#                Label:
-#                    halign: 'left'
-##                    font_size: 10
-#                    font_size: 0
-#                    do_rotation: 90
-#                    text: root.tag_error_count_text
-#                Image:
-#                    id: img_tags
-#                    color: 0,0,0
-
-
     Splitter:
         id: spl
 
@@ -278,18 +198,6 @@
 #                    on_double_tap: root.update_chain_string_from_popup()
 
                     text: root.label_chain_string_text
-
-#                TextInput:
-##                    readonly: 'True'
-#
-#                    on_double_tap: root.show_load_chain()
-##                    on_text_validate: root.show_load_chain()
-#                    on_value: root.show_load_chain()
-#
-#                    padding: 2,0,2,0
-##                    halign: 'middle'
-#                    text: root.label_chain_string_text
-##                    text_size: self.size
 
                 Button:
                     size_hint_x: 0.05
@@ -319,22 +227,8 @@
     #                        size_hint_x: 1
 
 
-#        Splitter:
-#            vertical: 0
-#            GridLayout:
-#                size_hint_x: 0.5
-#                cols:1
-#                id: gl_right
-#                padding: 10
-#                Button:
-#                    text: 'Save the matrix??'
-        #
-        #        Button:
-        #            text: 'Exit'
-        #            on_press: Exit()
 
-
-#[ColoredGrid@GridLayout]:
+#<ColoredGrid@GridLayout>:
 #    cols: 1
 #    size_hint_y: None
 ##    height: self.minimum_height * 4
@@ -355,27 +249,11 @@
 #
 #    GridLayout:
 #        ctx.GridLayout
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-<ResolutionControls>
-#    slider_value: slider_value
-    slider: slider
-    cols:1
-    Label:
-        text: 'Resolution multiplier'
-    Label:
-        text: str(round(slider.value,2))
-    Slider:
-        id: slider
-        sla_steps: 42
-        value: 0.5
-        min: 0.05
-        max: 2
-#        on_value: root.chain_control.set_resolution_div(self.value);
-        value: root.slider_value
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-#<ChainStringTextInput>:
 
 
+<Grid1@GridLayout>
+    padding: (2,2,2,2)
+    spacing: (2,2)
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #GridLayoutFramed:
 <ButtonLeft>:
@@ -387,8 +265,93 @@
     height: 25
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <LabelLeft@Label>:
-    halign: 'left'
     text_size: self.size
+    halign: 'left'
+    valign: 'middle'
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<LabelRight@Label>:
+    text_size: self.size
+    halign: 'right'
+    valign: 'middle'
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<LabelMiddle@Label>:
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
+
+#<Label>
+#    text_size: self.size
+#    halign: 'center'
+#    valign: 'middle'
+#    canvas_color: .5, .5 , .5, .5
+#    margin: 5
+#    canvas.before:
+#        Color:
+#            rgb: self.canvas_color
+#        Rectangle:
+#            pos: self.x, self.y
+#            size: self.width, self.height
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<DetectColorControls>
+    size_hint_y: None
+    height: 70
+    cols:1
+
+    Grid1
+        cols: 1
+        LabelLeft:
+            text: 'Color to detect:'
+
+        CheckBoxLabel:
+            group: 'color'
+            text: 'red'
+            active: 'False'
+            on_active: select_color(self.text)
+        CheckBoxLabel:
+            group: 'color'
+            text: 'orange'
+            active: 'False'
+            on_active: select_color(self.text)
+        CheckBoxLabel:
+            group: 'color'
+            text: 'green'
+            active: 'False'
+            on_active: select_color(self.text)
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<ResolutionControls>
+    slider: slider
+#    slider_value: slider_value
+
+    size_hint_y: None
+    height: 60
+    cols:1
+    Grid1
+        cols: 2
+#        size_hint_y: None
+        LabelRight:
+            size_hint_x: 2
+            text: 'Resolution multiplier'
+        LabelMiddle:
+            text: str(round(slider.value,2))
+    Slider:
+        id: slider
+        sla_steps: 42
+
+        value: 0.5
+        min: 0.05
+        max: 2
+#        on_value: root.chain_control.set_resolution_div(self.value);
+#        value: root.slider_value
+#        value: slider_value
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#<ChainStringTextInput>:
+
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <UnicodeButton>
@@ -421,13 +384,7 @@
         on_press: root.use_chain(root.text, use=False)
 
     UnicodeButton
-#        size_hint: None,None
         size_hint_x: 0.025
-#        width: self.height
-#        text: unichr(2764)
-
-#        text: '>'
-#        text: '\u22BC' # >>>
         text: '\u2713\u25B6' # check
         on_press: root.use_chain(root.text, use=True)
 
@@ -471,9 +428,6 @@
                     text: 'Available step names:'
                     size_hint_y: 0.1
 
-#                GridLayout:
-#                    cols: 3
-#                    id: layout_available_steps
                 StackLayout:
 #                    orientation: 'lr-tb'
                     orientation: 'tb-lr'
@@ -488,7 +442,6 @@
             TextInput:
                 size_hint_y: 5
                 id: chain_string_input
-    #            text: 'original, gray'
                 text: root.chain_string
     #            on_enter: root.when_on_enter()
                 on_text_validate: root.update_chain_string()
@@ -504,21 +457,12 @@
                 UnicodeButton:
                     text: '\u00D7'
                     on_press: root.dismiss()
-#                Button:
-#                    text: 'Show available step names'
-#                    on_press: root.show_step_names()
                 UnicodeButton:
                     text: '\u2713'
                     on_press: root.update_chain_string()
                 UnicodeButton:
                     text: '\u2713\u25B6'
                     on_press: root.update_chain_string()
-
-#            on_text: print(self.text)
-#            on_text: print(root.chain_string_text)
-
-#            valign: 'middle'
-#            text_size: self.si`ze
 
         GridLayout
             cols:1
@@ -533,28 +477,24 @@
                     text: 'Save history'
                     on_press: root.save_chain_history()
             ScrollView
-#                StackLayout:
-#
-#                    orientation: 'lr-tb'
                 StackLayout
-
+                    id: chain_history_layout
 #                    size_hint_y: None
                     orientation: 'lr-tb'
                     orientation: 'tb-lr'
 #                    orientation: 'lr-bt'
 #                    orientation: 'vertical'
-                    id: chain_history_layout
 
 
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <CheckBoxLabel@BoxLayout>:
+    checkbox: checkbox
     text: ''
     active: 'False'
     group: ''
     on_active: checkbox.on_active
-    checkbox: checkbox
-#    BoxLayout:
+
     CheckBox:
         id: checkbox
         size_hint_x: 0.2
@@ -583,31 +523,14 @@
     tbt_show_img: tbt_show_img
     tbt_narrow: tbt_narrow
 
-#    kivy_image: kivy_image
-
-#    bottom_layout: bottom_layout
-
-#    info_label_right: info_label_right
     time_label: time_label
 
     cols:1
     size_hint: (None, None)
     width: 282
 
-#    layout_steps_height: 1500
-#    size_hint_y: 0.4
-#    size_hint_y: None
-#    size_hint_x: 1/3
-#    size_hint_x: None
 #    width: 282
-#    height: self.minimum_height * 4
 #    height: 250
-#    size_hint_y: layout_steps_height / 400
-
-#    cols: 1
-
-#    orientation: 'tb-rl'
-#    orientation: 'vertical'
 
     padding: (4,4,4,4)
     spacing: (4,4)
@@ -620,9 +543,6 @@
             pos: self.x + self.margin, self.y + self.margin + 1
             size: self.width - 2 * self.margin , root.height - 2 * self.margin
 #            self.thickness
-
-
-#    id: bottom_layout
 
     GridLayout:
         cols: 2
@@ -671,22 +591,6 @@
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')
 
-#    Image:
-#        id: kivy_image
-#        size_hint_y: None
-#        height: 0.8*250
-#                size_hint_y: 1.1
-#                size_hint_x: 1
-#                background_normal: 'True'
-#
-#            TextInput:
-#                id: info_label_right
-#                text: 'ahoj'
-#                valign: 'top'
-#                size_hint_y: 0
-##                readonly: 'True'
-##                do_scroll: 'True'
-
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <StepWidgetInfoLabel>
@@ -700,6 +604,9 @@
     on_text: self.update_parent()
     on_focus: self.update_parent()
 #    on_enter: self.update_parent()
+##    readonly: 'True'
+##    do_scroll: 'True'
+##    size_hint_y: 0.2
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 <StepWidgetImage>
@@ -708,22 +615,4 @@
 #    height: texture_size[0]
     height: 205
 
-
-
-#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-##<InfoLabelWidget@TextInput>:
-#<InfoLabelWidget>:
-#
-##    id: parent
-##    GridLayout:
-##        cols:1
-##        Label:
-#    text: self.text
-##    text: 'asd'
-##            font_size: 6
-##            font_size: 12
-##    readonly: 'True'
-##    do_scroll: 'True'
-##    size_hint_y: 0.2
-##    wid
 
