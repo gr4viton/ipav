@@ -30,18 +30,35 @@ import numpy as np
 from StepData import *
 import findHomeography as fh
 
+
+
+class StepWidgetInfoLabel(TextInput):
+    update_height = None
+    last_lines = 0
+    def update_parent(self):
+        if len(self._lines) != self.last_lines:
+            self.last_lines = len(self._lines)
+            self.height = (len(self._lines)+1) * self.line_height
+            self.update_height()
+
+
+class HidableWidget(Widget):
+    pass
+
 # class StepWidget(BoxLayout):
 # class StepWidget(StackLayout):
-class StepWidget(AnchorLayout):
+# class StepWidget(AnchorLayout):
+class StepWidget(GridLayout):
 
     name = StringProperty()
     drawing = ObjectProperty('down')
     kivy_image = ObjectProperty()
 
     # info_label_bottom = ObjectProperty()
-    info_label_layout = ObjectProperty()
-    control_layout = ObjectProperty()
-    bottom_layout = ObjectProperty()
+    # info_label_layout = ObjectProperty()
+    # control_layout = ObjectProperty()
+
+    # bottom_layout = ObjectProperty()
 
     # info_label_right = ObjectProperty()
     time_label = ObjectProperty()
@@ -52,13 +69,31 @@ class StepWidget(AnchorLayout):
     tbt_show_img = ObjectProperty()
     tbt_draw = ObjectProperty()
 
+    info_label_widget = None
 
     # layout_steps_height = NumericProperty(1600)
 
     elsewhere = +6666
 
 
-    def __init__(self, **kwargs):
+    def update_height(self):
+        heights = [child.height for child in self.children]
+        spacing = len(heights) - 1
+        self.height = sum(heights) + (spacing * self.spacing[0]) + self.padding[0] + self.padding[2]
+        print('updating')
+
+    def clear_widgets(self, children=None, **kwargs):
+        children = [children]
+        super(StepWidget, self).clear_widgets(children, **kwargs)
+        self.update_height()
+
+    def add_widget(self, widget, index=0, canvas=None, **kwargs):
+        super(StepWidget, self).add_widget(widget, index, **kwargs)
+        print('adding widget')
+        self.update_height()
+
+
+    def __init__(self,**kwargs):
         super(StepWidget, self).__init__(**kwargs)
         # self.layout_steps = kwargs['parent']
         self.name = ''
@@ -89,6 +124,8 @@ class StepWidget(AnchorLayout):
         # self.kivy_image = ImageButton(self.toggle_drawing)
         # self.kivy_image = ImageButton()
         # self.add_widget(self.kivy_image)
+
+        self.update_height()
 
     def recreate_texture(self, cv_image):
         self.texture_shape = cv_image.shape
@@ -262,28 +299,14 @@ class StepWidget(AnchorLayout):
         self.info_label_hide()
 
     def info_label_show(self):
-        children = self.info_label_layout.children
-        if children is not None:
-            self.info_label_layout.add_widget(InfoLabelWidget())
-            children = self.info_label_layout.children
-            if len(children) > 0:
-                self.info_label_bottom =children[0]
-                # print(0.2*self.info_label_bottom.parrent.size)
-                # self.kivy_image_y_info = self.padding_y + self.info_label_bottom.size[1]
-                self.kivy_image_y_info = self.padding_y + 40
-            self.info_label_layout.size_hint_y = 0.2
+        if self.info_label_widget is None:
+            self.info_label_widget = StepWidgetInfoLabel()
+            self.add_widget(self.info_label_widget)
 
     def info_label_hide(self):
-        children = self.info_label_layout.children
-        if len(children) > 0:
-            self.info_label_layout.remove_widget(children[0])
-            self.info_label_layout.size_hint_y = 0
-            self.info_label_bottom = None
-            #
-            # self.info_label_bottom.y = self.elsewhere
-            # self.info_label_bottom.size_hint_y = None
-            # # self.info_label_bottom.min_height = 0
-            # self.info_label_bottom.height = 1000
+        if self.info_label_widget is not None:
+            self.clear_widgets(self.info_label_widget)
+            self.info_label_widget = None
 
     def show_info(self, value):
         self.info_showed = value

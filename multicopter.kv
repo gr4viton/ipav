@@ -585,14 +585,14 @@
 
     kivy_image: kivy_image
 
-#    info_label_bottom: info_label_bottom
-    info_label_layout: info_label_layout
-#    control_layout: control_layout
-    bottom_layout: bottom_layout
+#    bottom_layout: bottom_layout
 
 #    info_label_right: info_label_right
     time_label: time_label
 
+    cols:1
+    size_hint: (None, None)
+    width: 282
 
 #    layout_steps_height: 1500
 #    size_hint_y: 0.4
@@ -605,7 +605,8 @@
 #    size_hint_y: layout_steps_height / 400
 
 #    cols: 1
-    orientation: 'tb-rl'
+
+#    orientation: 'tb-rl'
 #    orientation: 'vertical'
 
     padding: (4,4,4,4)
@@ -617,17 +618,16 @@
             rgb: self.color
         Rectangle:
             pos: self.x + self.margin, self.y + self.margin + 1
-            size: self.width - 2 * self.margin , self.height - 2 * self.margin
+            size: self.width - 2 * self.margin , root.height - 2 * self.margin
 #            self.thickness
 
 
-    id: bottom_layout
+#    id: bottom_layout
 
     GridLayout:
         cols: 2
-#        size_hint_y: 0.15
-#        size_hint_y: None
-#        height: 0.15 * 250
+        size_hint_y: None
+        height: 0.15 * 250
 
         ToggleButton:
             id: tbt_narrow
@@ -671,14 +671,6 @@
                     state: 'down'
                     on_state: root.set_drawing(self.state == 'down')
 
-#    GridLayout
-#        cols:1
-#        size_hint_y: 0.85
-#    GridLayout:
-#        cols: 1
-##        size_hint_y: 0.8
-##            GridLayout:
-#                cols:1
     Image:
         id: kivy_image
 #        size_hint_y: None
@@ -696,17 +688,16 @@
 ##                do_scroll: 'True'
 
 
-    GridLayout:
-        cols: 1
-        id: info_label_layout
-#        size_hint_y: None
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<StepWidgetInfoLabel>
+    multiline: 'True'
+    text: '2\n3'
+    size_hint: 1, None
+    height: (len(self._lines)+1) * self.line_height
+    on_text: self.update_parent()
+#    on_enter: self.update_parent()
+    on_focus: self.update_parent()
 
-#        GridLayout:
-#            cols: 1
-#            id: control_layout
-##            size_hint_y: 0.2
-
-#
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 #<InfoLabelWidget@TextInput>:
 <InfoLabelWidget>:
