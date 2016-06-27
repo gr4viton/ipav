@@ -1,0 +1,79 @@
+#:kivy 1.9
+
+<steps_demo>:
+
+    layout_steps: layout_steps
+    cols: 1
+    GridLayout: # right tab
+        cols: 1
+        padding: 5
+        GridLayout: # step window layout
+            cols:1
+            id: grid_steps
+            ScrollView: # step scrolling
+                id: scroll_steps
+
+                min_move: 5
+                scroll_distance: min(self.width, self.height) * 0.8
+                do_scroll_x: 0
+
+                StackLayout:
+                    height: self.minimum_height - 0
+                    size_hint_y: None
+                    id: layout_steps
+                    orientation: 'lr-tb'
+
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<StepWidgetInfo>
+    multiline: 'True'
+    text: '2\n3'
+    size_hint: 1, None
+    height: (len(self._lines)+1) * self.line_height
+    on_text: self.update_parent()
+#    on_enter: self.update_parent()
+    on_focus: self.update_parent()
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+<StepWidget>:
+
+    bottom_layout: bottom_layout
+
+#    orientation: 'vertical'
+    cols:1
+
+    size_hint_y: None
+    size_hint_x: None
+
+    width: 225
+#    height: sum([child.height for child in self.children])
+#    height: self.minimum_height
+    cols: 1
+
+    padding: (4,4,4,4)
+    spacing: (4,4)
+    margin: 1
+    color: .08,.16 , .24
+    canvas.before:
+        Color:
+            rgb: self.color
+        Rectangle:
+            pos: self.x + self.margin, self.y + self.margin + 1
+            size: self.width - 2 * self.margin , root.height - 2 * self.margin
+
+    id: bottom_layout
+
+    GridLayout:
+        cols: 2
+        size_hint_y: None
+        height: 0.15 * 250
+
+        ToggleButton:
+            id: tbt_narrow
+            text: root.name
+            size_hint_x: 0.9
+            state: 'down'
+#            on_state: root.set_narrowed(narrowed=(self.state != 'down'), from_gui=True)
+
+            on_state: root.clear_widgets()
+
