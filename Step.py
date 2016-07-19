@@ -2,7 +2,8 @@ import time
 from StepEnum import DataDictParameterNames as dd
 import numpy as np
 
-from copy import copy
+# from copy import copy
+from StepData import StepData
 
 class Step():
     """ Step class - this is usefull comment, literally"""
@@ -31,13 +32,26 @@ class Step():
         self.last_widget_name_label = name
 
         # self.controls = None
-        self.controls = controls
+        self.controls = None
+        if controls:
+            # self.controls = controls
+            self.controls_type = type(controls)
 
+            self.controls = self.controls_type()
+            # self.controls_original = controls
+            print( 'controls', type(controls))
+            # ResolutionControls
+            # self.controls = GridLayout()
+
+            print('Got controls for step [{}] = {}'.format(self.name, self.controls))
+
+
+
+        self.data_prev = StepData()
+        self.data_post = StepData()
         self.count = 0
 
-        if controls:
-            print('Got controls for step [{}]'.format(self.name))
-            print(self.controls)
+
 
     def rename_stepwidget_label(self, new_name):
         if self.last_widget_name_label is not new_name:
@@ -51,18 +65,16 @@ class Step():
         self.data_post[dd.new_name] = ''
 
     def run(self, data_prev):
-        self.data_prev = data_prev.copy()
+        # self.data_prev = data_prev.copy()
         # self.data_prev = copy(data_prev)
-
+        self.data_prev.copy_from(data_prev)
 
         if self.count == 0:
             print('address new = {}, old = {} == step[{}]'.format(
                 hex(id(self.data_prev[dd.im])),
                 hex(id(data_prev[dd.im])),
-                self.name
+                self.name + ' before'
             ))
-            self.count = 200
-        self.count -=1
 
 
         # self.user_input = False # e.g. from snippet or gui
@@ -77,8 +89,19 @@ class Step():
 
         self.data_prev[dd.info_text] = ''
         start = time.time()
-        self.data_post = self.function(self.data_prev)
+        # self.data_post = self.function(self.data_prev)
+        self.data_post.copy_from(self.function(self.data_prev))
         end = time.time()
+
+        if self.count == 0:
+            print('address new = {}, old = {} == step[{}]'.format(
+                hex(id(self.data_prev[dd.im])),
+                hex(id(data_prev[dd.im])),
+                self.name + ' after'
+            ))
+            self.count = 200
+        self.count -=1
+
 
         self.check_renaming()
         # new_name = self.data_post.get(dd.new_name,'')
