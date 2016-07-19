@@ -1,23 +1,14 @@
-import numpy as np
-import cv2
 
-import findHomeography as fh
-
-from subprocess import Popen, PIPE
-
-# from cv2 import xfeatures2d
-# import common
 import time
-import sys
 import os
 
-from StepEnum import DataDictParameterNames as dd
-from StepData import StepData
 from FcnAditional import *
 from Step import Step
 from StepEnum import DataDictParameterNames as dd
+from StepData import StepData
+# from kivy.uix.slider import Slider
 
-from kivy.uix.slider import Slider
+from StepEnum import DataDictParameterNames as dd
 from kivy.uix.gridlayout import GridLayout
 
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty, BoundedNumericProperty

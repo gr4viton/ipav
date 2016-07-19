@@ -1,32 +1,12 @@
+
 from kivy.app import App
-from kivy.lang import Builder
-from kivy.app import App
-from kivy.uix.widget import Widget
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.image import Image
-from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.uix.popup import Popup
-from kivy.uix.textinput import TextInput
-
-from kivy.graphics import Color, Rectangle
-from kivy.uix.floatlayout import FloatLayout
-from kivy.uix.button import Button
-# from kivy.uix.checkbox import CheckBox
-from kivy.uix.togglebutton import ToggleButton
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty
-from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 
-# from kivy.core.window import WindowBase
+from kivy.core.window import Window
 
-import cv2
-import numpy as np
-# import sys
-import threading
-import time
+
 
 from findHomeography import Error as tag_error
 from CaptureControl import CaptureControl
@@ -80,7 +60,6 @@ def convert_rgb_to_texture(im_rgb):
 #         super(ChainStringTextInput, self)._on_focus(instance, value, *largs)
 #
 
-# import functools.partial as partial
 
 
 
@@ -141,17 +120,7 @@ class Multicopter(GridLayout):
         self.change_chain_widget.open()
 
 
-    def __init__(self, capture_control, chain_control, **kwargs):
-        # make sure we aren't overriding any important functionality
-        super(Multicopter, self).__init__(**kwargs)
-
-        # self.init_load_popup()
-
-        self.capture_control = capture_control
-        self.chain_control = chain_control
-        self.chain_control.add_show_load_chain(self.show_load_chain)
-
-        self.step_widgets_control = StepWidgetControl(self.layout_steps)
+    def set_default_chain(self):
 
         # new_chain_string = 'original, gray, resize'
         new_chain_string = 'original, resize, detect red'
@@ -192,12 +161,8 @@ class Multicopter(GridLayout):
         def blender_cube():
             return all_sources_hulls() + ',blend, pause'
 
-
         def detect_green():
             return 'original, resize, detect green'
-
-
-        #
 
         # new_chain_string = 'original, .resize, detect red'
         def source_ids(ids):
@@ -217,6 +182,23 @@ class Multicopter(GridLayout):
 
         new_chain_string = detect_green()
         new_chain_string = 'original'
+
+        return new_chain_string
+
+    def __init__(self, capture_control, chain_control, **kwargs):
+        # make sure we aren't overriding any important functionality
+        super(Multicopter, self).__init__(**kwargs)
+
+        # self.init_load_popup()
+
+        self.capture_control = capture_control
+        self.chain_control = chain_control
+        self.chain_control.add_show_load_chain(self.show_load_chain)
+
+        self.step_widgets_control = StepWidgetControl(self.layout_steps)
+
+        new_chain_string = self.set_default_chain()
+
         # Load the chain
         available_steps_dict = self.chain_control.get_available_steps()
 
@@ -247,6 +229,8 @@ class multicopterApp(App):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
         w = 1360
+        top = 15
+        left = 4
         # 1305 714
         Config.set('kivy', 'show_fps', 1)
         Config.set('kivy', 'desktop', 1)
@@ -255,13 +239,19 @@ class multicopterApp(App):
         # Config.set('graphics', 'window_state', 'maximized')
         Config.set('graphics', 'position', 'custom')
         Config.set('graphics', 'height', h)
+        print( 'height =',Config.getint('graphics', 'height'))
+        print( 'Window.size =',Window.size)
+
         Config.set('graphics', 'width', w)
-        Config.set('graphics', 'top', 15)
-        Config.set('graphics', 'left', 4)
+        Config.set('graphics', 'top', top )
+        Config.set('graphics', 'left', left)
         Config.set('graphics', 'multisamples', 0) # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
 
+        # Config.set('graphics', 'height', h)
+        # Config.set('graphics', 'width', w)
 
         Config.set('input', 'mouse', 'mouse,disable_multitouch')
+
 
         # Config.set('graphics', 'fullscreen', 'fake')
         # Config.set('graphics', 'fullscreen', 1)
@@ -297,7 +287,12 @@ class multicopterApp(App):
         #         on_keyboard=self.keyboard_shortcut)
         # win.bind(on_keyboard=self._on_keyboard_handler)
 
+        # Config.set('graphics', 'resizable', '0')
+        # Window.size = (w,h)
+        # Window.position = (top,left)
+
         self.root = Multicopter(self.capture_control, self.chain_control)
+
         self.build_opencv()
 
         return self.root

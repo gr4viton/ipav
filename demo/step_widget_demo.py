@@ -18,15 +18,14 @@ from kivy.uix.stacklayout import StackLayout
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.anchorlayout import AnchorLayout
 
-from kivy.uix.scrollview import ScrollView
+# from kivy.uix.scrollview import ScrollView
 
 txt='''
 #:kivy 1.9
 
 <steps_demo>:
-
     layout_steps: layout_steps
-    cols: 1
+    # cols: 1
     GridLayout: # right tab
         cols: 1
         padding: 5
