@@ -2,9 +2,9 @@ import numpy as np
 import cv2
 from enum import Enum
 
-import matplotlib.pyplot as plt
-from itertools import cycle
-import howToFindSqure as sq
+# import matplotlib.pyplot as plt
+# from itertools import cycle
+# import howToFindSqure as sq
 
 class Error(Enum):
     flawless = 0

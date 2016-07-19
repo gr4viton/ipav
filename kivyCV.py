@@ -1,14 +1,36 @@
-
 from kivy.app import App
+from kivy.lang import Builder
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.image import Image
+from kivy.uix.label import Label
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
-from kivy.config import Config
-
-from kivy.core.window import Window
+from kivy.uix.popup import Popup
+from kivy.uix.textinput import TextInput
 
 import sys
 sys.path.append('./blender')
 sys.path.append('./demo')
+
+from kivy.graphics import Color, Rectangle
+from kivy.uix.floatlayout import FloatLayout
+from kivy.uix.button import Button
+# from kivy.uix.checkbox import CheckBox
+from kivy.uix.togglebutton import ToggleButton
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.uix.behaviors import ButtonBehavior
+from kivy.config import Config
+
+# from kivy.core.window import WindowBase
+
+import cv2
+import numpy as np
+# import sys
+import threading
+import time
 
 from findHomeography import Error as tag_error
 from CaptureControl import CaptureControl
@@ -235,14 +257,14 @@ class multicopterApp(App):
         left = 4
         # 1305 714
         Config.set('kivy', 'show_fps', 1)
-        Config.set('kivy', 'desktop', 1)
+        # Config.set('kivy', 'desktop', 1)
         # Config.set('kivy', 'name', 'a')
 
         # Config.set('graphics', 'window_state', 'maximized')
         Config.set('graphics', 'position', 'custom')
         Config.set('graphics', 'height', h)
         print( 'height =',Config.getint('graphics', 'height'))
-        print( 'Window.size =',Window.size)
+        # print( 'Window.size =',Window.size)
 
         Config.set('graphics', 'width', w)
         Config.set('graphics', 'top', top )
