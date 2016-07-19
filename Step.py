@@ -28,8 +28,8 @@ class Step():
 
         self.last_widget_name_label = name
 
-        self.controls = None
-        # self.controls = controls
+        # self.controls = None
+        self.controls = controls
 
         if controls:
             print('Got controls for step [{}]'.format(self.name))

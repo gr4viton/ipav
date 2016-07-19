@@ -100,7 +100,7 @@ import sys
 
 
 
-, NumericProperty
+# , NumericProperty
 from kivy.uix.behaviors import ButtonBehavior
 from kivy.config import Config
 from kivy.uix.boxlayout import BoxLayout
