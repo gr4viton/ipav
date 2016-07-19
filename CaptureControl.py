@@ -1,7 +1,7 @@
 from thread_controls import ImageStreamControl #, ChainControl, Chain
 import cv2
 
-from camera_distinguish import Distinguish
+# from camera_distinguish import Distinguish
 
 def init_cap_prop():
     prefix = 'CAP_PROP_'

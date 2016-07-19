@@ -6,7 +6,9 @@ from kivy.config import Config
 
 from kivy.core.window import Window
 
-
+import sys
+sys.path.append('./blender')
+sys.path.append('./demo')
 
 from findHomeography import Error as tag_error
 from CaptureControl import CaptureControl
