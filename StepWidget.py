@@ -12,6 +12,8 @@ import cv2
 import numpy as np
 from StepEnum import DataDictParameterNames as dd
 
+from copy import copy
+
 
 class StepWidgetImage(Image):
     pass
@@ -176,7 +178,7 @@ class StepWidget(GridLayout):
             print('Deleted old controls widgets')
 
 
-        self.controls = self.step.controls
+        self.controls = copy(self.step.controls)
         if self.controls:
             self.add_widget(self.controls)
             print('Created new controls widgets')

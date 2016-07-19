@@ -9,9 +9,13 @@ class StepData(dict):
         dict_copy = self.__dict__.copy()
         # print(dict_copy.keys())
         if dd.im in dict_copy.keys():
+            # if dd.im
             dict_copy[dd.im] = dict_copy[dd.im].copy()
-        # print("making copy!")
+            # print("making copy!")
         return dict_copy
+
+    def copy_insides(self):
+        pass
 
     def __setitem__(self, key, item):
         self.__dict__[key] = item

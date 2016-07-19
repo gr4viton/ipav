@@ -18,7 +18,6 @@ import numpy as np
 import cv2
 import findHomeography as fh
 
-# from StepControl import *
 from kivy.properties import ObjectProperty, StringProperty, NumericProperty, BoundedNumericProperty
 
 from kivy.uix.gridlayout import GridLayout

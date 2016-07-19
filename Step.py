@@ -2,6 +2,8 @@ import time
 from StepEnum import DataDictParameterNames as dd
 import numpy as np
 
+from copy import copy
+
 class Step():
     """ Step class - this is usefull comment, literally"""
 
@@ -31,6 +33,8 @@ class Step():
         # self.controls = None
         self.controls = controls
 
+        self.count = 0
+
         if controls:
             print('Got controls for step [{}]'.format(self.name))
             print(self.controls)
@@ -48,6 +52,17 @@ class Step():
 
     def run(self, data_prev):
         self.data_prev = data_prev.copy()
+        # self.data_prev = copy(data_prev)
+
+
+        if self.count == 0:
+            print('address new = {}, old = {} == step[{}]'.format(
+                hex(id(self.data_prev[dd.im])),
+                hex(id(data_prev[dd.im])),
+                self.name
+            ))
+            self.count = 200
+        self.count -=1
 
 
         # self.user_input = False # e.g. from snippet or gui
