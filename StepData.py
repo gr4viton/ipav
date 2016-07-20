@@ -50,8 +50,8 @@ class StepData(dict):
         self.__dict__[key] = item
 
     def __getitem__(self, key):
-        # return self.__dict__[key]
-        val = dict.__getitem__(self, key)
+        return self.__dict__[key]
+        # val = dict.__getitem__(self, key)
         return val
 
     def __repr__(self):
