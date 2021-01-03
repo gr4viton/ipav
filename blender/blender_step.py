@@ -61,8 +61,6 @@ class blender_module():
 
         script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
         self.pic_dir = os.path.join(script_dir, 'pic')
-<<<<<<< HEAD
-
 
         self.script_path = os.path.join(script_dir, 'render.py')
         # script_file = 'mediator.py'

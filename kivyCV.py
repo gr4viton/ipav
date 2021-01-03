@@ -138,6 +138,7 @@ class Multicopter(GridLayout):
         # new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, pause 5'
         # new_chain_string = 'original'
         new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5'
+        new_chain_string = 'original'
 
 
         def try_detect_green():
@@ -276,7 +277,6 @@ class multicopterApp(App):
         Chain.load_data_chain_names = Chain.tag_names
 
         current_chain = Chain(selected_chain_name, start_chain = False)
-
 
         self.chain_control = ChainControl(self.capture_control, current_chain)
         self.chain_control.start_computing()

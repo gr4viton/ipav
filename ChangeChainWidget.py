@@ -10,7 +10,7 @@ from kivy.core.text import Label as CoreLabel
 class Fonter():
     fonts_paths = CoreLabel.get_system_fonts_dir()
     # fonts_path = fonts_paths[1] + '\\'
-    fonts_path = fonts_paths[0] + '\\'
+    fonts_path = fonts_paths[0]
 
 class ButtonLeft(Button):
     pass
@@ -131,10 +131,14 @@ class ChangeChainWidget(Popup):
                 ChainHistory(text=chain_string, use_chain=self.use_chain))
 
 class UnicodeButton(Button, Fonter):
-    # unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
-    unifont = str(Fonter.fonts_path) + 'calibrib'
-    # unifont = str(Fonter.fonts_path) + 'Carlito-Bold'
-    # unifont = str(Fonter.fonts_path) + 'DejaVuSans'
+    windows = False
+    if windows:
+        # unifont = str(Fonter.fonts_path) + 'SourceCodePro-Regular'
+        unifont = str(Fonter.fonts_path) + '\\calibrib'
+        # unifont = str(Fonter.fonts_path) + 'Carlito-Bold'
+        # unifont = str(Fonter.fonts_path) + 'DejaVuSans'
+    else:
+        unifont = Fonter.fonts_path + '/truetype/dejavu/DejaVuSans'
 
 class ChainHistory(GridLayout, Fonter):
     text = StringProperty()
