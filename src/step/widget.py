@@ -9,7 +9,7 @@ from kivy.properties import ObjectProperty, StringProperty
 
 import cv2
 import numpy as np
-from StepEnum import DataDictParameterNames as dd
+from step.enums import DataDictParameterNames as dd
 
 from copy import copy
 

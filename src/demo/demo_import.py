@@ -68,14 +68,9 @@ from subprocess import Popen, PIPE
 import sys
 
 
-from StepEnum import DataDictParameterNames as dd
-from StepData import StepData
+from step.enums import DataDictParameterNames as dd
+from step.data import StepData
 from kivy.uix.slider import Slider
-
-from StepEnum import DataDictParameterNames as dd
-from StepData import StepData
-from kivy.uix.slider import Slider
-
 
 import findHomeography as fh
 import timeit

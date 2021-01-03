@@ -2,7 +2,7 @@ from kivy.uix.gridlayout import GridLayout
 
 from kivy.properties import ObjectProperty, BoundedNumericProperty
 
-from StepEnum import DataDictParameterNames as dd
+from step.enums import DataDictParameterNames as dd
 
 
 class DetectColorControls(GridLayout):

@@ -12,7 +12,7 @@ from kivy.config import Config
 
 from findHomeography import Error as tag_error
 from CaptureControl import CaptureControl
-from StepWidget import StepWidgetControl
+from step.widget import StepWidgetControl
 from ChangeChainWidget import ChangeChainWidget
 
 import numpy as np

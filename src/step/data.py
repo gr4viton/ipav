@@ -1,5 +1,5 @@
 import numpy as np
-from StepEnum import DataDictParameterNames as dd
+from step.enums import DataDictParameterNames as dd
 
 
 class StepData(dict):

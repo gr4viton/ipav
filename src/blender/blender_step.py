@@ -10,7 +10,7 @@ import os
 import shutil
 from subprocess import Popen, PIPE, STDOUT
 
-from StepEnum import DataDictParameterNames as dd
+from step.enums import DataDictParameterNames as dd
 
 # import blender_client
 import sys

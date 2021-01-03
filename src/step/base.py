@@ -1,9 +1,9 @@
 import time
-from StepEnum import DataDictParameterNames as dd
+from step.enums import DataDictParameterNames as dd
 import numpy as np
 
 # from copy import copy
-from StepData import StepData
+from step.data import StepData
 
 
 class Step:

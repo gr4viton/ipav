@@ -5,9 +5,9 @@ import threading
 import cv2
 import numpy as np
 
-from StepControl import StepControl
-from StepEnum import DataDictParameterNames as dd
-from StepData import StepData
+from step.control import StepControl
+from step.enums import DataDictParameterNames as dd
+from step.data import StepData
 
 import os
 

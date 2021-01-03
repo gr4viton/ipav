@@ -6,8 +6,8 @@ import cv2
 import findHomeography as fh
 
 
-from Step import Step
-from StepEnum import DataDictParameterNames as dd
+from step.base import Step
+from step.enums import DataDictParameterNames as dd
 
 from ControlsWidgets import DetectColorControls, ResolutionControls
 
