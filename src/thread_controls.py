@@ -11,7 +11,7 @@ from step.data import StepData
 
 import os
 
-import CaptureControl as cc
+import capture_control as cc  # circular dependency if CaptureControl imported right away
 
 
 class LockedValue(object):

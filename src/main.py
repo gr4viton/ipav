@@ -9,9 +9,8 @@ sys.path.append("./demo")
 
 from kivy.config import Config
 
-
 from findHomeography import Error as tag_error
-from CaptureControl import CaptureControl
+from capture_control import CaptureControl
 from step.widget import StepWidgetControl
 from ChangeChainWidget import ChangeChainWidget
 

@@ -5,6 +5,7 @@ import cv2
 
 
 def init_cap_prop():
+    """Get the capture control keywords from opencv library."""
     prefix = "CAP_PROP_"
     length = len(prefix)
     dir_cv2_cap_prop = [word for word in dir(cv2) if word[:length] == prefix]
@@ -14,6 +15,7 @@ def init_cap_prop():
 
 
 class CaptureControl:
+    """Handler of multiple video sources."""
     streams = []
     stream_id = 0
     dir_cv2_cap_prop = init_cap_prop()
