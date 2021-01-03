@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-import findHomeography as fh
+import steps.find_homeography as fh
 import sys
 import time
 import os

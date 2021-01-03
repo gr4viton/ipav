@@ -26,3 +26,17 @@ Also used for generating 3d model from silhouettes of an objects captured by mul
   - 3D model shaping ->
 
 - developed on Windows 7 desktop (rip)
+
+# Redesign
+
+The first implementation design was semi-random. Started sporadic refactoring of the IPAV on 2021-01.
+
+## Structure
+
+Folders
+```
+step - prototypes and templates connected to Step class.
+steps - implementation of opencv and other CV methods inheriting from Step
+flow - tbd
+flows - tbd
+```

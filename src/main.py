@@ -9,14 +9,14 @@ sys.path.append("./demo")
 
 from kivy.config import Config
 
-from findHomeography import Error as tag_error
+from steps.find_homeography import Error as tag_error
 from capture_control import CaptureControl
 from step.widget import StepWidgetControl
 from ChangeChainWidget import ChangeChainWidget
 
 import numpy as np
 import cv2
-import findHomeography as fh
+import steps.find_homeography as fh
 
 from kivy.properties import (
     ObjectProperty,
