@@ -238,12 +238,12 @@ class Ipav(GridLayout):
     #         return True
 
 
-class ipavApp(App):
+class IpavApp(App):
     # frame = []
     # running_findtag = False
     title = ""
 
-    def build(self):
+    def configure_kivy(self):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
         w = 1360
@@ -274,6 +274,9 @@ class ipavApp(App):
 
         # Config.set('graphics', 'fullscreen', 'fake')
         # Config.set('graphics', 'fullscreen', 1)
+
+    def build(self):
+        self.configure_kivy()
 
         self.capture_control = CaptureControl()
         self.capture_control.start_all_capturing()
@@ -461,7 +464,7 @@ class ipavApp(App):
 
 
 if __name__ == "__main__":
-    ipavApp().run()
+    IpavApp().run()
     # comment
 
 
