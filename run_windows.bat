@@ -4,4 +4,4 @@ echo Changing direcotory to %cd%
 
 python.exe -c "print('\7')" :: BEEP
 
-python.exe kivyCV.py
+python.exe main.py

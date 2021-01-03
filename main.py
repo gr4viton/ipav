@@ -78,7 +78,7 @@ def convert_rgb_to_texture(im_rgb):
 #
 
 
-class Multicopter(GridLayout):
+class Ipav(GridLayout):
     gl_left = ObjectProperty()
     gl_middle = ObjectProperty()
     gl_right = ObjectProperty()
@@ -204,7 +204,7 @@ class Multicopter(GridLayout):
 
     def __init__(self, capture_control, chain_control, **kwargs):
         # make sure we aren't overriding any important functionality
-        super(Multicopter, self).__init__(**kwargs)
+        super(Ipav, self).__init__(**kwargs)
 
         # self.init_load_popup()
 
@@ -239,7 +239,7 @@ class Multicopter(GridLayout):
     #         return True
 
 
-class multicopterApp(App):
+class ipavApp(App):
     # frame = []
     # running_findtag = False
     title = ""
@@ -311,7 +311,7 @@ class multicopterApp(App):
         # Window.size = (w,h)
         # Window.position = (top,left)
 
-        self.root = Multicopter(self.capture_control, self.chain_control)
+        self.root = Ipav(self.capture_control, self.chain_control)
 
         self.build_opencv()
 
@@ -462,7 +462,7 @@ class multicopterApp(App):
 
 
 if __name__ == "__main__":
-    multicopterApp().run()
+    ipavApp().run()
     # comment
 
 

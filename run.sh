@@ -1,1 +1,1 @@
-pipenv run python kivyCV.py
+pipenv run python main.py
