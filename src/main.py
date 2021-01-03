@@ -2,11 +2,6 @@ from kivy.app import App
 from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 
-import sys
-
-sys.path.append("./blender")
-sys.path.append("./demo")
-
 from kivy.config import Config
 
 from steps.find_homeography import Error as tag_error
@@ -17,6 +12,7 @@ from ChangeChainWidget import ChangeChainWidget
 import numpy as np
 import cv2
 import steps.find_homeography as fh
+
 
 from kivy.properties import (
     ObjectProperty,

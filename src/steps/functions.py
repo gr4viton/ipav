@@ -1,6 +1,6 @@
 import numpy as np
 import cv2
-import find_homeography as fh
+import steps.find_homeography as fh
 
 
 def rgb_to_str(rgb):

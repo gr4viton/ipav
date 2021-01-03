@@ -22,9 +22,6 @@ class ImageStreamControl:
     already_selected = []
     count = 0
     invalid_values = [-1, 2009211520]
-    # invalid_values = [-1]
-    # invalid_values = [2009211520]
-    # invalid_values = []
 
     def __init__(self, source_id=0):
         # self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )

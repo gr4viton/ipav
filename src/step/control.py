@@ -11,6 +11,8 @@ from step.enums import DataDictParameterNames as dd
 
 from ControlsWidgets import DetectColorControls, ResolutionControls
 
+from steps.functions import threshIT, imclearborder, findTagsInScene
+
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # global variables
 
@@ -225,7 +227,7 @@ class StepControl:
         # self.available_step_fcn = {}
 
         def add_default(data, param, value):
-            if data[dd.take_all_def] == True or data[param] == None:
+            if data[dd.take_all_def] or data[param] is None:
                 data[param] = value
             return data[param]
 
@@ -694,7 +696,7 @@ class StepControl:
 
         # sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 
-        import blender_step
+        import blender.blender_step as blender_step
 
         self.bm = blender_step.blender_module()
 
@@ -844,7 +846,7 @@ class StepControl:
             return im_cnts
 
         def make_convex_hull(data):
-            if data[dd.cnts] == None:
+            if data[dd.cnts] is None:
                 # calc cnts
                 data = make_find_contours(data)
 

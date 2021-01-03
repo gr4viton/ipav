@@ -117,3 +117,8 @@ x] from data dict param names
 
 
 [] export only images of chain with arrows
+
+
+# todo
+- use docker containers for indidual step types
+  - scale the number of containers if more FPS are needed
