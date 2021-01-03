@@ -27,7 +27,8 @@ from kivy.properties import (
 
 from kivy.uix.gridlayout import GridLayout
 
-from thread_controls import ChainControl, Chain
+from chain.base import Chain
+from chain.control import ChainControl
 
 
 def colorify(im):
