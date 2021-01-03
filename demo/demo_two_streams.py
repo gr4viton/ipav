@@ -11,6 +11,6 @@ cap1 = cv2.VideoCapture(1)
 # cap1.set(4,120)
 
 ret0, frame0 = cap0.read()
-assert ret0 # succeeds
+assert ret0  # succeeds
 ret1, frame1 = cap1.read()
-assert ret1 # fails?!
+assert ret1  # fails?!

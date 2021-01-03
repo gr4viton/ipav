@@ -8,6 +8,7 @@
 PORT = 8081
 HOST = "localhost"
 
+
 def main():
     import sys
     import socket
@@ -16,7 +17,7 @@ def main():
     clientsocket.connect((HOST, PORT))
 
     for arg in sys.argv[1:]:
-        clientsocket.sendall(arg.encode("utf-8") + b'\x00')
+        clientsocket.sendall(arg.encode("utf-8") + b"\x00")
 
 
 if __name__ == "__main__":

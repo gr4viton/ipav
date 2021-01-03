@@ -14,20 +14,23 @@ import render
 # HOST = "192.168.1.100"
 PATH_MAX = 4096
 
+
 def execfile(filepath):
     import os
+
     global_namespace = {
         "__file__": filepath,
         "__name__": "__main__",
-        }
-    with open(filepath, 'rb') as file:
-        exec(compile(file.read(), filepath, 'exec'), global_namespace)
+    }
+    with open(filepath, "rb") as file:
+        exec(compile(file.read(), filepath, "exec"), global_namespace)
+
 
 class FlushFile(object):
-    '''
+    """
     http://stackoverflow.com/questions/230751/how-to-flush-output-of-python-print
     to flush after print
-    '''
+    """
 
     def __init__(self, fd):
         self.fd = fd
@@ -51,14 +54,14 @@ class FlushFile(object):
     def fileno(self):
         return self.fd.fileno()
 
-def printl():
-    print('_'*42)
 
+def printl():
+    print("_" * 42)
 
 
 def load_file(blend):
     print("Loading file", blend)
-    
+
 
 def main(PORT, HOST):
     import socket
@@ -71,7 +74,7 @@ def main(PORT, HOST):
     printl()
 
     looping = True
-    ending = pickle.STOP + b'\x00'
+    ending = pickle.STOP + b"\x00"
     while looping:
         connection, address = serversocket.accept()
         buf = connection.recv(PATH_MAX)
@@ -82,17 +85,17 @@ def main(PORT, HOST):
 
             if loaded_pickle:
                 loaded_pickle += pickle.STOP
-                print('loaded_pickle =', loaded_pickle)
+                print("loaded_pickle =", loaded_pickle)
                 data_dict = pickle.loads(loaded_pickle)
-                print('data_dict =', data_dict )
+                print("data_dict =", data_dict)
 
                 if data_dict:
-                    script = data_dict.get('exec', None)
+                    script = data_dict.get("exec", None)
                     if script:
                         print("Executing:", script)
                         execfile(script)
 
-                    blend = data_dict.get('load_blend', None)
+                    blend = data_dict.get("load_blend", None)
                     if blend:
                         load_file(blend)
 
@@ -101,7 +104,7 @@ def main(PORT, HOST):
                     #     looping = False
                     #     break
 
-                    if data_dict.get('exit', None) == True:
+                    if data_dict.get("exit", None) == True:
                         looping = False
                         break
 
@@ -134,6 +137,7 @@ def main(PORT, HOST):
 
     serversocket.close()
 
+
 if __name__ == "__main__":
     """
     This script is intended to be run in blender python interpreter.
@@ -150,33 +154,31 @@ if __name__ == "__main__":
     # message('I am flushing out now...')
 
     PORT = 8083
-    HOST = 'localhost'
+    HOST = "localhost"
 
-    delimiter = '--'
+    delimiter = "--"
     read_params = False
-    last_param = ''
+    last_param = ""
     param_dict = {}
 
-    print('sys.argv =', sys.argv)
+    print("sys.argv =", sys.argv)
     for arg in sys.argv:
-        if arg == '--':
+        if arg == "--":
             read_params = True
         else:
             if read_params == True:
-                if last_param == '':
+                if last_param == "":
                     last_param = arg
                 else:
                     param_dict.update({last_param: arg})
-                    last_param = ''
+                    last_param = ""
 
-    print('param_dict =', param_dict)
-    if 'PORT' in param_dict.keys():
-        PORT =  int(param_dict['PORT'])
-    if 'HOST' in param_dict.keys():
-        HOST =  param_dict['HOST']
+    print("param_dict =", param_dict)
+    if "PORT" in param_dict.keys():
+        PORT = int(param_dict["PORT"])
+    if "HOST" in param_dict.keys():
+        HOST = param_dict["HOST"]
 
-
-    print('Executing main with PORT=', PORT, '| HOST=', HOST)
+    print("Executing main with PORT=", PORT, "| HOST=", HOST)
     # sys.stdout.flush()
     main(PORT, HOST)
-

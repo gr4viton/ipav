@@ -2,22 +2,24 @@ import numpy as np
 import cv2
 import findHomeography as fh
 
+
 def rgb_to_str(rgb):
     """Returns: string representation of RGB without alpha
 
     Parameter rgb: the color object to display
     Precondition: rgb is an RGB object"""
-    return '[ '+str(rgb[0])+', '+str(rgb[1])+', '+str(rgb[2])+' ]'
-
+    return "[ " + str(rgb[0]) + ", " + str(rgb[1]) + ", " + str(rgb[2]) + " ]"
 
 
 def imclearborder(im, radius, buffer, mask):
     # Given a black and white image, first find all of its contours
 
-    #todo make faster copping as buffer is always the same size!
+    # todo make faster copping as buffer is always the same size!
     buffer = im.copy()
     # _, contours, hierarchy = cv2.findContours(buffer, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    _, contours, hierarchy = cv2.findContours(buffer, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS)
+    _, contours, hierarchy = cv2.findContours(
+        buffer, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_KCOS
+    )
     # _, contours, hierarchy = cv2.findContours(buffer, cv2.RETR_TREE, cv2.CHAIN_APPROX_TC89_L1)
 
     # hierarchy = Next, Previous, First_Child, Parent
@@ -26,7 +28,7 @@ def imclearborder(im, radius, buffer, mask):
     n_cols = im.shape[1]
 
     cTouching = []  # indexes of contours that touch the border
-    cInsideTouching = [] # indexes that are inside of contours that touch the border
+    cInsideTouching = []  # indexes that are inside of contours that touch the border
 
     # print('len contour',len(contours))
     # For each contour...
@@ -44,8 +46,12 @@ def imclearborder(im, radius, buffer, mask):
             colCnt = pt[0][0]
 
             # If this is within the radius of the border this contour goes bye bye!
-            check1 = (rowCnt >= 0 and rowCnt < radius) or (rowCnt >= n_rows - 1 - radius and rowCnt < n_rows)
-            check2 = (colCnt >= 0 and colCnt < radius) or (colCnt >= n_cols - 1 - radius and colCnt < n_cols)
+            check1 = (rowCnt >= 0 and rowCnt < radius) or (
+                rowCnt >= n_rows - 1 - radius and rowCnt < n_rows
+            )
+            check2 = (colCnt >= 0 and colCnt < radius) or (
+                colCnt >= n_cols - 1 - radius and colCnt < n_cols
+            )
 
             if check1 or check2:
 
@@ -53,13 +59,12 @@ def imclearborder(im, radius, buffer, mask):
 
                 # add first children inside cInsideTouching
                 # = first children is the other edge of external touching contour
-                q = hierarchy[0][idx][2] # first child index
+                q = hierarchy[0][idx][2]  # first child index
                 if q != -1:
                     cInsideTouching.append(q)
 
                 # as this contour is already added
                 break
-
 
     # as the contours are CHAIN_APPROX for speed, this makes also the "noise" dissapear
     approx_correction_thickness = 3
@@ -70,14 +75,18 @@ def imclearborder(im, radius, buffer, mask):
     for idx in cTouching:
         col = 0
         cv2.drawContours(mask, contours, idx, col, thickness=-1)
-        cv2.drawContours(mask, contours, idx, col, thickness=approx_correction_thickness )
+        cv2.drawContours(
+            mask, contours, idx, col, thickness=approx_correction_thickness
+        )
 
     # make the inner contours visible
     for idx in cInsideTouching:
         col = 255
         cv2.drawContours(mask, contours, idx, color=col, thickness=-1)
         col = 0
-        cv2.drawContours(mask, contours, idx, color=col, thickness=approx_correction_thickness )
+        cv2.drawContours(
+            mask, contours, idx, color=col, thickness=approx_correction_thickness
+        )
 
     # mask2 = mask.copy()
     # cv2.dilate(mask,mask2)
@@ -87,13 +96,12 @@ def imclearborder(im, radius, buffer, mask):
     return buffer
 
 
-
 def extractContourArea(im_scene, external_contour):
-    mask = np.uint8( np.zeros(im_scene.shape) )
+    mask = np.uint8(np.zeros(im_scene.shape))
     col = 1
     cv2.drawContours(mask, [external_contour], 0, col, -1)
 
-    scene_with_tag = np.uint8( np.zeros(im_scene.shape) )
+    scene_with_tag = np.uint8(np.zeros(im_scene.shape))
     cv2.bitwise_and(mask, im_scene.copy(), scene_with_tag)
     scene_with_tag = scene_with_tag * 255
 
@@ -105,8 +113,8 @@ def findTagsInScene(im_scene, model_tag):
     max_size = max(im_scene.shape)
     if max_size > allowed_size:
         # find tags in smaller image
-        a = allowed_size/max_size
-        im_scene_smaller = cv2.resize(im_scene,(0,0),fx=a,fy=a)
+        a = allowed_size / max_size
+        im_scene_smaller = cv2.resize(im_scene, (0, 0), fx=a, fy=a)
         markuped_scene, seen_tags = findTags(im_scene_smaller, model_tag)
         if seen_tags is None or len(seen_tags) == 0:
             markuped_scene, seen_tags = findTags(im_scene, model_tag)
@@ -115,14 +123,16 @@ def findTagsInScene(im_scene, model_tag):
 
     return markuped_scene, seen_tags
 
+
 def findTags(im_scene, model_tag):
 
     # first create copy of scene (not to be contoured)
     scene_markuped = im_scene.copy()
 
-
     # _, contours, hierarchy = cv2.findContours(im_scene.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE )
-    _, external_contours, hierarchy = cv2.findContours(im_scene.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_TC89_L1)
+    _, external_contours, hierarchy = cv2.findContours(
+        im_scene.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_TC89_L1
+    )
     # _, external_contours, hierarchy = cv2.findContours(im_scene.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE )
     # _, contours, hierarchy = cv2.findContours(im_scene.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE )
 
@@ -135,8 +145,9 @@ def findTags(im_scene, model_tag):
         scene_with_tag = extractContourArea(im_scene, external_contour)
 
         # initialize observed tag
-        observed_tag = fh.C_observedTag(scene_with_tag, external_contour, scene_markuped)
-
+        observed_tag = fh.C_observedTag(
+            scene_with_tag, external_contour, scene_markuped
+        )
 
         # find out if the tag is in the area
         observed_tag.calculate(model_tag)
@@ -190,17 +201,21 @@ def findTags(im_scene, model_tag):
     #
     # return scene_markuped, seen_tags
 
-def bwareaopen(imgBW, areaPixels,col = 0):
+
+def bwareaopen(imgBW, areaPixels, col=0):
     # Given a black and white image, first find all of its contours
     imgBWcopy = imgBW.copy()
-    _, contours, hierarchy = cv2.findContours(imgBWcopy.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    _, contours, hierarchy = cv2.findContours(
+        imgBWcopy.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE
+    )
 
     # For each contour, determine its total occupying area
     for idx in np.arange(len(contours)):
         area = cv2.contourArea(contours[idx])
-        if (area >= 0 and area <= areaPixels):
+        if area >= 0 and area <= areaPixels:
             cv2.drawContours(imgBWcopy, contours, idx, col, -1)
     return imgBWcopy
+
 
 def threshIT(im, type):
     ## THRESH
@@ -208,24 +223,26 @@ def threshIT(im, type):
         _, th1 = cv2.threshold(im, 127, 255, cv2.THRESH_BINARY_INV)
         return th1
     elif type == cv2.ADAPTIVE_THRESH_MEAN_C or type == 2:
-        th2 = cv2.adaptiveThreshold(im, 255, cv2.ADAPTIVE_THRESH_MEAN_C, \
-                                    cv2.THRESH_BINARY, 11, 2)
+        th2 = cv2.adaptiveThreshold(
+            im, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2
+        )
         return th2
     elif type == cv2.ADAPTIVE_THRESH_MEAN_C or type == 3:
-        th3 = cv2.adaptiveThreshold(im, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, \
-                                    cv2.THRESH_BINARY, 11, 2)
+        th3 = cv2.adaptiveThreshold(
+            im, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2
+        )
         return th3
 
     ## OTSU
-    elif type == 'otsu' or type == 4:
+    elif type == "otsu" or type == 4:
         ret, otsu = cv2.threshold(im, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return otsu
-    elif type == 'otsu_inv':
+    elif type == "otsu_inv":
         ret, otsu = cv2.threshold(im, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         return otsu
 
 
-def add_text(im, text, col = 255, hw = (1, 20)):
+def add_text(im, text, col=255, hw=(1, 20)):
     font = cv2.FONT_HERSHEY_COMPLEX_SMALL
-    cv2.putText(im, text, hw , font, 1, 0, 5)
+    cv2.putText(im, text, hw, font, 1, 0, 5)
     cv2.putText(im, text, hw, font, 1, col)

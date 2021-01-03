@@ -1,4 +1,3 @@
-
 import bpy, mathutils, math
 from mathutils import Vector
 from math import pi
@@ -12,15 +11,14 @@ import stat
 import select
 
 
-
 # script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/blender_out/')
-script_dir = os.path.abspath('D:/DEV/PYTHON/pyCV/kivyCV_start/blender')
-script_file = 'render.py'
+script_dir = os.path.abspath("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
+script_file = "render.py"
 # script_file = 'mediator.py'
 script_path = os.path.join(script_dir, script_file)
 
 filename = script_path
-script= compile(open(filename).read(), filename, 'exec')
+script = compile(open(filename).read(), filename, "exec")
 
 # def start_script(script):
 #     hey()
@@ -36,16 +34,18 @@ script= compile(open(filename).read(), filename, 'exec')
 # def render(origin):
 #     start_script(script_path)
 
+
 def hey():
     print("MEDIATOR HEY!")
 
+
 def printl():
-    print('_'*42)
+    print("_" * 42)
 
 
 if __name__ == "__main__":
     printl()
-    print('Waiting for commands from stdin.')
+    print("Waiting for commands from stdin.")
     printl()
 
     # exec(script)
@@ -66,36 +66,33 @@ if __name__ == "__main__":
             print("Empty stdin")
         if sys.stdin.isatty():
             # print("is  sys.stdin.isatty")
-            print('meh')
+            print("meh")
             for line in sys.stdin:
                 print(line)
-                if line == 'exit':
+                if line == "exit":
                     looping = False
-                elif line == 'render':
+                elif line == "render":
                     exec(script)
-
 
         mode = os.fstat(sys.stdin.fileno()).st_mode
         if stat.S_ISFIFO(mode):
-             print("stdin is piped")
+            print("stdin is piped")
         elif stat.S_ISREG(mode):
-             print( "stdin is redirected")
+            print("stdin is redirected")
         else:
-             print ("stdin is terminal")
-
-
+            print("stdin is terminal")
 
         while True:
             input = ""
-            print('toread')
+            print("toread")
             sys.stdout.flush()
             c = sys.stdin.read(1)
-            print('have read')
+            print("have read")
             sys.stdout.flush()
             while c is not sys.EOF:
                 input += c
                 c = sys.stdin.read(1)
-            for line in input.split('\n'):
+            for line in input.split("\n"):
                 print(line)
 
         # k = 0
@@ -112,20 +109,11 @@ if __name__ == "__main__":
         #    pass
         # print(k)
 
-
-
-
-
-
-
-
-
-
         time.sleep(1)
         sys.stdout.flush()
 
     # start_script(script_compiled)
     # render.run(Vector((0,0,0)))
     printl()
-    print('End of com.py')
+    print("End of com.py")
     printl()

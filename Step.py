@@ -5,14 +5,17 @@ import numpy as np
 # from copy import copy
 from StepData import StepData
 
-class Step():
+
+class Step:
     """ Step class - this is usefull comment, literally"""
 
     steps_count = 0
 
     def __init__(self, name, function, narrowed=False, controls=None):
         self.name = name
-        self.new_name = '' # if changed in rename_stepwidget_label it changes stepwidget label
+        self.new_name = (
+            ""  # if changed in rename_stepwidget_label it changes stepwidget label
+        )
         self.function = function
         self.execution_time_len = 23
         self.execution_time = 0
@@ -27,7 +30,7 @@ class Step():
         self.narrowed = narrowed
 
         self.id = Step.steps_count
-        Step.steps_count +=1
+        Step.steps_count += 1
 
         self.last_widget_name_label = name
 
@@ -39,19 +42,15 @@ class Step():
 
             self.controls = self.controls_type()
             # self.controls_original = controls
-            print( 'controls', type(controls))
+            print("controls", type(controls))
             # ResolutionControls
             # self.controls = GridLayout()
 
-            print('Got controls for step [{}] = {}'.format(self.name, self.controls))
-
-
+            print("Got controls for step [{}] = {}".format(self.name, self.controls))
 
         self.data_prev = StepData()
         self.data_post = StepData()
         self.count = 0
-
-
 
     def rename_stepwidget_label(self, new_name):
         if self.last_widget_name_label is not new_name:
@@ -59,10 +58,10 @@ class Step():
             self.new_name = new_name
 
     def check_renaming(self):
-        new_name = self.data_post.get(dd.new_name, '')
+        new_name = self.data_post.get(dd.new_name, "")
         if new_name:
             self.rename_stepwidget_label(new_name)
-        self.data_post[dd.new_name] = ''
+        self.data_post[dd.new_name] = ""
 
     def run(self, data_prev):
         # self.data_prev = data_prev.copy()
@@ -70,12 +69,13 @@ class Step():
         self.data_prev.copy_from(data_prev)
 
         if self.count == 0:
-            print('address new = {}, old = {} == step[{}]'.format(
-                hex(id(self.data_prev[dd.im])),
-                hex(id(data_prev[dd.im])),
-                self.name + ' before'
-            ))
-
+            print(
+                "address new = {}, old = {} == step[{}]".format(
+                    hex(id(self.data_prev[dd.im])),
+                    hex(id(data_prev[dd.im])),
+                    self.name + " before",
+                )
+            )
 
         # self.user_input = False # e.g. from snippet or gui
         self.user_input = self.controls is not None
@@ -87,29 +87,29 @@ class Step():
         else:
             self.data_prev[dd.take_all_def] = True
 
-        self.data_prev[dd.info_text] = ''
+        self.data_prev[dd.info_text] = ""
         start = time.time()
         # self.data_post = self.function(self.data_prev)
         self.data_post.copy_from(self.function(self.data_prev))
         end = time.time()
 
         if self.count == 0:
-            print('address new = {}, old = {} == step[{}]'.format(
-                hex(id(self.data_prev[dd.im])),
-                hex(id(data_prev[dd.im])),
-                self.name + ' after'
-            ))
+            print(
+                "address new = {}, old = {} == step[{}]".format(
+                    hex(id(self.data_prev[dd.im])),
+                    hex(id(data_prev[dd.im])),
+                    self.name + " after",
+                )
+            )
             self.count = 200
-        self.count -=1
-
+        self.count -= 1
 
         self.check_renaming()
         # new_name = self.data_post.get(dd.new_name,'')
         # if new_name:
         #     self.rename_stepwidget_label(new_name)
 
-
-        self.add_exec_times(end-start)
+        self.add_exec_times(end - start)
 
         return self.data_post
 
@@ -121,13 +121,13 @@ class Step():
         # info += self.str_mean_execution_time()
         im = data[dd.im]
         if im is not None:
-            info += str(im.shape) + 'px'
-            info += ', ' + str(im.dtype)
+            info += str(im.shape) + "px"
+            info += ", " + str(im.dtype)
             if im.dtype == np.float:
-                info += ' (R=negative, G=positive)'
+                info += " (R=negative, G=positive)"
 
         if data[dd.info] == True:
-            info += '\n' + data[dd.info_text]
+            info += "\n" + data[dd.info_text]
 
         return info
 
@@ -137,7 +137,9 @@ class Step():
             self.add_exec_times(tim)
         else:
             self.execution_times.append(tim)
-        self.mean_execution_time = np.sum(self.execution_times) / len(self.execution_times)
+        self.mean_execution_time = np.sum(self.execution_times) / len(
+            self.execution_times
+        )
 
-    def str_mean_execution_time(self, sufix=' ms'):
-        return '{0:.2f}'.format(round(self.mean_execution_time * 1000,2)) + sufix
+    def str_mean_execution_time(self, sufix=" ms"):
+        return "{0:.2f}".format(round(self.mean_execution_time * 1000, 2)) + sufix

@@ -1,7 +1,5 @@
-
 import time
 import threading
-
 
 
 import cv2
@@ -15,11 +13,13 @@ import os
 
 import CaptureControl as cc
 
+
 class LockedValue(object):
     """
     Thread safe numpy array
     """
-    def __init__(self, init_val = None):
+
+    def __init__(self, init_val=None):
         self.lock = threading.Lock()
         self.val = init_val
 
@@ -39,11 +39,13 @@ class LockedValue(object):
         self.val = val
         self.lock.release()
 
+
 class LockedNumpyArray(object):
     """
     Thread safe numpy array
     """
-    def __init__(self, init_val = None):
+
+    def __init__(self, init_val=None):
         self.lock = threading.Lock()
         self.val = init_val
 
@@ -66,41 +68,57 @@ class LockedNumpyArray(object):
         self.lock.release()
 
 
-class Chain():
+class Chain:
     tag_names = []
     chain_names = []
     load_data_chain_names = []
 
     data = LockedValue()
 
-    delimiter = ','
-    strip_chars = ' \t'
+    delimiter = ","
+    strip_chars = " \t"
+
     def load_steps_from_file(self, path):
-        with open (path, "r") as myfile:
+        with open(path, "r") as myfile:
             string = myfile.read
         self.load_steps_from_string(string)
 
     def load_steps_from_string(self, string):
-        self.step_names_list = string.replace('\n', self.delimiter).split(self.delimiter)
+        self.step_names_list = string.replace("\n", self.delimiter).split(
+            self.delimiter
+        )
         # print(self.step_names)
-        self.step_names_list = [step_name.strip(self.strip_chars) for step_name in self.step_names_list]
+        self.step_names_list = [
+            step_name.strip(self.strip_chars) for step_name in self.step_names_list
+        ]
 
-        self.step_names = [step for step in self.step_names_list if step != '']
+        self.step_names = [step for step in self.step_names_list if step != ""]
         # print(self.step_names)
 
-    def __init__(self, name, start_chain=True, path='', ):
+    def __init__(
+        self,
+        name,
+        start_chain=True,
+        path="",
+    ):
         self.name = name
         self.tag_search = name in self.tag_names
 
-        if path != '':
+        if path != "":
             self.load_steps_from_file(path)
         else:
-            if self.name in ['standard']:
+            if self.name in ["standard"]:
 
                 # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel vertical']
                 # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'sobel horizontal']\
-                self.step_names = ['original', 'resize', 'gray', 'thresholded', 'laplacian']
-                self.step_names = ['original', 'gauss', 'resize']
+                self.step_names = [
+                    "original",
+                    "resize",
+                    "gray",
+                    "thresholded",
+                    "laplacian",
+                ]
+                self.step_names = ["original", "gauss", "resize"]
 
                 # self.step_names = ['original', 'resize', 'gray', 'detect red', 'blender cube']
                 # self.step_names = ['original', 'resize', 'gray', 'thresholded', 'blender cube']
@@ -108,13 +126,12 @@ class Chain():
                 # self.step_names = ['original', 'resize', 'rgb stack']
 
                 # string = 'original, resize, gauss, resize'
-                string = 'original'
+                string = "original"
                 if start_chain:
                     self.load_steps_from_string(string)
 
         if self.name in self.load_data_chain_names:
             self.load_data()
-
 
     def load_data(self):
         # self.data = LockedValue( [1,2,3,42,69] )
@@ -122,7 +139,7 @@ class Chain():
         pass
 
 
-class ChainControl():
+class ChainControl:
     """
     Shared class to control findtag algorythm execution
     """
@@ -160,7 +177,7 @@ class ChainControl():
         self.on_stop()
         time.sleep(1)
 
-        self.current_chain = Chain('new_chain')
+        self.current_chain = Chain("new_chain")
         self.current_chain.load_steps_from_string(string)
 
         self.reset_step_control()
@@ -172,7 +189,6 @@ class ChainControl():
     def get_available_steps(self):
         # print(self._step_control.available_steps)
         return self._step_control.available_steps
-
 
     def start_computing(self):
         self.chain_computing = True
@@ -194,7 +210,9 @@ class ChainControl():
             self.add_exec_times(tim)
         else:
             self.execution_time.append(tim)
-        self.mean_execution_time = np.sum(self.execution_time) / len(self.execution_time)
+        self.mean_execution_time = np.sum(self.execution_time) / len(
+            self.execution_time
+        )
 
     def chain_loop(self):
         while self.chain_computing:
@@ -224,7 +242,7 @@ class ChainControl():
         self._step_control.step_all(data)
 
         end = time.time()
-        self.add_exec_times(end-start)
+        self.add_exec_times(end - start)
 
         # not thread safe
         self.step_control = self._step_control
@@ -232,7 +250,6 @@ class ChainControl():
 
         # here raise an event for the conversion and redrawing to happen
         # time.sleep(0.0001)
-
 
     def update_findtag_gui(self, frame, tag_model, running_findtag):
 
@@ -251,8 +268,7 @@ class ChainControl():
 #         self.source_id =
 
 
-
-class ImageStreamControl():
+class ImageStreamControl:
     """
     Shared class to control source capture execution
     """
@@ -268,7 +284,17 @@ class ImageStreamControl():
 
     def __init__(self, source_id=0):
         # self.frame = LockedNumpyArray( np.ones( (32,24,3,), np.uint8 ) * 128 )
-        self.frame = np.ones( (32,24,3,), np.uint8 ) * 128
+        self.frame = (
+            np.ones(
+                (
+                    32,
+                    24,
+                    3,
+                ),
+                np.uint8,
+            )
+            * 128
+        )
 
         self.dir_cv2_cap_prop = cc.CaptureControl.dir_cv2_cap_prop
         self.cv2_dict_name = {}
@@ -289,8 +315,7 @@ class ImageStreamControl():
 
         self.focal = 400
 
-
-        self.name = 'unitialized' + str(ImageStreamControl.count )
+        self.name = "unitialized" + str(ImageStreamControl.count)
         ImageStreamControl.count += 1
 
     def print_all_properties(self):
@@ -302,9 +327,9 @@ class ImageStreamControl():
 
         # stream.capture.set(3, width)
         # stream.capture.set(4, height)
-        print('Source [{}] Printing all properties:'.format(self.source_id))
+        print("Source [{}] Printing all properties:".format(self.source_id))
 
-        txt = ''
+        txt = ""
         for prop_name in self.dir_cv2_cap_prop:
             # super(cv2,prop_name)
             # print(globals())
@@ -317,11 +342,12 @@ class ImageStreamControl():
             # cv2
 
             if prop_val not in self.invalid_values:
-                length = len('CAP_PROP_')
-                txt += '{}={} | '.format(prop_name[length:], prop_val)
+                length = len("CAP_PROP_")
+                txt += "{}={} | ".format(prop_name[length:], prop_val)
         print(txt)
 
         # print(prop)
+
     def add_set_prop(self, prop_key, value, prop_list=[]):
         prop_list.append([self.cv2_dict_name[prop_key], prop_key, value])
         return prop_list
@@ -373,16 +399,22 @@ class ImageStreamControl():
             # self.capture_lock.release()
 
             if last_val != read_val:
-                print('Source[{}] Property set: {} = {} (before = {})'.format
-                  (self.source_id, prop_cv2_name, prop_val, last_val))
+                print(
+                    "Source[{}] Property set: {} = {} (before = {})".format(
+                        self.source_id, prop_cv2_name, prop_val, last_val
+                    )
+                )
             else:
-                print('Source[{}] Property could not be set! {} = {} (wanted= {})'.format
-                      (self.source_id, prop_cv2_name, read_val, prop_val))
+                print(
+                    "Source[{}] Property could not be set! {} = {} (wanted= {})".format(
+                        self.source_id, prop_cv2_name, read_val, prop_val
+                    )
+                )
         # for stream in self.streams:
-            # stream.capture.set(3, width)
-            # stream.capture.set(4, height)
+        # stream.capture.set(3, width)
+        # stream.capture.set(4, height)
 
-            # stream.capture.get(cv2.CAP_PROP_APERTURE)
+        # stream.capture.get(cv2.CAP_PROP_APERTURE)
 
     def init_capture(self):
         self.capture_lock.acquire()
@@ -407,12 +439,12 @@ class ImageStreamControl():
         already = ImageStreamControl.already_selected
         print(already)
 
-        rnd = 'round'
-        blu = 'blue'
+        rnd = "round"
+        blu = "blue"
 
-        blk = 'black'
-        gra = 'gray'
-        cli = 'clips'
+        blk = "black"
+        gra = "gray"
+        cli = "clips"
         # # con_blk = 129
         # # con_gra = 128
         # # con_cli = 127
@@ -451,7 +483,6 @@ class ImageStreamControl():
 
         ImageStreamControl.already_selected.append(name)
 
-
         if name == rnd:
             self.focal *= 1
         # prop = CAP_PROP_
@@ -461,9 +492,9 @@ class ImageStreamControl():
         # if name == rnd:
         #     self.set_property(cv2.CAP_PROP_SETTINGS, 1) # open settings on rnd cam
 
-        folder = r'D:\DEV\PYTHON\pyCV\calibration\_pics'
+        folder = r"D:\DEV\PYTHON\pyCV\calibration\_pics"
 
-        def load_matrix(folder,file):
+        def load_matrix(folder, file):
             path = os.path.join(folder, name, file)
             try:
                 mat = np.loadtxt(path)
@@ -471,8 +502,8 @@ class ImageStreamControl():
                 mat = None
             return np.array(mat)
 
-        mtx = load_matrix(folder, 'Intrinsic.txt')
-        dist = load_matrix(folder, 'Distortion.txt')
+        mtx = load_matrix(folder, "Intrinsic.txt")
+        dist = load_matrix(folder, "Distortion.txt")
         # print('Intrinsic: {}\nDistortion: {}'.format(mtx,dist))
 
         self.intrinsic = mtx
@@ -489,19 +520,19 @@ class ImageStreamControl():
         self.capture_lock.acquire()
         self.capture.open(self.source_id)
         if self.capture.isOpened() != True:
-            print('Source[', self.source_id, '] Cannot open capture.')
+            print("Source[", self.source_id, "] Cannot open capture.")
             return False
 
-        print('Source[{}] Opened capture.'.format(self.source_id))
+        print("Source[{}] Opened capture.".format(self.source_id))
         self.get_source_info()
-        print('Source[{}] Renamed to {}.'.format(self.source_id, self.name))
-                # print('Source[', self.source_id, '] renamed to {}.')
+        print("Source[{}] Renamed to {}.".format(self.source_id, self.name))
+        # print('Source[', self.source_id, '] renamed to {}.')
         self.capture_lock.release()
         return True
 
     def toggle_source_id(self):
         self.capture_lock.acquire()
-        #self.source_id = np.mod(self.source_id+1, 2)
+        # self.source_id = np.mod(self.source_id+1, 2)
         # self.open_capture()
         try_next = True
         while try_next:
@@ -509,26 +540,26 @@ class ImageStreamControl():
             self.capture.open(self.source_id)
 
             if self.capture.isOpened() != True:
-                print('Source[', self.source_id, '] Cannot open capture.')
+                print("Source[", self.source_id, "] Cannot open capture.")
                 self.source_id = -1
                 continue
 
             ret, frame = self.capture.read()
             if ret == False:
-                print('Source[', self.source_id, '] Cannot be read from')
+                print("Source[", self.source_id, "] Cannot be read from")
                 self.source_id = -1
                 continue
-            print('Source[', self.source_id, '] Opened capture')
+            print("Source[", self.source_id, "] Opened capture")
             try_next = False
         self.capture_lock.release()
 
     def close_capture(self):
         # self.capture_lock.acquire()
         self.capture.release()
-        print('Source[', self.source_id, '] Released capture.')
+        print("Source[", self.source_id, "] Released capture.")
         # self.capture_lock.release()
 
-    def start_capturing(self, blocking = True):
+    def start_capturing(self, blocking=True):
         if blocking == False:
             if self.open_capture() == False:
                 return False
@@ -539,12 +570,19 @@ class ImageStreamControl():
         else:
             return self.start_capturing_blocking()
 
-    def start_capturing_blocking(self, min_height = 50, iterations = 9999999):
+    def start_capturing_blocking(self, min_height=50, iterations=9999999):
         if self.start_capturing(blocking=False) == False:
             return False
 
-        print('Source[', self.source_id, '] Captured frame with dimensions', self.frame.shape,
-              '. Waiting until the height is greater than', min_height, 'px')
+        print(
+            "Source[",
+            self.source_id,
+            "] Captured frame with dimensions",
+            self.frame.shape,
+            ". Waiting until the height is greater than",
+            min_height,
+            "px",
+        )
         looping = iterations + 1
 
         while looping > 1:
@@ -552,16 +590,28 @@ class ImageStreamControl():
                 if self.frame.shape[0] < min_height:
                     pass
                 else:
-                    print('Source[', self.source_id, '] Captured frame with dimensions', self.frame.shape,
-                          '. Continuing with program execution.')
+                    print(
+                        "Source[",
+                        self.source_id,
+                        "] Captured frame with dimensions",
+                        self.frame.shape,
+                        ". Continuing with program execution.",
+                    )
                     return True
             looping -= 1
-        print('Source[', self.source_id, '] Did not captured frame with greater height than',
-              min_height, 'px in ', iterations, 'iterations.')
+        print(
+            "Source[",
+            self.source_id,
+            "] Did not captured frame with greater height than",
+            min_height,
+            "px in ",
+            iterations,
+            "iterations.",
+        )
         return False
 
     def stop_capturing(self):
-        print('Source[', self.source_id, '] Stopped capturing.')
+        print("Source[", self.source_id, "] Stopped capturing.")
         self.capturing = False
 
     def toggle_capturing(self):
@@ -584,7 +634,11 @@ class ImageStreamControl():
         self.capture_lock.acquire()
         if self.capture.isOpened() != True:
             # self.open_capture()
-            print('Source[', self.source_id, '] Cannot read frame as the capture is not opened')
+            print(
+                "Source[",
+                self.source_id,
+                "] Cannot read frame as the capture is not opened",
+            )
             self.capture_lock.release()
             return False
         else:

@@ -20,7 +20,7 @@ from kivy.uix.anchorlayout import AnchorLayout
 
 # from kivy.uix.scrollview import ScrollView
 
-txt='''
+txt = """
 #:kivy 1.9
 
 <steps_demo>:
@@ -100,7 +100,7 @@ txt='''
             on_state: root.clear_widgets()
 
 
-'''
+"""
 
 # Builder.load_string(txt)
 
@@ -109,25 +109,31 @@ txt='''
 class StepWidgetInfo(TextInput):
     update_height = None
     last_lines = 0
+
     def update_parent(self):
         if len(self._lines) != self.last_lines:
             self.last_lines = len(self._lines)
-            self.height = (len(self._lines)+1) * self.line_height
+            self.height = (len(self._lines) + 1) * self.line_height
             self.update_height()
-
 
 
 # class StepWidget(BoxLayout):
 # class StepWidget(StackLayout):
 # class StepWidget(AnchorLayout):
 class StepWidget(GridLayout):
-    name = 'step'
+    name = "step"
     bottom_layout = ObjectProperty()
+
     def update_height(self):
         heights = [child.height for child in self.children]
         spacing = len(heights) - 1
-        self.height = sum(heights) + (spacing * self.spacing[0]) + self.padding[0] + self.padding[2]
-        print('updating')
+        self.height = (
+            sum(heights)
+            + (spacing * self.spacing[0])
+            + self.padding[0]
+            + self.padding[2]
+        )
+        print("updating")
 
     def __init__(self, **kwargs):
         super(StepWidget, self).__init__(**kwargs)
@@ -139,6 +145,7 @@ class StepWidget(GridLayout):
         self.update_height()
 
     pass
+
 
 class steps_demo(GridLayout):
     layout_steps = ObjectProperty()
@@ -169,37 +176,38 @@ class steps_demo(GridLayout):
         # btn = Button(text='add', on_press=callback)
         # self.layout_steps.add_widget(btn)
 
-
     pass
+
 
 class steps_demoApp(App):
     # frame = []
     # running_findtag = False
-    title = ''
+    title = ""
+
     def build(self):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
         w = 1360
         # 1305 714
-        Config.set('kivy', 'show_fps', 1)
-        Config.set('kivy', 'desktop', 1)
+        Config.set("kivy", "show_fps", 1)
+        Config.set("kivy", "desktop", 1)
         # Config.set('kivy', 'name', 'a')
 
         # Config.set('graphics', 'window_state', 'maximized')
-        Config.set('graphics', 'position', 'custom')
-        Config.set('graphics', 'height', h)
-        Config.set('graphics', 'width', w)
-        Config.set('graphics', 'top', 15)
-        Config.set('graphics', 'left', 4)
-        Config.set('graphics', 'multisamples', 0) # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
+        Config.set("graphics", "position", "custom")
+        Config.set("graphics", "height", h)
+        Config.set("graphics", "width", w)
+        Config.set("graphics", "top", 15)
+        Config.set("graphics", "left", 4)
+        Config.set(
+            "graphics", "multisamples", 0
+        )  # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
 
-
-        Config.set('input', 'mouse', 'mouse,disable_multitouch')
+        Config.set("input", "mouse", "mouse,disable_multitouch")
 
         self.root = steps_demo()
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     steps_demoApp().run()
     # comment

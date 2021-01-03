@@ -1,5 +1,6 @@
 import enum
 
+
 class AutoNumber(enum.Enum):
     def __new__(cls):
         value = len(cls.__members__) + 1
@@ -7,10 +8,12 @@ class AutoNumber(enum.Enum):
         obj._value_ = value
         return obj
 
+
 class DataDictParameterNames(AutoNumber):
     """
     DataDictParameterNames == dd
     """
+
     # = ()
     im = ()
     info = ()

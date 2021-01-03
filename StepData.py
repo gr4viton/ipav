@@ -1,9 +1,9 @@
-
 import numpy as np
 from StepEnum import DataDictParameterNames as dd
 
+
 class StepData(dict):
-    def __init__(self,*arg,**kw):
+    def __init__(self, *arg, **kw):
         super(StepData, self).__init__(*arg, **kw)
 
     def copy(self):
@@ -27,11 +27,13 @@ class StepData(dict):
                     sh = data[dd.im].shape
                     self.__dict__[dd.im] = np.matrix(sh)
                     self.__dict__[dd.im] = data[dd.im].copy()
-                        # data[dd.im].copy()
-                    print('old = {} new = {}'.format(
-                        hex(id(self.__dict__[dd.im])),
-                        hex(id(data[dd.im])),
-                    ))
+                    # data[dd.im].copy()
+                    print(
+                        "old = {} new = {}".format(
+                            hex(id(self.__dict__[dd.im])),
+                            hex(id(data[dd.im])),
+                        )
+                    )
                 else:
                     # is there a function to just copy the data to the same address ? - would it be quicker?
                     self.__dict__[dd.im] = data[dd.im].copy()
@@ -44,7 +46,6 @@ class StepData(dict):
         #     dict_copy[dd.im] = dict_copy[dd.im].copy()
         #     # print("making copy!")
         # return dict_copy
-
 
     def __setitem__(self, key, item):
         self.__dict__[key] = item

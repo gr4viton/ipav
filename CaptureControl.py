@@ -1,17 +1,19 @@
-from thread_controls import ImageStreamControl #, ChainControl, Chain
+from thread_controls import ImageStreamControl  # , ChainControl, Chain
 import cv2
 
 # from camera_distinguish import Distinguish
 
+
 def init_cap_prop():
-    prefix = 'CAP_PROP_'
+    prefix = "CAP_PROP_"
     length = len(prefix)
     dir_cv2_cap_prop = [word for word in dir(cv2) if word[:length] == prefix]
     # self.dir_cv2_cap_prop = [print(word[:length]) for word in dir(cv2)]
     print(dir_cv2_cap_prop)
     return dir_cv2_cap_prop
 
-class CaptureControl():
+
+class CaptureControl:
     streams = []
     stream_id = 0
     dir_cv2_cap_prop = init_cap_prop()
@@ -29,7 +31,6 @@ class CaptureControl():
 
         # FPS:
         # RED-round = 2000
-
 
         # opened_ids = [0,1,2,3,4]
         # ids = [0,1,2,3]
@@ -59,12 +60,10 @@ class CaptureControl():
     def get_stream(self, id):
         rng = range(len(self.streams))
         for (q, stream) in zip(rng, self.streams):
-        # stream_w_id = [stream for stream in self.streams if stream.source_id == id]
+            # stream_w_id = [stream for stream in self.streams if stream.source_id == id]
             if stream.source_id == id:
                 self.cur_index = q
                 return stream
-
-
 
     def get_next_stream(self):
         self.cur_index += 1
@@ -73,7 +72,6 @@ class CaptureControl():
         return self.streams[self.cur_index]
         # next_stream = [stream for stream in self.streams if stream.source_id == id]
         # print(type(stream_w_id[0]))
-
 
     def start_all_capturing(self):
         for stream in self.streams:
@@ -85,7 +83,6 @@ class CaptureControl():
                 # stream.print_all_properties()
 
         # Distinguish.print_usb_info()
-
 
     def on_stop(self):
         for stream in self.streams:

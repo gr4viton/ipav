@@ -3,8 +3,9 @@ from kivy.clock import Clock
 from kivy.graphics.texture import Texture
 
 import sys
-sys.path.append('./blender')
-sys.path.append('./demo')
+
+sys.path.append("./blender")
+sys.path.append("./demo")
 
 from kivy.config import Config
 
@@ -18,7 +19,12 @@ import numpy as np
 import cv2
 import findHomeography as fh
 
-from kivy.properties import ObjectProperty, StringProperty, NumericProperty, BoundedNumericProperty
+from kivy.properties import (
+    ObjectProperty,
+    StringProperty,
+    NumericProperty,
+    BoundedNumericProperty,
+)
 
 from kivy.uix.gridlayout import GridLayout
 
@@ -31,15 +37,18 @@ def colorify(im):
     else:
         return im.copy()
 
+
 def convert_to_texture(im):
     return convert_rgb_to_texture(colorify(im))
+
 
 def convert_rgb_to_texture(im_rgb):
     buf1 = cv2.flip(im_rgb, 0)
     buf = buf1.tostring()
-    texture1 = Texture.create(size=(im_rgb.shape[1], im_rgb.shape[0]), colorfmt='bgr')
-    texture1.blit_buffer(buf, colorfmt='bgr', bufferfmt='ubyte')
+    texture1 = Texture.create(size=(im_rgb.shape[1], im_rgb.shape[0]), colorfmt="bgr")
+    texture1.blit_buffer(buf, colorfmt="bgr", bufferfmt="ubyte")
     return texture1
+
 
 # class ImageButton(ButtonBehavior, Image):
 #
@@ -69,8 +78,6 @@ def convert_rgb_to_texture(im_rgb):
 #
 
 
-
-
 class Multicopter(GridLayout):
     gl_left = ObjectProperty()
     gl_middle = ObjectProperty()
@@ -82,43 +89,42 @@ class Multicopter(GridLayout):
     sla_tags = ObjectProperty()
     layout_steps = ObjectProperty()
     # img_steps = ObjectProperty()
-    label_mean_exec_time = StringProperty('??')
-    label_mean_exec_time_last = StringProperty('??')
+    label_mean_exec_time = StringProperty("??")
+    label_mean_exec_time_last = StringProperty("??")
     # img_tags_background = ObjectProperty((0.08, 0.16 , 0.24))
     grid_img_tags = ObjectProperty()
-    lb_webcam_resolution = StringProperty('? x ? x ?')
+    lb_webcam_resolution = StringProperty("? x ? x ?")
 
-    tag_error_count_text = StringProperty('No tags found')
+    tag_error_count_text = StringProperty("No tags found")
 
-    label_chain_string_text = StringProperty('...loading...')
+    label_chain_string_text = StringProperty("...loading...")
     # chain_string = StringProperty('...loading...') - in change_chain_widget.chain_string
 
     # popup_chain_string_text = StringProperty('...loading...')
-    chain_string = ''
+    chain_string = ""
 
     def update_chain_string_from_popup(self, whatever=None):
         new_string = self.change_chain_widget.chain_string_input.text
         # preprocessing error checking
         # print('Updating chain string to: [', self.change_chain_widget.chain_string, ']')
-        print('Updating chain string to: [', new_string, ']')
+        print("Updating chain string to: [", new_string, "]")
         self.set_chain_string(new_string)
 
-    def set_chain_string(self, new_chain_string,  whatever=None):
-        print('Previous self.chain_string = ', self.chain_string)
-        print('New = ', new_chain_string)
+    def set_chain_string(self, new_chain_string, whatever=None):
+        print("Previous self.chain_string = ", self.chain_string)
+        print("New = ", new_chain_string)
         self.chain_string = new_chain_string
 
         self.change_chain_widget.chain_string_input.text = new_chain_string
         self.change_chain_widget.chain_string_input.multiline = False
 
-
         # START THE CHAIN COMPUTING !
         step_names = self.chain_control.load_chain(new_chain_string)
         self.change_chain_widget.dismiss()
 
-        step_names_string = ', '.join(step_names)
+        step_names_string = ", ".join(step_names)
         self.label_chain_string_text = step_names_string
-        print("Chain string =[", step_names_string , ']')
+        print("Chain string =[", step_names_string, "]")
 
     def show_load_chain(self, whatever=None):
         # self.load_popup.open()
@@ -127,32 +133,34 @@ class Multicopter(GridLayout):
     def show_load_chain_key(self, keyboard, keycode, text, modifiers):
         self.change_chain_widget.open()
 
-
     def set_default_chain(self):
 
         # new_chain_string = 'original, gray, resize'
-        new_chain_string = 'original, resize, detect red'
-        new_chain_string = 'original, resize, gray, gauss, otsu, laplacian, abs'
-        new_chain_string = 'original, resize, gray, gauss, otsu, laplacian, abs, uint8, contour'
-        new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull'
+        new_chain_string = "original, resize, detect red"
+        new_chain_string = "original, resize, gray, gauss, otsu, laplacian, abs"
+        new_chain_string = (
+            "original, resize, gray, gauss, otsu, laplacian, abs, uint8, contour"
+        )
+        new_chain_string = "original, resize, detect red, mega gauss, otsu, cnt, hull"
         # new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, pause 5'
         # new_chain_string = 'original'
-        new_chain_string = 'original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5'
-        new_chain_string = 'original'
-
+        new_chain_string = (
+            "original, resize, detect red, mega gauss, otsu, cnt, hull, blend, pause 5"
+        )
+        new_chain_string = "original"
 
         def try_detect_green():
-            a = ''
-            a += 'source1, .resize, .mega gauss, detect green, .otsu, .cnt, hull,'
-            a += 'source1, .resize, detect green, .mega gauss, .otsu, .cnt, hull'
+            a = ""
+            a += "source1, .resize, .mega gauss, detect green, .otsu, .cnt, hull,"
+            a += "source1, .resize, detect green, .mega gauss, .otsu, .cnt, hull"
             return a
 
         def range_sources_hulls(rng):
             # hulling = ', .resize, .gauss, .detect green, .mega gauss, .otsu, .cnt, hull,' # gauss on color is useless
-            hulling = ', .resize, .detect green, .mega gauss, .otsu, .cnt, hull,'
+            hulling = ", .resize, .detect green, .mega gauss, .otsu, .cnt, hull,"
 
-            chain_list = ['source{}'.format(i) + hulling for i in rng]
-            new_chain_string = ''.join(chain_list)
+            chain_list = ["source{}".format(i) + hulling for i in rng]
+            new_chain_string = "".join(chain_list)
 
             # last = ['source4, .resize' + hulling]
             # last = ['source4, .resize, .resize, .detect green, .mega gauss, .mega gauss, .otsu, .cnt, hull']
@@ -161,21 +169,21 @@ class Multicopter(GridLayout):
 
         def all_sources_hulls():
             rng = range(3)
-            rng = [0,2,3]
-            rng = [0,1,2,3]
-            rng = [0,1,2,3,4,5]
+            rng = [0, 2, 3]
+            rng = [0, 1, 2, 3]
+            rng = [0, 1, 2, 3, 4, 5]
             # rng = [0,2,3,4]
             return range_sources_hulls(rng)
 
         def blender_cube():
-            return all_sources_hulls() + ',blend, pause'
+            return all_sources_hulls() + ",blend, pause"
 
         def detect_green():
-            return 'original, resize, detect green'
+            return "original, resize, detect green"
 
         # new_chain_string = 'original, .resize, detect red'
         def source_ids(ids):
-            return ','.join(['source{}'.format(id) for id in ids])
+            return ",".join(["source{}".format(id) for id in ids])
 
         new_chain_string = all_sources_hulls()
         new_chain_string = range_sources_hulls([0])
@@ -190,7 +198,7 @@ class Multicopter(GridLayout):
         # # new_chain_string += ', blender, pause'
 
         new_chain_string = detect_green()
-        new_chain_string = 'original'
+        new_chain_string = "original"
 
         return new_chain_string
 
@@ -211,10 +219,10 @@ class Multicopter(GridLayout):
         # Load the chain
         available_steps_dict = self.chain_control.get_available_steps()
 
-        self.change_chain_widget = ChangeChainWidget(new_chain_string,
-                                                     self.update_chain_string_from_popup,
-                                                     available_steps_dict)
-        self.set_chain_string(new_chain_string )
+        self.change_chain_widget = ChangeChainWidget(
+            new_chain_string, self.update_chain_string_from_popup, available_steps_dict
+        )
+        self.set_chain_string(new_chain_string)
 
         # self.update_chain_string_from_popup()
 
@@ -230,10 +238,12 @@ class Multicopter(GridLayout):
     #         print('meem')
     #         return True
 
+
 class multicopterApp(App):
     # frame = []
     # running_findtag = False
-    title = ''
+    title = ""
+
     def build(self):
         # root.bind(size=self._update_rect, pos=self._update_rect)
         h = 700
@@ -241,26 +251,27 @@ class multicopterApp(App):
         top = 15
         left = 4
         # 1305 714
-        Config.set('kivy', 'show_fps', 1)
+        Config.set("kivy", "show_fps", 1)
         # Config.set('kivy', 'desktop', 1)
         # Config.set('kivy', 'name', 'a')
 
         # Config.set('graphics', 'window_state', 'maximized')
-        Config.set('graphics', 'position', 'custom')
-        Config.set('graphics', 'height', h)
-        print( 'height =',Config.getint('graphics', 'height'))
+        Config.set("graphics", "position", "custom")
+        Config.set("graphics", "height", h)
+        print("height =", Config.getint("graphics", "height"))
         # print( 'Window.size =',Window.size)
 
-        Config.set('graphics', 'width', w)
-        Config.set('graphics', 'top', top )
-        Config.set('graphics', 'left', left)
-        Config.set('graphics', 'multisamples', 0) # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
+        Config.set("graphics", "width", w)
+        Config.set("graphics", "top", top)
+        Config.set("graphics", "left", left)
+        Config.set(
+            "graphics", "multisamples", 0
+        )  # to correct bug from kivy 1.9.1 - https://github.com/kivy/kivy/issues/3576
 
         # Config.set('graphics', 'height', h)
         # Config.set('graphics', 'width', w)
 
-        Config.set('input', 'mouse', 'mouse,disable_multitouch')
-
+        Config.set("input", "mouse", "mouse,disable_multitouch")
 
         # Config.set('graphics', 'fullscreen', 'fake')
         # Config.set('graphics', 'fullscreen', 1)
@@ -270,21 +281,22 @@ class multicopterApp(App):
 
         # selected_chain_name = 'c2'
         # selected_chain_name = '3L'
-        selected_chain_name = 'standard'
+        selected_chain_name = "standard"
 
-        Chain.chain_names = ['2L', '3L', 'c2', 'standard']
-        Chain.tag_names = ['2L', '3L', 'c2']
+        Chain.chain_names = ["2L", "3L", "c2", "standard"]
+        Chain.tag_names = ["2L", "3L", "c2"]
         Chain.load_data_chain_names = Chain.tag_names
 
-        current_chain = Chain(selected_chain_name, start_chain = False)
+        current_chain = Chain(selected_chain_name, start_chain=False)
 
         self.chain_control = ChainControl(self.capture_control, current_chain)
         self.chain_control.start_computing()
 
-
         self.tag_errors_count = {}
-        [self.tag_errors_count.update({str(name): int(0)}) for name, member in tag_error.__members__.items()]
-
+        [
+            self.tag_errors_count.update({str(name): int(0)})
+            for name, member in tag_error.__members__.items()
+        ]
 
         # win = self
         # win = self.root
@@ -313,14 +325,14 @@ class multicopterApp(App):
     #         instance.rotation += 90
 
     def build_opencv(self):
-        self.fps_redraw = 1.0/50.0
-        self.fps_findtag = 1.0/50.0
+        self.fps_redraw = 1.0 / 50.0
+        self.fps_findtag = 1.0 / 50.0
 
-        Clock.schedule_interval(self.redraw_capture, self.fps_redraw )
-        print('Scheduled redraw_capture with fps = ', 1/self.fps_redraw)
+        Clock.schedule_interval(self.redraw_capture, self.fps_redraw)
+        print("Scheduled redraw_capture with fps = ", 1 / self.fps_redraw)
 
-        Clock.schedule_interval(self.redraw_chain, self.fps_findtag )
-        print('Scheduled redraw_findtag with fps = ', 1/self.fps_findtag)
+        Clock.schedule_interval(self.redraw_chain, self.fps_findtag)
+        print("Scheduled redraw_findtag with fps = ", 1 / self.fps_findtag)
 
     # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     # redraw_capture() create one texture object - dont create every time!
@@ -342,11 +354,10 @@ class multicopterApp(App):
                 # self.root.img_webcam.texture = convert_to_texture(frame)
                 #
 
-
                 self.root.lb_webcam_resolution = str(frame.shape)
 
-        preview = fh.joinIm(frames,1)
-        self.root.img_webcam.texture = convert_to_texture(preview )
+        preview = fh.joinIm(frames, 1)
+        self.root.img_webcam.texture = convert_to_texture(preview)
 
         # print('redraw')
         # frame = self.capture_control.stream.frame
@@ -354,8 +365,6 @@ class multicopterApp(App):
         #
         # if frame is not None:
         #     self.root.img_webcam.texture = convert_to_texture(frame)
-
-
 
     def redraw_chain(self, dt):
         # step_control = self.chain_control.step_control
@@ -366,11 +375,13 @@ class multicopterApp(App):
         self.root.step_widgets_control.update_layout_steps(step_control)
         # self.root.update_layout_steps(step_control)
 
-
         if len(self.chain_control.execution_time) > 0:
-            self.root.label_mean_exec_time = str(np.round(self.chain_control.execution_time[-1], 5) * 1000)
-            self.root.label_mean_exec_time_last = str(np.round(self.chain_control.mean_execution_time, 5) * 1000)
-
+            self.root.label_mean_exec_time = str(
+                np.round(self.chain_control.execution_time[-1], 5) * 1000
+            )
+            self.root.label_mean_exec_time_last = str(
+                np.round(self.chain_control.mean_execution_time, 5) * 1000
+            )
 
         # self.redraw_findtag()
 
@@ -388,12 +399,13 @@ class multicopterApp(App):
 
             for tag in seen_tags:
                 # print(tag.error)
-                self.tag_errors_count[tag.error.name] = self.tag_errors_count[tag.error.name] + 1
+                self.tag_errors_count[tag.error.name] = (
+                    self.tag_errors_count[tag.error.name] + 1
+                )
 
                 # set flag
                 if tag.error == tag_error.flawless:
                     self.set_tags_found(True)
-
 
                 if tag.error in show_tag_set:
                     # print(tag.tag_warped.shape)
@@ -402,7 +414,6 @@ class multicopterApp(App):
 
                 else:
                     self.set_tags_found(False)
-
 
         else:
             self.set_tags_found(False)
@@ -424,37 +435,41 @@ class multicopterApp(App):
         # print(imAllTags.shape)
         # self.root.img_tags.texture = convert_to_texture(imAllTags.copy())
 
-    def set_tags_found(self, found = False):
-        if(found == False):
-            self.root.grid_img_tags.color = (.08, .16 , .24)
+    def set_tags_found(self, found=False):
+        if found == False:
+            self.root.grid_img_tags.color = (0.08, 0.16, 0.24)
         else:
-            self.root.grid_img_tags.color = (.08, .96 , .24)
-
+            self.root.grid_img_tags.color = (0.08, 0.96, 0.24)
 
     def set_tag_error_count_text(self):
-        list = [str(self.tag_errors_count.get(name)) + ' = ' + str(name)
-                for name, member in tag_error.__members__.items()]
-        self.root.tag_error_count_text = '\n'.join(list)
+        list = [
+            str(self.tag_errors_count.get(name)) + " = " + str(name)
+            for name, member in tag_error.__members__.items()
+        ]
+        self.root.tag_error_count_text = "\n".join(list)
 
         # name = tag_error.flawless.name
         # print(name)
         # print(self.tag_errors_count)
-        self.root.txt_numFound.text = str(self.tag_errors_count.get(tag_error.flawless.name))
+        self.root.txt_numFound.text = str(
+            self.tag_errors_count.get(tag_error.flawless.name)
+        )
 
     def on_stop(self):
         print("Stopping capture")
         self.capture_control.on_stop()
         self.chain_control.on_stop()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     multicopterApp().run()
     # comment
 
 
-#todo create binding connection between stepwidget (gui) and step object (processing)
-    # stepwidget.py
-    # - to allow step function parameter modifications from gui (sliders)
-    #   -- need to do it.. how the slider works now?
-    # - and the other way around - step function changing widget name label
-    #   -- no need = periodic updating functions of gui - textinput info, exec time - add name
-    #   ==update_layout_steps
+# todo create binding connection between stepwidget (gui) and step object (processing)
+# stepwidget.py
+# - to allow step function parameter modifications from gui (sliders)
+#   -- need to do it.. how the slider works now?
+# - and the other way around - step function changing widget name label
+#   -- no need = periodic updating functions of gui - textinput info, exec time - add name
+#   ==update_layout_steps

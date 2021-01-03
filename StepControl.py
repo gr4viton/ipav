@@ -18,25 +18,23 @@ from ControlsWidgets import DetectColorControls, ResolutionControls
 # function definitions
 
 
+class StepControl:
 
-class StepControl():
-
-    delimiter = ','
-    strip_chars = ' \t'
+    delimiter = ","
+    strip_chars = " \t"
 
     buffer = None
     seen_tags = None
     mask_ones = None
 
-    def recreate_mask(self,im ):
+    def recreate_mask(self, im):
         if self.mask_ones is None or im.shape != self.mask_ones.shape:
-            self.mask_ones = np.uint8( np.ones(im.shape) + 254)
+            self.mask_ones = np.uint8(np.ones(im.shape) + 254)
             # print('recreated mask')
 
     def get_mask(self, im):
         self.recreate_mask(im)
         return self.mask_ones.copy()
-
 
     def recreate_buffer(self, im):
         if self.buffer is None:
@@ -52,26 +50,23 @@ class StepControl():
             self.recreate_buffer(im)
         return self.buffer
 
-
     def get_controls(self, name):
         # print('Checking controls for step [{}]'.format(name))
-        if name == 'resize':
+        if name == "resize":
             # print('returned controls !!!!!!!!!!!!!!!!!!!!!!')
             return ResolutionControls()
             # return None
-        elif name == 'detect green':
+        elif name == "detect green":
             return DetectColorControls()
         else:
             return None
-
 
     def add_available_step(self, name, function, origin=None, controls=None):
         if not controls:
             controls = self.get_controls(name)
 
-
         if controls:
-            print('Got controls for step [{}]'.format(name))
+            print("Got controls for step [{}]".format(name))
             print(controls)
 
         self.available_steps[name] = Step(name, function, controls=controls)
@@ -91,7 +86,6 @@ class StepControl():
             word = words[0]
             synonym_word = words[1:]
             self.add_synonyms_separate(word, synonym_word)
-
 
     def add_synonyms_separate(self, word, synonyms_word):
         # self.available_steps = ['abs']
@@ -116,13 +110,17 @@ class StepControl():
                 else:
                     synonyms.append(synonyms_word)
 
-
-
-            synonyms = [self.add_available_step(synonym.strip(strip_chars), function, word) for synonym in synonyms]
-            print('[{}] is now know also as [{}]'.format(word,synonyms))
+            synonyms = [
+                self.add_available_step(synonym.strip(strip_chars), function, word)
+                for synonym in synonyms
+            ]
+            print("[{}] is now know also as [{}]".format(word, synonyms))
         else:
-            print('Cannot add synonyms to step_name [', word,
-                  '] as it is not defined in available_steps')
+            print(
+                "Cannot add synonyms to step_name [",
+                word,
+                "] as it is not defined in available_steps",
+            )
         # if type(synonyms) == type(list):
 
     def select_steps(self, current_chain):
@@ -130,13 +128,14 @@ class StepControl():
 
         # legacy from findtag search in image
         if current_chain.tag_search == True:
+
             def make_find_tags(im):
                 markuped_scene, seen_tags = findTagsInScene(im.copy(), self.chain)
                 self.seen_tags = seen_tags
                 return markuped_scene
 
             # add find tag with currentyl selected current_chain
-            findtag_name = 'findTags'
+            findtag_name = "findTags"
             self.available_steps.pop(findtag_name, None)
             self.add_available_step(findtag_name, make_find_tags)
 
@@ -146,8 +145,8 @@ class StepControl():
         # [self.steps.append(self.available_steps[step_name].copy()) for step_name in self.chain.step_names]
         # [self.steps.append(Step(step_name, self.available_step_fcn[step_name])) for step_name in self.chain.step_names]
 
-        hide_char = '.'
-        info_char = 'i'
+        hide_char = "."
+        info_char = "i"
         for step_name in self.chain.step_names:
             narrowed = False
             # print(step_name)
@@ -156,13 +155,14 @@ class StepControl():
                 narrowed = True
 
             available_step = self.available_steps.get(step_name, None)
-            if not available_step: # not known step name
+            if not available_step:  # not known step name
                 break
 
-            new_step = Step(step_name, available_step.function, narrowed, available_step.controls)
+            new_step = Step(
+                step_name, available_step.function, narrowed, available_step.controls
+            )
             self.steps.append(new_step)
             # print(self.steps[-1].narrow)
-
 
     def __init__(self, resolution_multiplier, current_chain):
 
@@ -170,10 +170,10 @@ class StepControl():
         self.define_available_steps()
         self.select_steps(current_chain)
 
-
     # def add_operation(self):
     #     pass
-    exc_delimiter = ':'
+    exc_delimiter = ":"
+
     def run_all(self, data):
         # data = StepData()
         # data[dd.im] = im
@@ -182,21 +182,23 @@ class StepControl():
         for step in self.steps:
             try:
                 data = step.run(data)
-            except cv2.error  as ex:
+            except cv2.error as ex:
                 exc_string = ex.args[0]
                 error_list = exc_string.split(self.exc_delimiter)
                 error_string = error_list[-1]
                 # error_number = error_list[-2]
-                error_substring = error_string.split(' ')
+                error_substring = error_string.split(" ")
                 error_number_string = error_substring[1]
-                error_number = int(error_number_string [1:-1])
+                error_number = int(error_number_string[1:-1])
                 # ''.
                 print(error_number)
 
                 if error_number == -215:
-                    print('Going to do automatic conversion to CV_8UC1 (functions abs and uint8)')
-                    pos = 'pozice curent stepu'
-                    self.add_new_steps(pos, 'uint8, abs')
+                    print(
+                        "Going to do automatic conversion to CV_8UC1 (functions abs and uint8)"
+                    )
+                    pos = "pozice curent stepu"
+                    self.add_new_steps(pos, "uint8, abs")
                 # errno, strerror = ex.args
                 # print(errno, strerror)
 
@@ -215,7 +217,6 @@ class StepControl():
         # self.resolution_multiplier = data[dd.resolution_multiplier]
         self.run_all(data)
 
-
     def define_available_steps(self):
         """
         dd = data_dict
@@ -223,34 +224,31 @@ class StepControl():
         self.available_steps = {}
         # self.available_step_fcn = {}
 
-
         def add_default(data, param, value):
             if data[dd.take_all_def] == True or data[param] == None:
                 data[param] = value
             return data[param]
 
-
         def make_nothing(data):
             # data[dd.resolution] = data[dd.im].shape
             stream = data[dd.stream]
-            txt = 'S[{}]={}'.format(stream.source_id, stream.name)
+            txt = "S[{}]={}".format(stream.source_id, stream.name)
             data[dd.new_name] = txt
             # info_text(data, txt)
             return data
 
-
         def make_set_source(data, source_id=0):
             # if source_id < len(data[dd.captured]):
-                # data[dd.im] = data[dd.captured][source_id]
+            # data[dd.im] = data[dd.captured][source_id]
             stream = data[dd.capture_control].get_stream(source_id)
             if stream is None:
-                print('ImageStreamControl with id=[{}] is nonexistent', source_id)
+                print("ImageStreamControl with id=[{}] is nonexistent", source_id)
             else:
                 data[dd.stream] = stream
                 # print(stream.source_id)
                 data[dd.im] = stream.frame
-                txt = '|S[{}]={}|'.format(stream.source_id, stream.name)
-                info_text(data,txt)
+                txt = "|S[{}]={}|".format(stream.source_id, stream.name)
+                info_text(data, txt)
 
             return data
 
@@ -259,7 +257,6 @@ class StepControl():
             return self.make_set_source(data, source_id)
             # data[dd.stream] = stream
             # data[dd.im] = stream.frame
-
 
             # if stream is None:
             #     print('ImageStreamControl with id=[{}] is nonexistent', source_id)
@@ -270,11 +267,12 @@ class StepControl():
 
             # return data
 
-
-        def make_gauss(data, kernel=(5,5), sigma=(1,1)):
+        def make_gauss(data, kernel=(5, 5), sigma=(1, 1)):
             kernel = add_default(data, dd.kernel, kernel)
             sigma = add_default(data, dd.sigma, sigma)
-            data[dd.im] = cv2.GaussianBlur(data[dd.im], kernel, sigmaX=sigma[0], sigmaY=sigma[1])
+            data[dd.im] = cv2.GaussianBlur(
+                data[dd.im], kernel, sigmaX=sigma[0], sigmaY=sigma[1]
+            )
             return data
 
         # def make_gauss(im, a=5, sigma=1):
@@ -298,15 +296,15 @@ class StepControl():
         # def make_gray(im):
         #     return cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
 
-
         def make_invert(data):
-            data[dd.im] = (255 - data[dd.im])
+            data[dd.im] = 255 - data[dd.im]
             return data
 
         # def make_invert(im):
         #     return (255 - im)
 
         clahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(4, 4))
+
         def make_clahe(data):
             data[dd.im] = clahe.apply(data[dd.im])
             return data
@@ -318,11 +316,13 @@ class StepControl():
             neighborhood_diameter = add_default(data, dd.neighborhood_diameter, 5)
             sigmaColor = add_default(data, dd.sigmaColor, 100)
             sigmaSpace = add_default(data, dd.sigmaSpace, 100)
-            data[dd.im] = cv2.bilateralFilter(data[dd.im], d=neighborhood_diameter,
-                                              sigmaColor=sigmaColor,
-                                              sigmaSpace=sigmaSpace)
+            data[dd.im] = cv2.bilateralFilter(
+                data[dd.im],
+                d=neighborhood_diameter,
+                sigmaColor=sigmaColor,
+                sigmaSpace=sigmaSpace,
+            )
             return data
-
 
         # def make_blur(im, a=75):
         #     return cv2.bilateralFilter(im, 9, a, a)
@@ -332,9 +332,16 @@ class StepControl():
             time.sleep(seconds)
             return data
 
-        def make_sobel(data,
-                       ksize=5, dx=0, dy=0, ddepth=cv2.CV_64F,
-                       vertical=False, horizontal=False, absolute=False):
+        def make_sobel(
+            data,
+            ksize=5,
+            dx=0,
+            dy=0,
+            ddepth=cv2.CV_64F,
+            vertical=False,
+            horizontal=False,
+            absolute=False,
+        ):
 
             ddepth = add_default(data, dd.ddepth, ddepth)
             dx = add_default(data, dd.dx, dx)
@@ -350,8 +357,7 @@ class StepControl():
             if horizontal:
                 dx = 1
 
-            im_out = cv2.Sobel(data[dd.im], ddepth=ddepth,
-                                              dx=dx, dy=dy, ksize=ksize)
+            im_out = cv2.Sobel(data[dd.im], ddepth=ddepth, dx=dx, dy=dy, ksize=ksize)
 
             if im_out is None:
                 im_out = data[dd.im]
@@ -360,10 +366,8 @@ class StepControl():
                 abs_sob = np.absolute(im_out)
                 im_out = np.uint8(abs_sob)
 
-
             data[dd.im] = im_out
             return data
-
 
         # def make_sobel(im, vertical=0, ksize=5):
         #     # out = im.copy()
@@ -385,29 +389,28 @@ class StepControl():
         #     im2 = im.copy()
         #     return cv2.Laplacian(im2,cv2.CV_64F)
 
-
         def make_median(data):
             ksize = add_default(data, dd.ksize, 5)
             data[dd.im] = cv2.medianBlur(data[dd.im], ksize=ksize)
             return data
 
-
         # def make_median(im, a=5):
         #     return cv2.medianBlur(im, a)
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
         def make_threshold(data):
             thresh = add_default(data, dd.thresh, 0)
-            maxVal= add_default(data, dd.maxVal, 255)
+            maxVal = add_default(data, dd.maxVal, 255)
             type = add_default(data, dd.type, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
 
-            return_threshold_value, thresholded_im = cv2.threshold(data[dd.im], thresh, maxVal, type)
+            return_threshold_value, thresholded_im = cv2.threshold(
+                data[dd.im], thresh, maxVal, type
+            )
             data[dd.return_threshold_value] = return_threshold_value
             data[dd.im] = thresholded_im
 
-
-            info_text(data, 'threshold = {}'. format(return_threshold_value))
+            info_text(data, "threshold = {}".format(return_threshold_value))
 
             return data
 
@@ -426,7 +429,6 @@ class StepControl():
             data[dd.im] = np.uint8(data[dd.im])
             return data
 
-
         def make_clear_border(data, width=5):
             im = data[dd.im]
             width = add_default(data, dd.width, width)
@@ -437,38 +439,34 @@ class StepControl():
         # def make_clear_border(im, width = 5):
         #     return imclearborder(im, width, self.get_buffer(im), self.get_mask(im))
 
-
-
         def make_otsu_inv(im):
-            return threshIT(im,'otsu_inv').copy()
-
+            return threshIT(im, "otsu_inv").copy()
 
         def make_color_edge(data, width=5, value=0):
-            print('geronima')
+            print("geronima")
             im = data[dd.im]
             width = add_default(data, dd.width, width)
             value = add_default(data, dd.color, value)
             a = width
-            im = cv2.copyMakeBorder(im[a:-a, a:-a], a, a, a, a,
-                                      cv2.BORDER_CONSTANT, value=value)
+            im = cv2.copyMakeBorder(
+                im[a:-a, a:-a], a, a, a, a, cv2.BORDER_CONSTANT, value=value
+            )
             data[dd.im] = im
             return data
 
-
-        def make_flood(im, color = 0):
+        def make_flood(im, color=0):
             # im = im.copy()
             im = im.copy()
             h, w = im.shape[:2]
             a = 2
             mask = np.zeros((h + a, w + a), np.uint8)
             mask[:] = 0
-            #seed = None
-            seed = (0,0)
+            # seed = None
+            seed = (0, 0)
             rect = 4
             # rect = 8
             cv2.floodFill(im, mask, seed, color, 0, 255, rect)
             return im
-
 
         # Initiate ORB detector
         scoreType = cv2.ORB_FAST_SCORE
@@ -476,11 +474,11 @@ class StepControl():
         orb = cv2.ORB_create(scoreType=scoreType)
         orb.setMaxFeatures(1000)
         # orb.setScaleFactor(1.2)
-# 'setEdgeThreshold','setFastThreshold', \
-# 'setFirstLevel', 'setMaxFeatures', \
-# 'setNLevels', 'setPatchSize', \
-# 'setScaleFactor', 'setScoreType',
-#         setWTA_K
+        # 'setEdgeThreshold','setFastThreshold', \
+        # 'setFirstLevel', 'setMaxFeatures', \
+        # 'setNLevels', 'setPatchSize', \
+        # 'setScaleFactor', 'setScoreType',
+        #         setWTA_K
 
         # orb = cv2.ORB_create()
         # chainName = '2L'
@@ -576,10 +574,7 @@ class StepControl():
         #
         #     return im_out
 
-
         # def make_dif_laplace(im):
-
-
 
         # # Init SURF detector
         #
@@ -646,7 +641,7 @@ class StepControl():
                 im_code = im
 
             a, b, c = cv2.split(im_code)
-            im1 = fh.joinIm([[a],[b]])
+            im1 = fh.joinIm([[a], [b]])
 
             im2 = fh.joinIm([[c], [im_gray]])
             im_out = fh.joinIm([[im1], [im2]], vertically=1)
@@ -656,9 +651,8 @@ class StepControl():
         def make_hls_stack(im):
             im_gray = make_gray(im)
             im_hls = cv2.cvtColor(im, cv2.COLOR_RGB2HLS_FULL)
-            h,l,s = cv2.split(im_hls)
-            im1 = fh.joinIm([[h],[l]])
-
+            h, l, s = cv2.split(im_hls)
+            im1 = fh.joinIm([[h], [l]])
 
             im2 = fh.joinIm([[s], [im_gray]])
             # print(im1.shape,'ass',im2.shape)
@@ -670,18 +664,17 @@ class StepControl():
             # im_hls = cv2.cvtColor(im, cv2.COLOR_RGB2HLS)
             im_hls = cv2.cvtColor(im, cv2.COLOR_RGB2HSV)
             # return np.uint8( im_hls[:, :, 2] )
-            return np.uint8( im_hls[:, :, 1] )
+            return np.uint8(im_hls[:, :, 1])
 
         def make_erase_color(im):
             im_gray = make_gray(im)
-            gray_field = np.uint8( np.ones(im_gray.shape) + 0)
+            gray_field = np.uint8(np.ones(im_gray.shape) + 0)
             # np.uint8( np.ones(im.shape) + 254)
 
             im_out = im_gray.copy()
 
-            mask =  make_gauss(make_hls_saturation(im), a =9, sigma=13)
+            mask = make_gauss(make_hls_saturation(im), a=9, sigma=13)
             mask = make_invert(mask)
-
 
             # _, th1 = cv2.threshold(mask, 127, 255, cv2.THRESH_TOZERO)
             # mask = th1
@@ -699,17 +692,13 @@ class StepControl():
             # return im_gray
             return im_out
 
-
-
-
         # sys.path.append("D:/DEV/PYTHON/pyCV/kivyCV_start/blender")
 
         import blender_step
 
         self.bm = blender_step.blender_module()
 
-
-# predavat dictionary - multiple possible images, text overlay
+        # predavat dictionary - multiple possible images, text overlay
         def make_blender_cube(data):
             # prjs = 'contours of moving objects'
             if not self.bm.running:
@@ -719,7 +708,6 @@ class StepControl():
             if not self.bm.rooming:
                 self.bm.init_room()
                 time.sleep(1.5)
-
 
             # print('%'*42,'data[dd.hulls] = ', data[dd.hulls])
 
@@ -734,11 +722,11 @@ class StepControl():
             sorted_files = sorted(file_paths, key=os.path.getctime)
             # print('X'*111)
 
-            latest_imfile = sorted_files [-1]
+            latest_imfile = sorted_files[-1]
             # print('latest_imfile', latest_imfile)
             im = cv2.imread(latest_imfile)
             if im is not None:
-                print('loaded_image from folder blender/pic')
+                print("loaded_image from folder blender/pic")
                 data[dd.im] = im
             else:
                 data[dd.im] = data[dd.im].copy()
@@ -752,19 +740,19 @@ class StepControl():
             """
 
         color_dict_hsv = {}
-        color_dict_hsv['blue'] = [[110,50,50],[130,255,255]]
+        color_dict_hsv["blue"] = [[110, 50, 50], [130, 255, 255]]
         # color_dict_hsv['green'] = [[50,110,50],[255,130,255]]
-        color_dict_hsv['green1'] = [[35,80,50],[108,240,250]]
+        color_dict_hsv["green1"] = [[35, 80, 50], [108, 240, 250]]
 
-        color_dict_hsv['green'] = [[35,60,30],[108,240,255]]
-        color_dict_hsv['orange'] = [[24,50,50],[42,255,255]]
-        color_dict_hsv['red'] = [[0,80,80],[24,255,255]]
+        color_dict_hsv["green"] = [[35, 60, 30], [108, 240, 255]]
+        color_dict_hsv["orange"] = [[24, 50, 50], [42, 255, 255]]
+        color_dict_hsv["red"] = [[0, 80, 80], [24, 255, 255]]
 
-        def make_detect_color(data, color_name='red'):
+        def make_detect_color(data, color_name="red"):
             im = data[dd.im]
             # Convert BGR to HSV
             if len(im.shape) == 2:
-                print('Cannot detect color on grayscale image!')
+                print("Cannot detect color on grayscale image!")
                 return data
 
             color_name = add_default(data, dd.color_name, color_name)
@@ -786,18 +774,20 @@ class StepControl():
             im_out = mask
             data[dd.im] = im_out
 
-            data[dd.new_name] = 'detect ' + color_name
-            txt = 'HSV <' + str(color)  + '>'
+            data[dd.new_name] = "detect " + color_name
+            txt = "HSV <" + str(color) + ">"
             info_text(data, txt)
             return data
 
         def get_spaced_colors(n):
             if n == 0:
                 return None
-            max_value = 16581375 #255**3
+            max_value = 16581375  # 255**3
             min_value = 255
             interval = int(max_value / n)
-            colors = [hex(I)[2:].zfill(6) for I in range(min_value, max_value, interval)]
+            colors = [
+                hex(I)[2:].zfill(6) for I in range(min_value, max_value, interval)
+            ]
 
             return [(int(i[:2], 16), int(i[2:4], 16), int(i[4:], 16)) for i in colors]
 
@@ -805,30 +795,30 @@ class StepControl():
             im = data[dd.im]
             mode = add_default(data, dd.mode, cv2.RETR_TREE)
             # method = add_default(data, dd.method , cv2.CHAIN_APPROX_SIMPLE)
-            method = add_default(data, dd.method , cv2.CHAIN_APPROX_NONE)
+            method = add_default(data, dd.method, cv2.CHAIN_APPROX_NONE)
 
-            third, cnts, hierarchy = cv2.findContours(im.copy(), mode=mode, method=method)
+            third, cnts, hierarchy = cv2.findContours(
+                im.copy(), mode=mode, method=method
+            )
 
-            info_text(data, '{} contours'. format(len(cnts)))
+            info_text(data, "{} contours".format(len(cnts)))
 
             data[dd.cnts] = cnts
 
             data[dd.im] = draw_cnts(data)
             return data
 
-
         def info_text(data, text):
             if data[dd.info] == False:
                 data[dd.info] = True
-                data[dd.info_text] = ''
-            info_text = data.get(dd.info_text, '')
+                data[dd.info_text] = ""
+            info_text = data.get(dd.info_text, "")
             data[dd.info_text] = info_text + text
-
 
         def draw_cnts(data, parameter=dd.cnts, contour_index=-1):
             im = data[dd.im]
             cnts = data[parameter]
-            thickness =  add_default(data, dd.thickness , 1)
+            thickness = add_default(data, dd.thickness, 1)
 
             cnts_count = len(cnts)
             if cnts_count == 0:
@@ -848,7 +838,7 @@ class StepControl():
                 for (cnt, color) in zip(cnts, colors):
                     cv2.drawContours(im_cnts, cnt, contour_index, color, thickness)
             else:
-                color = (0,255,0)
+                color = (0, 255, 0)
                 cv2.drawContours(im_cnts, cnts, 0, color, thickness)
 
             return im_cnts
@@ -858,7 +848,7 @@ class StepControl():
                 # calc cnts
                 data = make_find_contours(data)
 
-            data[dd.info_text] += 'Convex hull'
+            data[dd.info_text] += "Convex hull"
             cnts = data[dd.cnts]
             if len(cnts) < 1:
                 return data
@@ -868,7 +858,7 @@ class StepControl():
             len_max = 0
             for cnt in cnts:
                 if len(cnt) > len_max:
-                    len_max=len(cnt)
+                    len_max = len(cnt)
                     cnt_huge = cnt
 
             # cnt = cnts[0]
@@ -899,26 +889,24 @@ class StepControl():
 
             return data
 
-
-
         def make_detect_red2(im):
             # a = np.array([31, 67, 72], dtype=np.uint8)
             # b = np.array([28, 52, 76], dtype=np.uint8)
-            x = 255/100
-            a = np.array([24, 34*x, 26*x], dtype=np.uint8)
-            b = np.array([39, 100*x, 100*x], dtype=np.uint8)
+            x = 255 / 100
+            a = np.array([24, 34 * x, 26 * x], dtype=np.uint8)
+            b = np.array([39, 100 * x, 100 * x], dtype=np.uint8)
 
             # red/(r+g+b)
-            #216
+            # 216
 
-            lowerb, upperb = [a,b]
+            lowerb, upperb = [a, b]
             # lowerb, upperb = [b,a]
 
             # im_float = np.array(im, dtype=np.float)
             im_float = im
             im_hsv = cv2.cvtColor(im_float, cv2.COLOR_BGR2HSV)
-            h,s,v = cv2.split(im_hsv)
-            print('hue', np.min(h), np.max(h))
+            h, s, v = cv2.split(im_hsv)
+            print("hue", np.min(h), np.max(h))
             print(im_hsv.dtype)
 
             im_color = h
@@ -932,12 +920,12 @@ class StepControl():
             im_color = red / (green + blue + 1) * 255
             im_color = 255 / (red + green + blue + 1)
 
-            im_color = red / (red - green/2 - blue/2 + 1) * 255
-            im_color = red - green/2 - blue/2
-            im_color = 1/ (red - green/2 - blue/2)
-            im_color = red/ (red - green - blue) * 255
+            im_color = red / (red - green / 2 - blue / 2 + 1) * 255
+            im_color = red - green / 2 - blue / 2
+            im_color = 1 / (red - green / 2 - blue / 2)
+            im_color = red / (red - green - blue) * 255
             # im_color = red/ (red - green/2 - blue/2)
-            im_color = red/ (red - green/3- blue/3)
+            im_color = red / (red - green / 3 - blue / 3)
             # im_color = 255 - red/ (red - green/2 - blue/2)
 
             # red_float = red
@@ -950,96 +938,101 @@ class StepControl():
             # im_color = red
             # im_color = (red/255 + green/255 + blue/255)*255
 
-
             # im = im_uint8
 
-            lowerb, upperb = [100,180]
+            lowerb, upperb = [100, 180]
             mask = cv2.inRange(im_color, lowerb, upperb)
-            print('mask', np.min(mask), np.max(mask))
+            print("mask", np.min(mask), np.max(mask))
             im = mask * 1
             return im
 
+        self.add_available_step("original", make_nothing)
+        self.add_synonyms("original")
 
+        self.add_available_step("gray", make_gray)
+        self.add_available_step("clahe", make_clahe)
+        self.add_synonyms("clahe, clahed")
 
+        self.add_available_step("blur", make_blur)
+        self.add_synonyms("blur, blurred")
 
-        self.add_available_step('original', make_nothing)
-        self.add_synonyms('original')
+        self.add_available_step("gauss", make_gauss)
+        self.add_synonyms("gauss, gaussed")
+        self.add_available_step(
+            "mega gauss", lambda d: make_gauss(d, kernel=(7, 7), sigma=(3, 3))
+        )
 
-        self.add_available_step('gray', make_gray)
-        self.add_available_step('clahe', make_clahe)
-        self.add_synonyms('clahe, clahed')
+        self.add_available_step("median", make_median)
 
-        self.add_available_step('blur', make_blur)
-        self.add_synonyms('blur, blurred')
+        self.add_available_step("resize", make_resize)
+        self.add_available_step("invert", make_invert)
 
-        self.add_available_step('gauss', make_gauss)
-        self.add_synonyms('gauss, gaussed')
-        self.add_available_step('mega gauss', lambda d: make_gauss(d, kernel=(7,7), sigma=(3,3)))
+        self.add_available_step("threshold", make_threshold)
+        self.add_synonyms("threshold, thresh, thresholded")
+        self.add_available_step("otsu", make_otsu)
 
-        self.add_available_step('median', make_median)
+        self.add_available_step("abs", make_absolute)
+        self.add_synonyms("abs, absolute")
 
-        self.add_available_step('resize', make_resize)
-        self.add_available_step('invert', make_invert)
+        self.add_available_step("uint8", make_uint8)
+        self.add_synonyms("uint8, ubyte, dec, decimate, uint")
 
-        self.add_available_step('threshold', make_threshold)
-        self.add_synonyms('threshold, thresh, thresholded')
-        self.add_available_step('otsu', make_otsu)
+        self.add_available_step(
+            "sobel", lambda d: make_sobel(d, vertical=True, horizontal=True)
+        )
+        self.add_available_step("sobh", lambda d: make_sobel(d, horizontal=True))
+        self.add_available_step("sobv", lambda d: make_sobel(d, vertical=True))
+        self.add_synonyms("sobel, sob, sobvh, sobhv")
+        self.add_synonyms("sobh, sobelh, sobel horizontal")
+        self.add_synonyms("sobv, sobelv, sobel vertical")
 
+        self.add_available_step("pause", lambda d: make_pause(d, seconds=1))
+        self.add_synonyms("pause, pause 5")
 
-        self.add_available_step('abs', make_absolute)
-        self.add_synonyms('abs, absolute')
+        self.add_available_step("laplacian", make_laplacian)
+        self.add_synonyms("laplacian, laplace, lap, lapla")
 
-        self.add_available_step('uint8', make_uint8)
-        self.add_synonyms('uint8, ubyte, dec, decimate, uint')
+        self.add_available_step("contours", make_find_contours)
+        self.add_synonyms("contours, find contours, cnt, cnts, contour")
 
-        self.add_available_step('sobel', lambda d: make_sobel(d, vertical=True, horizontal=True))
-        self.add_available_step('sobh', lambda d: make_sobel(d, horizontal=True))
-        self.add_available_step('sobv', lambda d: make_sobel(d, vertical=True))
-        self.add_synonyms('sobel, sob, sobvh, sobhv')
-        self.add_synonyms('sobh, sobelh, sobel horizontal')
-        self.add_synonyms('sobv, sobelv, sobel vertical')
+        self.add_available_step("convex hull", make_convex_hull)
+        self.add_synonyms("convex hull, hull")
 
-
-        self.add_available_step('pause', lambda d: make_pause(d, seconds=1))
-        self.add_synonyms('pause, pause 5')
-
-        self.add_available_step('laplacian', make_laplacian)
-        self.add_synonyms('laplacian, laplace, lap, lapla')
-
-        self.add_available_step('contours', make_find_contours)
-        self.add_synonyms('contours, find contours, cnt, cnts, contour')
-
-
-        self.add_available_step('convex hull', make_convex_hull)
-        self.add_synonyms('convex hull, hull')
-
-        self.add_available_step('blender', make_blender_cube)
-        self.add_synonyms('blender, blend, blender cube')
+        self.add_available_step("blender", make_blender_cube)
+        self.add_synonyms("blender, blend, blender cube")
 
         # self.add_available_step('detect red', make_detect_color)
-        self.add_available_step('detect red', lambda d: make_detect_color(d, color_name='red'))
-        self.add_available_step('detect orange', lambda d: make_detect_color(d, color_name='orange'))
-        self.add_available_step('detect blue', lambda d: make_detect_color(d, color_name='blue'))
-        self.add_available_step('detect green', lambda d: make_detect_color(d, color_name='green'))
+        self.add_available_step(
+            "detect red", lambda d: make_detect_color(d, color_name="red")
+        )
+        self.add_available_step(
+            "detect orange", lambda d: make_detect_color(d, color_name="orange")
+        )
+        self.add_available_step(
+            "detect blue", lambda d: make_detect_color(d, color_name="blue")
+        )
+        self.add_available_step(
+            "detect green", lambda d: make_detect_color(d, color_name="green")
+        )
 
-        self.add_available_step('source', make_set_source)
-        self.add_available_step('source1', lambda d: make_set_source(d, source_id=1))
-        self.add_available_step('source2', lambda d: make_set_source(d, source_id=2))
-        self.add_available_step('source3', lambda d: make_set_source(d, source_id=3))
-        self.add_available_step('source4', lambda d: make_set_source(d, source_id=4))
-        self.add_available_step('source5', lambda d: make_set_source(d, source_id=5))
-        self.add_synonyms('source, set source, source0')
+        self.add_available_step("source", make_set_source)
+        self.add_available_step("source1", lambda d: make_set_source(d, source_id=1))
+        self.add_available_step("source2", lambda d: make_set_source(d, source_id=2))
+        self.add_available_step("source3", lambda d: make_set_source(d, source_id=3))
+        self.add_available_step("source4", lambda d: make_set_source(d, source_id=4))
+        self.add_available_step("source5", lambda d: make_set_source(d, source_id=5))
+        self.add_synonyms("source, set source, source0")
 
-        self.add_available_step('next source', make_set_next_source)
+        self.add_available_step("next source", make_set_next_source)
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        self.add_available_step('clear border', make_clear_border)
-        self.add_synonyms('clear border, border touch cleared, remove border touching')
+        self.add_available_step("clear border", make_clear_border)
+        self.add_synonyms("clear border, border touch cleared, remove border touching")
 
-# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        self.add_available_step('color edge', make_color_edge)
-        self.add_synonyms('color edge, remove frame, color frame, color')
+        # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+        self.add_available_step("color edge", make_color_edge)
+        self.add_synonyms("color edge, remove frame, color frame, color")
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% NOT YET
@@ -1058,35 +1051,34 @@ class StepControl():
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-        # self.add_available_step('orb', make_orb)
-        # self.add_available_step('sift', make_sift)
-        # self.add_available_step('surf', make_surf)
-        #
-        # self.add_available_step('freak', make_freak)
-        # self.add_available_step('fast', make_fast)
-
+# self.add_available_step('orb', make_orb)
+# self.add_available_step('sift', make_sift)
+# self.add_available_step('surf', make_surf)
+#
+# self.add_available_step('freak', make_freak)
+# self.add_available_step('fast', make_fast)
 
 
 def waitKeyExit():
     while True:
-        k = cv2.waitKey(30) & 0xff
-        if k == ord('q'):
+        k = cv2.waitKey(30) & 0xFF
+        if k == ord("q"):
             break
         if k == 27:
             break
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cap = cv2.VideoCapture(0)
     ims = []
 
-    cv2.namedWindow('image')
+    cv2.namedWindow("image")
 
     tbValue = 3
     maxValue = 6
     # cv2.createTrackbar("trackMe", "image", tbValue, maxValue, update)
     # loopCV(cap)
     cap.release()
-        # cnt = external_contours[q]
+    # cnt = external_contours[q]
 
     cv2.destroyAllWindows()
-
